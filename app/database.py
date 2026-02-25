@@ -2,6 +2,7 @@ import sqlite3
 import os
 import click
 from flask import current_app, g
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 def get_db():
@@ -10,6 +11,7 @@ def get_db():
         os.makedirs(os.path.dirname(os.path.abspath(db_path)), exist_ok=True)
         g.db = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
         g.db.row_factory = sqlite3.Row
+        g.db.execute('PRAGMA foreign_keys = ON')
     return g.db
 
 
@@ -26,3 +28,38 @@ def init_db(app):
         with open(schema_path, 'r') as f:
             db.executescript(f.read())
         db.commit()
+
+
+def get_user_by_username(username):
+    """Return user row for *username* or None."""
+    db = get_db()
+    return db.execute(
+        'SELECT id, username, password_hash, is_active FROM users WHERE username = ?',
+        (username,)
+    ).fetchone()
+
+
+def get_user_by_id(user_id):
+    """Return user row for *user_id* or None."""
+    db = get_db()
+    return db.execute(
+        'SELECT id, username, is_active FROM users WHERE id = ?',
+        (user_id,)
+    ).fetchone()
+
+
+def create_user(username, password):
+    """Insert a new user and return the new row id."""
+    password_hash = generate_password_hash(password)
+    db = get_db()
+    cur = db.execute(
+        'INSERT INTO users (username, password_hash) VALUES (?, ?)',
+        (username, password_hash)
+    )
+    db.commit()
+    return cur.lastrowid
+
+
+def verify_password(user_row, password):
+    """Return True if *password* matches the stored hash."""
+    return check_password_hash(user_row['password_hash'], password)
