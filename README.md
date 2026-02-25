@@ -118,12 +118,13 @@ All endpoints return JSON. DELETE returns 204 No Content.
 
 | Document | Purpose |
 |---|---|
+| [docs/architecture.md](docs/architecture.md) | System architecture (frontend, backend, storage, sync) |
 | [docs/product-spec.md](docs/product-spec.md) | Full feature specification |
 | [docs/milestones.md](docs/milestones.md) | Milestones & acceptance criteria |
 | [docs/ui-screens.md](docs/ui-screens.md) | UI screen inventory & wireframe notes |
 | [docs/data-model.md](docs/data-model.md) | Database schema & data decisions |
 | [docs/sync-strategy.md](docs/sync-strategy.md) | Autosave, offline & sync-status design |
 | [docs/security-checklist.md](docs/security-checklist.md) | Security review checklist |
-| [docs/deployment-notes.md](docs/deployment-notes.md) | Plesk deployment (no Docker) |
+| [docs/deployment-notes.md](docs/deployment-notes.md) | Plesk deployment, backup & logging (no Docker) |
 | [docs/qa-checklists/README.md](docs/qa-checklists/README.md) | Manual QA checklist structure |
 | [CHANGELOG.md](CHANGELOG.md) | Version history |

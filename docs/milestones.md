@@ -5,6 +5,90 @@
 
 ---
 
+## Milestone 0 — Project Foundation & Architecture (complete)
+
+**Goal:** Establish project structure, conventions, and documentation before any feature implementation.  
+No new user-facing features are delivered in this milestone.
+
+### Deliverables
+
+- [x] README with product overview, local dev setup, and Plesk deployment notes
+- [x] Architecture document (`docs/architecture.md`) — frontend, backend, storage, sync overview
+- [x] Environment/config strategy — `.env.example` documented; `.env` excluded from git
+- [x] PWA-first plan documented in `docs/product-spec.md` and `docs/architecture.md`
+- [x] Security baseline checklist (`docs/security-checklist.md`)
+- [x] Deployment notes targeting notes.defecttracker.uk (`docs/deployment-notes.md`)
+- [x] Backup strategy notes for database and media (`docs/deployment-notes.md` §13)
+- [x] Logging/diagnostics notes for Plesk/shared-hosting (`docs/deployment-notes.md` §14)
+- [x] Milestone plan (`docs/milestones.md`)
+- [x] Data model document (`docs/data-model.md`)
+- [x] Sync strategy document (`docs/sync-strategy.md`)
+- [x] QA checklist structure (`docs/qa-checklists/README.md`)
+
+### Assumptions
+
+- Plesk Obsidian or newer is available on the target server.
+- Python 3.8+ is available on the Plesk server (no custom Python compilation required).
+- SSH access to the server is available for initial setup.
+- No Docker or container runtime is present or required.
+- The domain `notes.defecttracker.uk` can be configured as a Plesk subdomain with Let's Encrypt SSL.
+- A single-user model is sufficient for v1; multi-user auth is deferred to Milestone 5+.
+- Local development requires only Python 3.8+ and a terminal (no Docker, no Node.js build step).
+
+### File/Folder Structure Summary
+
+```
+notes/
+├── app/
+│   ├── __init__.py          # Flask app factory
+│   ├── database.py          # SQLite helpers (get_db, init_db, close_db)
+│   ├── routes.py            # API + page routes (placeholder; full implementation in M1)
+│   ├── static/
+│   │   ├── css/style.css
+│   │   ├── js/app.js
+│   │   ├── icons/           # PWA icons
+│   │   ├── manifest.json
+│   │   └── sw.js            # Service worker
+│   └── templates/
+│       └── index.html
+├── docs/                    # All project documentation
+│   ├── architecture.md      # ← this milestone (system architecture)
+│   ├── product-spec.md
+│   ├── milestones.md        # ← this file
+│   ├── ui-screens.md
+│   ├── data-model.md
+│   ├── sync-strategy.md
+│   ├── security-checklist.md
+│   ├── deployment-notes.md  # Plesk deployment + backup + logging
+│   └── qa-checklists/
+│       └── README.md
+├── schema.sql               # DB schema (applied on first run)
+├── wsgi.py                  # WSGI entry (local / gunicorn)
+├── passenger_wsgi.py        # Plesk Passenger entry point
+├── requirements.txt         # Pinned Python dependencies
+├── run.sh                   # Local dev runner (no Docker)
+├── .env.example             # Environment variable template (no secrets)
+├── .gitignore               # Excludes .env, *.db, venv/, uploads/, *.log
+├── CHANGELOG.md
+└── DEPLOYMENT.md            # Legacy — superseded by docs/deployment-notes.md
+```
+
+### Acceptance Checklist — Milestone 0
+
+- [x] `docs/architecture.md` exists and covers frontend, backend, storage, and sync strategy.
+- [x] `README.md` documents product overview, local quick-start, and project structure.
+- [x] Local dev works without Docker: `bash run.sh` starts the app at http://localhost:5000.
+- [x] `.env.example` provides a template for all required environment variables.
+- [x] `.env` is excluded from git (in `.gitignore`); no secrets committed to the repository.
+- [x] `docs/deployment-notes.md` covers full Plesk deployment for notes.defecttracker.uk.
+- [x] Backup strategy for `notes.db` (and future media) is documented.
+- [x] Logging/diagnostics approach for Plesk/Passenger is documented.
+- [x] `docs/security-checklist.md` provides a baseline security review checklist.
+- [x] No Dockerfile, docker-compose.yml, or container-only scripts exist in the repository.
+- [x] No auth or notes features are implemented beyond minimal scaffolding placeholders.
+
+---
+
 ## Milestone 1 — Foundation (complete)
 
 **Goal:** Deployable single-user notes app with PWA basics.
@@ -121,6 +205,7 @@
 
 | Milestone | Theme | Status |
 |---|---|---|
+| M0 | Project Foundation & Architecture | ✅ Complete |
 | M1 | Foundation | ✅ Complete |
 | M2 | Sync Status & Offline Queue | 🔲 Planned |
 | M3 | Rich Content (Annotations, PDF) | 🔲 Planned |
