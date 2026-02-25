@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5a623" />
+  <meta name="description" content="Personal notes app" />
+  <title>Notes</title>
+  <link rel="manifest" href="/static/manifest.json" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Offline banner -->
+    <div id="offline-banner">⚠️ You're offline — changes will sync when reconnected</div>
+
+    <div class="main-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h1>Notes</h1>
+          <button class="btn-new" id="btn-new" title="New note" aria-label="New note">+</button>
+        </div>
+        <div id="note-list"></div>
+      </aside>
+
+      <!-- Editor Pane -->
+      <main class="editor-pane">
+        <div class="editor-header">
+          <button id="btn-back" aria-label="Back to list">&#8592;</button>
+          <span class="autosave-indicator" id="autosave-indicator"></span>
+          <button class="btn-delete" id="btn-delete" title="Delete note" aria-label="Delete note">🗑</button>
+        </div>
+
+        <!-- Welcome state (no note selected) -->
+        <div class="editor-welcome" id="editor-welcome">
+          <div class="icon">📝</div>
+          <p>Select a note or create a new one</p>
+        </div>
+
+        <!-- Editor content -->
+        <div id="editor-content" class="editor-body" style="display:none">
+          <div
+            id="note-title"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Note title"
+            aria-multiline="false"
+            spellcheck="true"
+          ></div>
+          <div
+            id="note-body"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Note body"
+            aria-multiline="true"
+            spellcheck="true"
+          ></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Delete confirmation dialog -->
+  <div class="dialog-overlay" id="dialog-overlay" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+    <div class="dialog">
+      <h2 id="dialog-title">Delete note?</h2>
+      <p>This note will be permanently deleted. This action cannot be undone.</p>
+      <div class="dialog-actions">
+        <button class="btn btn-cancel" id="btn-cancel-delete">Cancel</button>
+        <button class="btn btn-confirm-delete" id="btn-confirm-delete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
