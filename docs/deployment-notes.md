@@ -215,7 +215,153 @@ cp notes.db.backup notes.db
 
 ---
 
-## 13. Not Supported
+## 13. Backup Strategy
+
+### Database Backup
+
+The SQLite database (`notes.db`) is a single file on the Plesk server filesystem. Back it up regularly using one of the following approaches:
+
+**Manual / scripted copy (recommended minimum)**
+
+```bash
+# Run from the app root directory
+cp notes.db "notes.db.$(date +%Y%m%d-%H%M%S).backup"
+```
+
+Take a copy before every deployment (see §10 Updating the App).
+
+**Plesk Scheduled Tasks (Cron)**
+
+Use Plesk → **Scheduled Tasks** to run a nightly backup script:
+
+```bash
+#!/bin/bash
+APP_ROOT="/var/www/vhosts/defecttracker.uk/notes.defecttracker.uk/app_root"
+BACKUP_DIR="/var/www/vhosts/defecttracker.uk/backups/notes"
+mkdir -p "$BACKUP_DIR"
+cp "$APP_ROOT/notes.db" "$BACKUP_DIR/notes.db.$(date +%Y%m%d).backup"
+# Keep only the last 14 daily backups
+find "$BACKUP_DIR" -name '*.backup' -mtime +14 -delete
+```
+
+Store the `BACKUP_DIR` outside the web root so backups are not web-accessible.
+
+**Plesk Backup Manager**
+
+Plesk's built-in **Backup Manager** (Domains → Backup Manager) can back up the entire domain including files. Schedule full domain backups weekly and incremental backups daily. Confirm that the domain backup includes the app root directory where `notes.db` lives.
+
+### Media Files Backup (Milestone 3+)
+
+When image attachments are added (M3), media files will be stored under `uploads/` (excluded from git via `.gitignore`). Include this directory in the nightly backup script:
+
+```bash
+tar -czf "$BACKUP_DIR/uploads.$(date +%Y%m%d).tar.gz" "$APP_ROOT/uploads/"
+```
+
+### Restore
+
+To restore the database from a backup:
+
+```bash
+cp notes.db notes.db.pre-restore   # keep a copy of the broken db just in case
+cp /path/to/backup/notes.db.YYYYMMDD.backup notes.db
+touch passenger_wsgi.py            # restart Passenger to pick up the restored file
+```
+
+### Backup Checklist
+
+- [ ] Daily automated backup of `notes.db` configured in Plesk Scheduled Tasks.
+- [ ] Backup directory is outside the web root.
+- [ ] Retention policy applied (e.g. keep 14 daily backups).
+- [ ] Backup restored and verified at least once after initial setup.
+- [ ] Plesk Backup Manager schedule confirmed.
+
+---
+
+## 14. Logging & Diagnostics
+
+### Application Logs (Passenger / Plesk)
+
+Passenger writes Flask stdout/stderr to the domain error log:
+
+```
+/var/www/vhosts/defecttracker.uk/logs/error_log
+```
+
+View the last 100 lines:
+
+```bash
+tail -100 /var/www/vhosts/defecttracker.uk/logs/error_log
+```
+
+Watch in real time:
+
+```bash
+tail -f /var/www/vhosts/defecttracker.uk/logs/error_log
+```
+
+### Access Logs
+
+HTTP access logs (request method, path, status code, response time) are in:
+
+```
+/var/www/vhosts/defecttracker.uk/logs/access_log
+```
+
+Useful for diagnosing 4xx/5xx rates or slow requests:
+
+```bash
+grep ' 500 ' /var/www/vhosts/defecttracker.uk/logs/access_log | tail -50
+```
+
+### Flask Application Logging
+
+Flask's built-in logger writes to stderr (captured by Passenger → error_log).  
+Log level is controlled by `FLASK_ENV`:
+
+| `FLASK_ENV` | Log level | Debug toolbar |
+|---|---|---|
+| `production` | WARNING | Off |
+| `development` | DEBUG | On (local only) |
+
+To add diagnostic logging in `routes.py` or `database.py`:
+
+```python
+import logging
+logger = logging.getLogger(__name__)
+logger.warning("Something unexpected: %s", detail)
+```
+
+Avoid logging sensitive data (note content, secrets, full request bodies).
+
+### Diagnosing a 500 Error
+
+1. Check `error_log` for the Python traceback.
+2. Confirm `DATABASE_PATH` in `.env` points to a writable location.
+3. Confirm the venv is activated and `flask` is importable:
+   ```bash
+   source venv/bin/activate && python3 -c "import flask; print(flask.__version__)"
+   ```
+4. Confirm `FLASK_ENV=production` (debug mode must be off in production).
+5. Restart Passenger: `touch passenger_wsgi.py`.
+
+### Diagnosing a Service Worker Issue
+
+1. Open browser DevTools → **Application** → **Service Workers**.
+2. Confirm the SW is registered and active.
+3. If the SW is stuck on "waiting to activate": click **skipWaiting** in DevTools, or bump the cache version in `sw.js` and redeploy.
+4. Clear site data (DevTools → Application → Clear storage) to force a fresh install.
+
+### Plesk Log Viewer
+
+Plesk provides a web-based log viewer:  
+**Domains → notes.defecttracker.uk → Logs**
+
+This is useful when SSH access is not available.
+
+---
+
+## 15. Not Supported
 
 - **Docker / containers** — not used; not supported.  
 - **Gunicorn as a standalone server in production** — use Passenger WSGI via Plesk only.  
