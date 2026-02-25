@@ -62,6 +62,8 @@ notes/
 │   ├── deployment-notes.md  # Plesk deployment + backup + logging
 │   └── qa-checklists/
 │       └── README.md
+├── migrations/              # SQL migration files (NNN_description.sql; none yet in M0)
+│   └── README.md            # Migration instructions and naming convention
 ├── schema.sql               # DB schema (applied on first run)
 ├── wsgi.py                  # WSGI entry (local / gunicorn)
 ├── passenger_wsgi.py        # Plesk Passenger entry point

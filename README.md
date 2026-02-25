@@ -73,6 +73,7 @@ notes/
 │   └── templates/
 │       └── index.html
 ├── docs/                  # Project documentation
+│   ├── architecture.md    # System architecture overview
 │   ├── product-spec.md
 │   ├── milestones.md
 │   ├── ui-screens.md
@@ -82,6 +83,7 @@ notes/
 │   ├── deployment-notes.md
 │   └── qa-checklists/
 │       └── README.md
+├── migrations/            # SQL migration files (applied after initial schema.sql)
 ├── schema.sql             # DB schema
 ├── wsgi.py                # WSGI entry (local / gunicorn)
 ├── passenger_wsgi.py      # Plesk Passenger entry
