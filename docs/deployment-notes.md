@@ -366,3 +366,85 @@ This is useful when SSH access is not available.
 - **Docker / containers** — not used; not supported.  
 - **Gunicorn as a standalone server in production** — use Passenger WSGI via Plesk only.  
 - **Systemd service files** — Passenger manages the process lifecycle.
+
+---
+
+## 16. Milestone 8 — Hardening Deployment Notes
+
+### HTTP Security Headers
+
+All HTTP responses now include security headers set in the Flask app factory
+(`app/__init__.py`). No additional Plesk / Apache configuration is required for
+these headers, but the following additional server-level header is **strongly
+recommended** and should be added in Plesk → **Apache & nginx Settings** →
+**Additional directives for HTTPS**:
+
+```apache
+Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+```
+
+This adds HSTS (HTTP Strict Transport Security), which forces browsers to
+always use HTTPS for the domain. **Only add this after confirming HTTPS works
+correctly** — once HSTS is active, HTTP access is blocked by browsers.
+
+### Applying the M8 Update
+
+```bash
+cd /var/www/vhosts/defecttracker.uk/notes.defecttracker.uk/app_root
+
+# Back up the database before updating
+cp notes.db "notes.db.$(date +%Y%m%d-%H%M%S).backup"
+
+git pull origin main
+
+source venv/bin/activate
+pip install -r requirements.txt
+deactivate
+
+touch passenger_wsgi.py   # restart Passenger
+```
+
+No database migrations are required for M8.
+
+### Settings Page
+
+The new `/settings` page is accessible from the sidebar footer (⚙️). It
+provides:
+- Username display
+- Change password form (requires the current password)
+- Dark mode toggle (stored in `localStorage`, no server round-trip)
+
+### Verifying Security Headers in Production
+
+After deploying, verify the headers are set:
+
+```bash
+curl -sI https://notes.defecttracker.uk | grep -E 'X-Frame|X-Content|Referrer|Permissions|Content-Security'
+```
+
+Expected output should include:
+```
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+Content-Security-Policy: default-src 'self'; ...
+```
+
+### Rate-Limiting on the Login Endpoint
+
+Flask-level rate limiting is not included (to avoid adding dependencies).
+For production, apply rate limiting at the Apache level via Plesk:
+
+In Plesk → **Apache & nginx Settings** → **Additional directives for HTTP/HTTPS**:
+
+```apache
+<Location /login>
+    # Limit to 10 requests per second per IP (requires mod_ratelimit)
+    SetOutputFilter RATE_LIMIT
+    SetEnv rate-limit 10
+</Location>
+```
+
+Alternatively, contact the hosting provider to enable `mod_evasive` or
+`mod_security` at the server level.

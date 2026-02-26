@@ -5,6 +5,8 @@ from .database import get_db, get_user_by_id
 bp = Blueprint('main', __name__)
 
 _NOTE_FIELDS = 'id, title, body, is_pinned, is_archived, is_trashed, folder_id, created_at, updated_at'
+_MAX_TITLE = 500
+_MAX_BODY = 100_000
 
 
 def _current_user_id():
@@ -136,6 +138,8 @@ def create_note():
     data = request.get_json(silent=True) or {}
     title = data.get('title', '')
     body = data.get('body', '')
+    if len(title) > _MAX_TITLE or len(body) > _MAX_BODY:
+        abort(400)
     folder_id = None
     if 'folder_id' in data and data['folder_id'] is not None:
         folder_id = int(data['folder_id'])
@@ -187,6 +191,8 @@ def update_note(note_id):
     data = request.get_json(silent=True) or {}
     title = data.get('title', '')
     body = data.get('body', '')
+    if len(title) > _MAX_TITLE or len(body) > _MAX_BODY:
+        abort(400)
     is_pinned = int(bool(data.get('is_pinned', 0)))
 
     if 'folder_id' in data:
@@ -572,3 +578,8 @@ def not_found(e):
 @bp.errorhandler(400)
 def bad_request(e):
     return jsonify({'error': 'Bad request'}), 400
+
+
+@bp.errorhandler(500)
+def server_error(e):
+    return jsonify({'error': 'Internal server error'}), 500

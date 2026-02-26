@@ -66,6 +66,7 @@
         <!-- Sign out at the bottom -->
         <div class="sidebar-footer">
           <span class="sidebar-user">{{ username }}</span>
+          <a href="{{ url_for('settings.settings_page') }}" class="btn-link" title="Settings" aria-label="Settings">⚙️</a>
           <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0">
             <button type="submit" class="btn-signout">Sign out</button>
           </form>
