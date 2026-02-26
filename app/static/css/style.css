@@ -971,3 +971,30 @@ body {
   .ann-width-slider { width: 60px; }
   .ann-actions { margin-left: 0; }
 }
+
+/* ===== Sync status badges ===== */
+.sync-badge {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.sync-badge--local {
+  background: #e8a838;
+  color: #fff;
+  title: "Unsaved (offline)";
+}
+
+.sync-badge--syncing {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.sync-badge--failed {
+  background: #ef4444;
+  color: #fff;
+}

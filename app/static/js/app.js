@@ -11,6 +11,7 @@ let currentFilter = 'active';
 let currentFolderId = null;   // null = all, number = filter by folder
 let currentSort = 'updated_desc';
 let searchQuery = '';
+let isOffline = !navigator.onLine;
 
 /* ===== Constants ===== */
 const DAY_MS = 86400000;
@@ -88,6 +89,13 @@ function escapeHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+function _syncIcon(status) {
+  if (status === 'local')   return '●';
+  if (status === 'syncing') return '↻';
+  if (status === 'failed')  return '⚠';
+  return '';
+}
+
 function currentNote() {
   return notes.find(n => n.id === currentNoteId) || null;
 }
@@ -116,11 +124,16 @@ function renderList() {
           `<span class="note-tag-chip">${escapeHtml(t.name)}</span>`
         ).join('')}${n.tags.length > 3 ? `<span class="note-tag-more">+${n.tags.length - 3}</span>` : ''}</div>`
       : '';
+    const syncStatus = window.SyncQueue ? window.SyncQueue.getSyncStatus(n.id) : 'synced';
+    const syncBadge = syncStatus !== 'synced'
+      ? `<span class="sync-badge sync-badge--${syncStatus}" aria-label="Sync status: ${syncStatus}" title="Sync: ${syncStatus}">${_syncIcon(syncStatus)}</span>`
+      : '';
     return `
     <div class="note-item ${n.id === currentNoteId ? 'active' : ''}" data-id="${n.id}" role="listitem">
       <div class="note-item-header">
         <div class="note-item-title">${escapeHtml(getTitle(n))}</div>
         ${n.is_pinned ? '<span class="note-pin-badge" aria-label="Pinned">📌</span>' : ''}
+        ${syncBadge}
       </div>
       <div class="note-item-subtitle">${escapeHtml(getSubtitle(n))}</div>
       ${tagHtml}
@@ -295,8 +308,20 @@ async function loadNotes() {
     if (currentFolderId !== null) params.set('folder_id', currentFolderId);
     notes = await apiRequest('GET', `/api/notes?${params}`);
     renderList();
+    // Persist for offline use (only cache the default unfiltered active view)
+    if (!searchQuery && currentFilter === 'active' && currentFolderId === null && window.SyncQueue) {
+      window.SyncQueue.cacheNotesData(notes, folders);
+    }
   } catch (e) {
     console.error('Failed to load notes', e);
+    // Offline fallback: show cached notes
+    if (!navigator.onLine && window.SyncQueue) {
+      const cached = window.SyncQueue.getCachedNotesData();
+      if (cached) {
+        notes = cached.notes || [];
+        renderList();
+      }
+    }
   }
 }
 
@@ -307,6 +332,15 @@ async function loadFolders() {
     populateFolderSelect();
   } catch (e) {
     console.error('Failed to load folders', e);
+    // Offline fallback: use folders from cache
+    if (!navigator.onLine && window.SyncQueue) {
+      const cached = window.SyncQueue.getCachedNotesData();
+      if (cached && cached.folders) {
+        folders = cached.folders;
+        renderFolderList();
+        populateFolderSelect();
+      }
+    }
   }
 }
 
@@ -343,20 +377,43 @@ async function saveNote() {
   if (!note || note.is_trashed) return;
   isSaving = true;
   setAutosave('Saving…');
+  if (window.SyncQueue) window.SyncQueue.markSyncing(currentNoteId);
+  renderList();
   const title = noteTitle.textContent.trim();
   const body = noteBody.textContent;
   const is_pinned = note.is_pinned ? 1 : 0;
   const folder_id = note.folder_id != null ? note.folder_id : null;
+  const payload = { title, body, is_pinned, folder_id };
+  const cachedServerTs = note.updated_at || null;
+
+  if (!navigator.onLine) {
+    // Queue immediately without attempting network
+    if (window.SyncQueue) {
+      window.SyncQueue.enqueueSave(currentNoteId, payload, cachedServerTs);
+      window.SyncQueue.updateCachedNote({ ...note, title, body });
+    }
+    setAutosave('Saved locally');
+    isSaving = false;
+    renderList();
+    return;
+  }
+
   try {
-    const updated = await apiRequest('PUT', `/api/notes/${currentNoteId}`,
-      { title, body, is_pinned, folder_id });
+    const updated = await apiRequest('PUT', `/api/notes/${currentNoteId}`, payload);
     const idx = notes.findIndex(n => n.id === currentNoteId);
     if (idx !== -1) notes[idx] = updated;
+    if (window.SyncQueue) window.SyncQueue.markSynced(currentNoteId);
     renderList();
     setAutosave('Saved');
   } catch (e) {
-    setAutosave('Save failed');
-    console.error('Save failed', e);
+    // Queue for retry on reconnect
+    if (window.SyncQueue) {
+      window.SyncQueue.markFailed(currentNoteId, payload, cachedServerTs);
+      window.SyncQueue.updateCachedNote({ ...note, title, body });
+    }
+    setAutosave('Saved locally');
+    console.error('Save failed — queued for retry', e);
+    renderList();
   } finally {
     isSaving = false;
   }
@@ -899,9 +956,32 @@ inputCameraCapture.addEventListener('change', async () => {
 
 /* ===== Offline detection ===== */
 function updateOnlineStatus() {
-  offlineBanner.classList.toggle('visible', !navigator.onLine);
+  isOffline = !navigator.onLine;
+  offlineBanner.classList.toggle('visible', isOffline);
 }
-window.addEventListener('online', updateOnlineStatus);
+
+async function _onReconnect() {
+  updateOnlineStatus();
+  if (!window.SyncQueue || window.SyncQueue.queueLength() === 0) return;
+  renderList(); // show syncing badges
+  await window.SyncQueue.processSyncQueue(apiRequest, async serverNote => {
+    // Conflict copy: create a new note with the server's current content
+    try {
+      await apiRequest('POST', '/api/notes', {
+        title: `Conflict copy: ${serverNote.title || 'Untitled'}`,
+        body: serverNote.body || '',
+        folder_id: serverNote.folder_id || null
+      });
+      console.log('[sync] conflict copy created for note', serverNote.id);
+    } catch (err) {
+      console.error('[sync] failed to create conflict copy', err);
+    }
+  });
+  // Reload fresh notes after sync
+  await loadNotes();
+}
+
+window.addEventListener('online',  _onReconnect);
 window.addEventListener('offline', updateOnlineStatus);
 updateOnlineStatus();
 
@@ -911,6 +991,9 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/static/sw.js').catch(console.error);
   });
 }
+
+/* ===== Sync status change listener ===== */
+window.addEventListener('sync-status-changed', () => renderList());
 
 /* ===== Init ===== */
 showEditor(false);
