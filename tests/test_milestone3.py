@@ -474,7 +474,7 @@ class TestUserIsolation:
 
     def test_cannot_use_other_users_tag(self, app, auth_client, client):
         # Create alice's note while still logged in as alice
-        nid = client.post('/api/notes', json={'title': 'T', 'body': ''}).get_json()['id']
+        nid = auth_client.post('/api/notes', json={'title': 'T', 'body': ''}).get_json()['id']
         with app.app_context():
             from app.database import create_user
             create_user('bob4', 'bobpassword4')

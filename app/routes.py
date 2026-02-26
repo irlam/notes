@@ -12,7 +12,9 @@ def _current_user_id():
 
 
 def _like(val):
-    """Wrap *val* in LIKE wildcards, escaping the | escape character and metacharacters."""
+    """Wrap *val* in LIKE wildcards.
+    The pipe character is escaped first so that the |% and |_ sequences
+    introduced next are not themselves double-escaped."""
     return '%' + val.replace('|', '||').replace('%', '|%').replace('_', '|_') + '%'
 
 
