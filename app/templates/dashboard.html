@@ -34,6 +34,7 @@
           <button class="filter-tab active" data-filter="active" role="tab" aria-selected="true">Notes</button>
           <button class="filter-tab" data-filter="archived" role="tab" aria-selected="false">Archived</button>
           <button class="filter-tab" data-filter="trashed" role="tab" aria-selected="false">Trash</button>
+          <button class="filter-tab" data-filter="conflicts" role="tab" aria-selected="false">⚠ Conflicts</button>
         </div>
 
         <!-- Folder section (hidden in Trash view) -->
@@ -93,9 +94,11 @@
             <button id="btn-pin" class="btn-icon" title="Pin note" aria-label="Pin note">📌</button>
             <button id="btn-archive" class="btn-icon" title="Archive note" aria-label="Archive note">📥</button>
             <button id="btn-export-pdf" class="btn-icon" title="Export to PDF" aria-label="Export note to PDF">📄</button>
+            <button id="btn-history" class="btn-icon" title="Version history" aria-label="Version history">🕐</button>
             <button id="btn-trash" class="btn-icon btn-trash-note" title="Move to trash" aria-label="Move to trash">🗑️</button>
             <button id="btn-restore" class="btn-icon" title="Restore note" aria-label="Restore note" style="display:none">↩️</button>
             <button id="btn-delete-permanent" class="btn-icon btn-danger" title="Delete permanently" aria-label="Delete permanently" style="display:none">❌</button>
+            <button id="btn-delete-conflict" class="btn-icon btn-danger" title="Delete conflict copy" aria-label="Delete conflict copy" style="display:none">🗑️ Delete Conflict</button>
           </div>
 
           <!-- Tag bar -->
@@ -145,6 +148,27 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Version History Panel -->
+  <div id="history-panel" class="history-panel" role="dialog" aria-modal="true" aria-labelledby="history-panel-title" style="display:none;">
+    <div class="history-panel-inner">
+      <div class="history-panel-header">
+        <h2 id="history-panel-title">Version History</h2>
+        <button id="btn-close-history" class="btn-icon" aria-label="Close history">✕</button>
+      </div>
+      <p class="history-panel-hint">Click a version to preview it, then restore if needed.</p>
+      <div id="history-list" class="history-list" aria-live="polite">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Conflict Notification Banner -->
+  <div id="conflict-banner" class="conflict-banner" role="alert" aria-live="assertive" style="display:none;">
+    ⚠️ A conflict copy was created.
+    <button id="btn-view-conflicts" class="btn-link">View Conflicts</button>
+    <button id="btn-dismiss-conflict-banner" class="btn-icon" aria-label="Dismiss">✕</button>
   </div>
 
   <!-- Confirm permanent delete dialog -->

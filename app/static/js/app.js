@@ -11,6 +11,7 @@ let currentFilter = 'active';
 let currentFolderId = null;   // null = all, number = filter by folder
 let currentSort = 'updated_desc';
 let searchQuery = '';
+let historyNoteId = null;    // note whose history panel is open
 
 /* ===== Constants ===== */
 const DAY_MS = 86400000;
@@ -264,6 +265,7 @@ const btnExportPdf = document.getElementById('btn-export-pdf');
 const btnTrash = document.getElementById('btn-trash');
 const btnRestore = document.getElementById('btn-restore');
 const btnDeletePermanent = document.getElementById('btn-delete-permanent');
+const btnDeleteConflict = document.getElementById('btn-delete-conflict');
 const mainLayout = document.querySelector('.main-layout');
 const editorContent = document.getElementById('editor-content');
 const editorWelcome = document.getElementById('editor-welcome');
@@ -290,6 +292,13 @@ const inputUploadImage = document.getElementById('input-upload-image');
 const inputCameraCapture = document.getElementById('input-camera-capture');
 const imageUploadStatus = document.getElementById('image-upload-status');
 const imageBlocksEl = document.getElementById('image-blocks');
+const btnHistory = document.getElementById('btn-history');
+const historyPanel = document.getElementById('history-panel');
+const historyList = document.getElementById('history-list');
+const btnCloseHistory = document.getElementById('btn-close-history');
+const conflictBanner = document.getElementById('conflict-banner');
+const btnViewConflicts = document.getElementById('btn-view-conflicts');
+const btnDismissConflictBanner = document.getElementById('btn-dismiss-conflict-banner');
 
 /* ===== Helpers ===== */
 function formatDate(dateStr) {
@@ -358,8 +367,10 @@ function renderList() {
           state === 'saving' ? 'Syncing\u2026' : 'Sync failed'
         }" aria-label="Sync status"></span>`
       : '';
+    const isConflict = !!n.conflict_of;
+    const dateLabel = isConflict ? 'Conflict copy' : `Edited ${formatDate(n.updated_at)}`;
     return `
-    <div class="note-item ${n.id === currentNoteId ? 'active' : ''}" data-id="${n.id}" role="listitem">
+    <div class="note-item ${n.id === currentNoteId ? 'active' : ''}${isConflict ? ' conflict-item' : ''}" data-id="${n.id}" role="listitem">
       <div class="note-item-header">
         <div class="note-item-title">${escapeHtml(getTitle(n))}</div>
         ${n.is_pinned ? '<span class="note-pin-badge" aria-label="Pinned">📌</span>' : ''}
@@ -367,7 +378,7 @@ function renderList() {
       </div>
       <div class="note-item-subtitle">${escapeHtml(getSubtitle(n))}</div>
       ${tagHtml}
-      <div class="note-item-date">Edited ${formatDate(n.updated_at)}</div>
+      <div class="note-item-date">${dateLabel}</div>
     </div>`;
   }).join('');
 
@@ -461,12 +472,15 @@ function showEditor(show) {
 function updateEditorToolbar(note) {
   if (!note) return;
   const trashed = !!note.is_trashed;
+  const isConflict = !!note.conflict_of;
 
-  btnPin.style.display = trashed ? 'none' : '';
-  btnArchive.style.display = trashed ? 'none' : '';
-  btnTrash.style.display = trashed ? 'none' : '';
+  btnPin.style.display = (trashed || isConflict) ? 'none' : '';
+  btnArchive.style.display = (trashed || isConflict) ? 'none' : '';
+  btnTrash.style.display = (trashed || isConflict) ? 'none' : '';
   btnRestore.style.display = trashed ? '' : 'none';
   btnDeletePermanent.style.display = trashed ? '' : 'none';
+  if (btnHistory) btnHistory.style.display = (trashed || isConflict) ? 'none' : '';
+  if (btnDeleteConflict) btnDeleteConflict.style.display = isConflict ? '' : 'none';
 
   btnPin.classList.toggle('active', !!note.is_pinned);
   btnPin.title = note.is_pinned ? 'Unpin note' : 'Pin note';
@@ -474,20 +488,20 @@ function updateEditorToolbar(note) {
   btnArchive.classList.toggle('active', !!note.is_archived);
   btnArchive.title = note.is_archived ? 'Unarchive note' : 'Archive note';
 
-  noteTitle.contentEditable = trashed ? 'false' : 'true';
-  noteBody.contentEditable = trashed ? 'false' : 'true';
+  noteTitle.contentEditable = (trashed || isConflict) ? 'false' : 'true';
+  noteBody.contentEditable = (trashed || isConflict) ? 'false' : 'true';
 
   // Folder selector
   noteFolderSelect.value = note.folder_id != null ? String(note.folder_id) : '';
-  noteFolderSelect.disabled = trashed;
+  noteFolderSelect.disabled = trashed || isConflict;
 
   // Tag bar
-  tagInput.style.display = trashed ? 'none' : '';
+  tagInput.style.display = (trashed || isConflict) ? 'none' : '';
   renderTagChips(note);
   updateTagDatalist();
 
   // Image toolbar
-  if (imageToolbar) imageToolbar.style.display = trashed ? 'none' : '';
+  if (imageToolbar) imageToolbar.style.display = (trashed || isConflict) ? 'none' : '';
 }
 
 function openNote(id) {
@@ -611,7 +625,7 @@ async function createNote() {
 async function saveNote() {
   if (!currentNoteId) return;
   const note = currentNote();
-  if (!note || note.is_trashed) return;
+  if (!note || note.is_trashed || note.conflict_of) return;
   isSaving = true;
   const title = noteTitle.textContent.trim();
   const body = noteBody.textContent;
@@ -643,6 +657,7 @@ async function saveNote() {
     await dequeueWrite(currentNoteId);
     await idbPut('cached_notes', { ...updated, cached_at: Date.now() });
     setSyncState(currentNoteId, 'synced');
+    if (updated.conflict_note_id) showConflictBanner();
     renderList();
   } catch (e) {
     // Queue for retry
@@ -1024,6 +1039,91 @@ async function deleteFolder(folderId) {
   }
 }
 
+/* ===== Version History ===== */
+async function openHistoryPanel(noteId) {
+  historyNoteId = noteId;
+  historyList.innerHTML = '<div class="history-loading">Loading\u2026</div>';
+  historyPanel.style.display = '';
+  try {
+    const versions = await apiRequest('GET', `/api/notes/${noteId}/versions`);
+    if (versions.length === 0) {
+      historyList.innerHTML = '<div class="history-empty">No versions saved yet.<br>Versions are created automatically each time you save.</div>';
+      return;
+    }
+    historyList.innerHTML = versions.map(v => {
+      const d = new Date(v.saved_at.replace(' ', 'T') + 'Z');
+      const label = d.toLocaleString([], {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+      return `<div class="history-item" data-version-id="${v.id}">
+        <div class="history-item-meta">
+          <span class="history-item-date">${label}</span>
+        </div>
+        <div class="history-item-title">${escapeHtml(v.title || 'Untitled')}</div>
+        <button class="btn-restore-version" data-version-id="${v.id}" aria-label="Restore version from ${label}">Restore</button>
+      </div>`;
+    }).join('');
+    historyList.querySelectorAll('.btn-restore-version').forEach(btn => {
+      btn.addEventListener('click', () => restoreVersion(noteId, parseInt(btn.dataset.versionId)));
+    });
+  } catch (e) {
+    historyList.innerHTML = '<div class="history-empty">Failed to load version history.</div>';
+    console.error('Failed to load history', e);
+  }
+}
+
+function closeHistoryPanel() {
+  historyPanel.style.display = 'none';
+  historyNoteId = null;
+}
+
+async function restoreVersion(noteId, versionId) {
+  if (!confirm('Restore this version? The current content will be saved as a new version first.')) return;
+  try {
+    const updated = await apiRequest('POST', `/api/notes/${noteId}/versions/${versionId}/restore`);
+    const idx = notes.findIndex(n => n.id === noteId);
+    if (idx !== -1) notes[idx] = updated;
+    if (currentNoteId === noteId) {
+      noteTitle.textContent = updated.title;
+      noteBody.textContent = updated.body;
+      updateEditorToolbar(updated);
+    }
+    setAutosave('Restored \u2713');
+    renderList();
+    closeHistoryPanel();
+  } catch (e) {
+    console.error('Failed to restore version', e);
+    alert('Failed to restore version. Please try again.');
+  }
+}
+
+/* ===== Conflict Banner ===== */
+function showConflictBanner() {
+  if (conflictBanner) conflictBanner.style.display = '';
+}
+
+function hideConflictBanner() {
+  if (conflictBanner) conflictBanner.style.display = 'none';
+}
+
+async function deleteConflictCopy() {
+  if (!currentNoteId) return;
+  const note = currentNote();
+  if (!note || !note.conflict_of) return;
+  const id = currentNoteId;
+  try {
+    await apiRequest('DELETE', `/api/conflicts/${id}`);
+    notes = notes.filter(n => n.id !== id);
+    showEditor(false);
+    mainLayout.classList.remove('editor-open');
+    renderList();
+    setAutosave('');
+  } catch (e) {
+    console.error('Failed to delete conflict copy', e);
+  }
+}
+
 /* ===== Autosave ===== */
 function scheduleAutosave() {
   setAutosave('');
@@ -1034,9 +1134,9 @@ function scheduleAutosave() {
 /* ===== Filter / Sort / Search ===== */
 function setFilter(filter) {
   currentFilter = filter;
-  // Hide folder section in Trash view
-  folderSection.style.display = filter === 'trashed' ? 'none' : '';
-  if (filter === 'trashed') currentFolderId = null;
+  // Hide folder section in Trash and Conflicts views
+  folderSection.style.display = (filter === 'trashed' || filter === 'conflicts') ? 'none' : '';
+  if (filter === 'trashed' || filter === 'conflicts') currentFolderId = null;
 
   filterTabs.forEach(t => {
     const isActive = t.dataset.filter === filter;
@@ -1250,4 +1350,43 @@ if (autosaveEl) {
       flushQueue().then(() => renderList());
     }
   });
+}
+
+/* ===== History panel events ===== */
+if (btnHistory) {
+  btnHistory.addEventListener('click', () => {
+    if (currentNoteId) openHistoryPanel(currentNoteId);
+  });
+}
+
+if (btnCloseHistory) {
+  btnCloseHistory.addEventListener('click', closeHistoryPanel);
+}
+
+if (historyPanel) {
+  historyPanel.addEventListener('click', e => {
+    if (e.target === historyPanel) closeHistoryPanel();
+  });
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && historyPanel && historyPanel.style.display !== 'none') {
+    closeHistoryPanel();
+  }
+});
+
+/* ===== Conflict banner events ===== */
+if (btnViewConflicts) {
+  btnViewConflicts.addEventListener('click', () => {
+    hideConflictBanner();
+    setFilter('conflicts');
+  });
+}
+
+if (btnDismissConflictBanner) {
+  btnDismissConflictBanner.addEventListener('click', hideConflictBanner);
+}
+
+if (btnDeleteConflict) {
+  btnDeleteConflict.addEventListener('click', deleteConflictCopy);
 }

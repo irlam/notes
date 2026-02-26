@@ -62,6 +62,9 @@ def create_app():
     from .settings import settings_bp
     app.register_blueprint(settings_bp)
 
+    from .versions import versions_bp
+    app.register_blueprint(versions_bp)
+
     # --- Security headers ---
     @app.after_request
     def add_security_headers(response):

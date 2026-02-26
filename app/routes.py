@@ -4,7 +4,7 @@ from .database import get_db, get_user_by_id
 
 bp = Blueprint('main', __name__)
 
-_NOTE_FIELDS = 'id, title, body, is_pinned, is_archived, is_trashed, folder_id, created_at, updated_at'
+_NOTE_FIELDS = 'id, title, body, is_pinned, is_archived, is_trashed, folder_id, conflict_of, created_at, updated_at'
 _MAX_TITLE = 500
 _MAX_BODY = 100_000
 
@@ -81,14 +81,19 @@ def list_notes():
     conditions = ['n.user_id = ?']
     params = [uid]
 
-    if filter_param == 'trashed':
+    if filter_param == 'conflicts':
+        conditions.append('n.conflict_of IS NOT NULL')
+    elif filter_param == 'trashed':
         conditions.append('n.is_trashed = 1')
+        conditions.append('n.conflict_of IS NULL')
     elif filter_param == 'archived':
         conditions.append('n.is_archived = 1')
         conditions.append('n.is_trashed = 0')
+        conditions.append('n.conflict_of IS NULL')
     else:
         conditions.append('n.is_archived = 0')
         conditions.append('n.is_trashed = 0')
+        conditions.append('n.conflict_of IS NULL')
 
     if folder_id is not None:
         conditions.append('n.folder_id = ?')
@@ -184,7 +189,8 @@ def get_note(note_id):
 def update_note(note_id):
     db = get_db()
     existing = db.execute(
-        'SELECT id FROM notes WHERE id = ? AND user_id = ?', (note_id, _current_user_id())
+        'SELECT id, title, body, updated_at FROM notes WHERE id = ? AND user_id = ?',
+        (note_id, _current_user_id())
     ).fetchone()
     if existing is None:
         abort(404)
@@ -194,6 +200,24 @@ def update_note(note_id):
     if len(title) > _MAX_TITLE or len(body) > _MAX_BODY:
         abort(400)
     is_pinned = int(bool(data.get('is_pinned', 0)))
+
+    from .versions import _snapshot, _prune_versions
+
+    # Snapshot current content before overwriting
+    _snapshot(db, note_id, _current_user_id(), existing['title'], existing['body'])
+
+    # Conflict detection: if client sends its last-known updated_at and it
+    # differs from what the server has, create a conflict copy first.
+    conflict_note_id = None
+    client_updated_at = data.get('client_updated_at')
+    if client_updated_at and client_updated_at != existing['updated_at']:
+        conflict_title = ('[Conflict Copy] ' + existing['title'])[:_MAX_TITLE]
+        cur_conflict = db.execute(
+            'INSERT INTO notes (user_id, title, body, conflict_of, created_at, updated_at) '
+            'VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
+            (_current_user_id(), conflict_title, existing['body'], note_id)
+        )
+        conflict_note_id = cur_conflict.lastrowid
 
     if 'folder_id' in data:
         new_folder_id = data['folder_id']
@@ -216,12 +240,16 @@ def update_note(note_id):
             (title, body, is_pinned, note_id, _current_user_id())
         )
     db.commit()
+    _prune_versions(db, note_id, _current_user_id())
+
     row = db.execute(
         f'SELECT {_NOTE_FIELDS} FROM notes WHERE id = ?',
         (note_id,)
     ).fetchone()
     d = dict(row)
     d['tags'] = _fetch_tags_for_notes(db, [note_id]).get(note_id, [])
+    if conflict_note_id is not None:
+        d['conflict_note_id'] = conflict_note_id
     return jsonify(d)
 
 
