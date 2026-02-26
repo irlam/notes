@@ -4,7 +4,7 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .auth import login_required
-from .database import get_db, get_user_by_id
+from .database import get_db, get_user_by_id, get_user_email, set_user_email
 
 settings_bp = Blueprint('settings', __name__)
 
@@ -21,7 +21,8 @@ def _current_user_id():
 def settings_page():
     user = get_user_by_id(_current_user_id())
     return render_template('settings.html',
-                           username=user['username'] if user else '')
+                           username=user['username'] if user else '',
+                           user_email=user['email'] if user else '')
 
 
 @settings_bp.route('/api/settings/password', methods=['POST'])
@@ -64,3 +65,25 @@ def change_password():
     )
     db.commit()
     return jsonify({'ok': True})
+
+
+@settings_bp.route('/api/settings/email', methods=['GET'])
+@login_required
+def get_email():
+    """Return the current user's stored email address."""
+    return jsonify({'email': get_user_email(_current_user_id()) or ''})
+
+
+@settings_bp.route('/api/settings/email', methods=['POST'])
+@login_required
+def update_email():
+    """Update the current user's email address.
+
+    Request JSON: {email}
+    """
+    data = request.get_json(silent=True) or {}
+    email = (data.get('email') or '').strip()
+    if email and ('@' not in email or len(email) > 254):
+        return jsonify({'error': 'Invalid email address.'}), 400
+    set_user_email(_current_user_id(), email or None)
+    return jsonify({'ok': True, 'email': email or None})

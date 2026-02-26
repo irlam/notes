@@ -18,8 +18,8 @@ Built with Python Flask (backend) and vanilla JS (frontend) — **no Docker, no 
 | Version history + conflict copies | ✅ Implemented |
 | PWA / installable (manifest + service worker) | ✅ Implemented |
 | Settings page (change password, dark mode) | ✅ Implemented |
-| Email PDF (direct email of note PDF) | 🔲 Planned — Milestone 10 |
-| Batch export (ZIP / multi-note PDF) | 🔲 Planned — Milestone 10 |
+| Email PDF (direct email of note PDF) | ✅ Implemented — Milestone 10 |
+| Batch export (ZIP / multi-note PDF) | ✅ Implemented — Milestone 10 |
 
 ## Tech Stack
 
@@ -75,7 +75,7 @@ notes/
 │   ├── __init__.py          # Flask app factory
 │   ├── auth.py              # Login/logout + login_required decorator
 │   ├── database.py          # SQLite helpers
-│   ├── email_export.py      # M10 stubs: email PDF + batch export (501 placeholders)
+│   ├── email_export.py      # M10: email PDF + batch export
 │   ├── media.py             # Image upload, camera, annotation
 │   ├── pdf.py               # PDF export (ReportLab)
 │   ├── routes.py            # Notes API + dashboard + sync
@@ -96,7 +96,7 @@ notes/
 │   └── schema.mysql.sql     # Canonical MySQL 8+ schema for fresh production installs
 ├── docs/                    # Project documentation
 │   ├── first-install.md     # ← First-time install guide (local + Plesk)
-│   ├── milestone-10.md      # ← M10 planning: Email PDF + Batch Export
+│   ├── milestone-10.md      # ← M10: Email PDF + Batch Export
 │   ├── milestones.md        # Milestone plan with status matrix
 │   ├── architecture.md
 │   ├── product-spec.md
@@ -130,7 +130,7 @@ Copy `.env.example` to `.env` and customise:
 | `FLASK_ENV` | `production` | `development` enables debug mode |
 | `SESSION_COOKIE_SECURE` | `false` | Set `true` in production (HTTPS required) |
 | `SESSION_LIFETIME_DAYS` | `14` | Session cookie lifetime in days |
-| `ENABLE_EMAIL_EXPORT` | `false` | Enable Milestone 10 email PDF feature (not yet implemented) |
+| `ENABLE_EMAIL_EXPORT` | `false` | Enable Milestone 10 email PDF + batch export (`true` to activate) |
 | `SMTP_HOST` | *(empty)* | SMTP server hostname (M10) |
 | `SMTP_PORT` | `587` | SMTP port (M10) |
 | `SMTP_USER` | *(empty)* | SMTP username (M10) |
@@ -157,8 +157,8 @@ Copy `.env.example` to `.env` and customise:
 | POST | `/api/notes/<id>/images` | Upload image |
 | PUT | `/api/notes/<id>/images/<img_id>` | Update annotation data |
 | DELETE | `/api/notes/<id>/images/<img_id>` | Delete image |
-| POST | `/api/notes/<id>/email-pdf` | **[M10 stub — 501]** Email PDF |
-| POST | `/api/batch-export` | **[M10 stub — 501]** Batch export |
+| POST | `/api/notes/<id>/email-pdf` | Email PDF to user's registered address (requires `ENABLE_EMAIL_EXPORT=true`) |
+| POST | `/api/batch-export` | Batch export notes as ZIP or combined PDF (requires `ENABLE_EMAIL_EXPORT=true`) |
 
 All endpoints require authentication and return JSON. DELETE returns 204 No Content.
 

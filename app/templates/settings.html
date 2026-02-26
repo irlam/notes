@@ -181,6 +181,21 @@
         </div>
       </div>
 
+      <!-- Email address (used for Email PDF feature) -->
+      <div class="settings-section">
+        <h2>Email Address</h2>
+        <form id="email-form" autocomplete="on" novalidate>
+          <div class="form-group">
+            <label for="user-email">Email address</label>
+            <input id="user-email" name="user-email" type="email"
+              autocomplete="email" placeholder="you@example.com"
+              value="{{ user_email or '' }}" maxlength="254" />
+          </div>
+          <button type="submit" class="btn-save" id="email-btn">Save email</button>
+          <p class="form-msg" id="email-msg"></p>
+        </form>
+      </div>
+
       <!-- Change password -->
       <div class="settings-section">
         <h2>Change Password</h2>
@@ -234,6 +249,40 @@
       } else {
         document.documentElement.removeAttribute('data-theme');
         localStorage.setItem(darkKey, '0');
+      }
+    });
+
+    // ---- Save email address ----
+    const emailForm = document.getElementById('email-form');
+    const emailMsg  = document.getElementById('email-msg');
+    const emailBtn  = document.getElementById('email-btn');
+
+    emailForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      emailMsg.textContent = '';
+      emailMsg.className = 'form-msg';
+      emailBtn.disabled = true;
+
+      const email = document.getElementById('user-email').value.trim();
+      try {
+        const r = await fetch('/api/settings/email', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({email}),
+        });
+        const data = await r.json();
+        if (r.ok) {
+          emailMsg.textContent = 'Email address saved.';
+          emailMsg.className = 'form-msg ok';
+        } else {
+          emailMsg.textContent = data.error || 'Failed to save email.';
+          emailMsg.className = 'form-msg err';
+        }
+      } catch {
+        emailMsg.textContent = 'Network error. Please try again.';
+        emailMsg.className = 'form-msg err';
+      } finally {
+        emailBtn.disabled = false;
       }
     });
 

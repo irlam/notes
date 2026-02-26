@@ -226,13 +226,6 @@ def export_note_pdf(note_id):
     The response carries ``Content-Disposition: attachment`` so browsers
     prompt a download on desktop and mobile alike.
     """
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib.styles import ParagraphStyle
-    from reportlab.lib.units import inch
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-    from reportlab.platypus import Image as RLImage
-    from reportlab.lib import colors
-
     _register_fonts()
 
     db = get_db()
@@ -256,9 +249,45 @@ def export_note_pdf(note_id):
         (note_id, uid, _MAX_IMAGES),
     ).fetchall()
 
-    # -----------------------------------------------------------------------
-    # Build PDF
-    # -----------------------------------------------------------------------
+    media_path = current_app.config['MEDIA_PATH']
+    pdf_bytes = build_pdf_bytes(note, img_rows, media_path)
+
+    # Derive a safe filename from the note title
+    raw = (note['title'] or 'note').strip() or 'note'
+    safe = ''.join(c if c.isalnum() or c in ' -_' else '_' for c in raw)
+    filename = (safe[:50] or 'note') + '.pdf'
+
+    response = make_response(pdf_bytes)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
+
+
+def build_pdf_bytes(note, img_rows, media_path):
+    """Build and return the PDF bytes for *note*.
+
+    Parameters
+    ----------
+    note : dict
+        Must contain: title, body, created_at, updated_at.
+    img_rows : iterable
+        Rows from ``note_images``; each must have filename,
+        original_filename, annotation_data.
+    media_path : str
+        Filesystem path to the media uploads directory.
+
+    Returns
+    -------
+    bytes
+        Raw PDF data.
+    """
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+    from reportlab.platypus import Image as RLImage
+    from reportlab.lib import colors
+
     buf = io.BytesIO()
     margin = inch
     page_w, _ = A4
@@ -349,10 +378,9 @@ def export_note_pdf(note_id):
     # Images
     if img_rows:
         story.append(Spacer(1, 14))
-        media_dir = current_app.config['MEDIA_PATH']
 
         for img_row in img_rows:
-            img_path = os.path.join(media_dir, img_row['filename'])
+            img_path = os.path.join(media_path, img_row['filename'])
             if not os.path.isfile(img_path):
                 continue
 
@@ -389,14 +417,4 @@ def export_note_pdf(note_id):
             story.append(Spacer(1, 10))
 
     doc.build(story)
-    pdf_bytes = buf.getvalue()
-
-    # Derive a safe filename from the note title
-    raw = (note['title'] or 'note').strip() or 'note'
-    safe = ''.join(c if c.isalnum() or c in ' -_' else '_' for c in raw)
-    filename = (safe[:50] or 'note') + '.pdf'
-
-    response = make_response(pdf_bytes)
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
-    return response
+    return buf.getvalue()

@@ -29,6 +29,9 @@ def create_app():
     )
     # 12 MB hard limit (covers 10 MB image + multipart overhead)
     app.config['MAX_CONTENT_LENGTH'] = 12 * 1024 * 1024
+    app.config['ENABLE_EMAIL_EXPORT'] = (
+        os.environ.get('ENABLE_EMAIL_EXPORT', 'false').lower() == 'true'
+    )
 
     # --- Session / cookie security ---
     app.config['SESSION_COOKIE_HTTPONLY'] = True

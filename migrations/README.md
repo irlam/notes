@@ -63,3 +63,4 @@ where supported, or guarded by `SELECT` checks) so they are safe to re-run.
 | `003_add_folders_tags.sql` | Add `folders`, `tags`, `note_tags` tables; add `folder_id` to notes | M3 | ✅ |
 | `004_add_images.sql` | Add `note_images` table | M4 | ✅ |
 | `005_add_versions.sql` | Add `note_versions` table and `conflict_of` column on notes | M9 | ✅ |
+| `006_add_user_email.sql` | Add `email` column to `users`; add `email_send_log` table | M10 | ✅ |
