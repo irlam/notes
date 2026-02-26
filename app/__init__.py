@@ -65,6 +65,9 @@ def create_app():
     from .versions import versions_bp
     app.register_blueprint(versions_bp)
 
+    from .email_export import email_export_bp
+    app.register_blueprint(email_export_bp)
+
     # --- Security headers ---
     @app.after_request
     def add_security_headers(response):
