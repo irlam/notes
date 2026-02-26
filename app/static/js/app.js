@@ -462,6 +462,7 @@ function showEditor(show) {
     editorContent.style.display = 'none';
     editorWelcome.style.display = '';
     currentNoteId = null;
+    window.currentNoteId = null;
     images = [];
     if (imageBlocksEl) imageBlocksEl.innerHTML = '';
     if (imageToolbar) imageToolbar.style.display = 'none';
@@ -515,6 +516,7 @@ function openNote(id) {
   }
 
   currentNoteId = id;
+  window.currentNoteId = id;
   noteTitle.textContent = note.title;
   noteBody.textContent = note.body;
   showEditor(true);
