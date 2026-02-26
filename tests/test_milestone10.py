@@ -394,7 +394,7 @@ class TestBatchExportEnabled:
 
 
 # ---------------------------------------------------------------------------
-# PDF build_pdf_bytes helper (regression — ensure route still works)
+# build_pdf_bytes helper — direct unit test
 # ---------------------------------------------------------------------------
 
 class TestBuildPdfBytesHelper:
@@ -404,3 +404,33 @@ class TestBuildPdfBytesHelper:
         assert r.status_code == 200
         assert r.content_type == 'application/pdf'
         assert r.data[:4] == b'%PDF'
+
+    def test_build_pdf_bytes_directly(self, app):
+        """build_pdf_bytes returns valid PDF bytes for a plain note."""
+        with app.app_context():
+            from app.pdf import build_pdf_bytes, _register_fonts
+            _register_fonts()
+            note = {
+                'title': 'Direct Test',
+                'body': 'Line one\nLine two',
+                'created_at': '2025-01-01 00:00:00',
+                'updated_at': '2025-01-02 00:00:00',
+            }
+            pdf_bytes = build_pdf_bytes(note, [], '/tmp')
+        assert isinstance(pdf_bytes, bytes)
+        assert pdf_bytes[:4] == b'%PDF'
+        assert len(pdf_bytes) > 1000
+
+    def test_build_pdf_bytes_empty_note(self, app):
+        """build_pdf_bytes handles empty title and body gracefully."""
+        with app.app_context():
+            from app.pdf import build_pdf_bytes, _register_fonts
+            _register_fonts()
+            note = {
+                'title': '',
+                'body': '',
+                'created_at': '',
+                'updated_at': '',
+            }
+            pdf_bytes = build_pdf_bytes(note, [], '/tmp')
+        assert pdf_bytes[:4] == b'%PDF'

@@ -363,7 +363,7 @@ def batch_export():
     if fmt == 'zip':
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
-            seen_names: dict = {}
+            seen_names: dict[str, int] = {}
             for note_id in note_ids:
                 row = db.execute(
                     'SELECT id, title, body, created_at, updated_at '
