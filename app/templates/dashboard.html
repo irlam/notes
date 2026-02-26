@@ -94,6 +94,8 @@
             <button id="btn-pin" class="btn-icon" title="Pin note" aria-label="Pin note">📌</button>
             <button id="btn-archive" class="btn-icon" title="Archive note" aria-label="Archive note">📥</button>
             <button id="btn-export-pdf" class="btn-icon" title="Export to PDF" aria-label="Export note to PDF">📄</button>
+            <button id="btn-email-pdf" class="btn-icon btn-m10-stub" title="Email PDF (coming soon)" aria-label="Email PDF — coming soon" disabled>✉️</button>
+            <button id="btn-batch-export" class="btn-icon btn-m10-stub" title="Batch export (coming soon)" aria-label="Batch export — coming soon" style="display:none" disabled>📦</button>
             <button id="btn-history" class="btn-icon" title="Version history" aria-label="Version history">🕐</button>
             <button id="btn-trash" class="btn-icon btn-trash-note" title="Move to trash" aria-label="Move to trash">🗑️</button>
             <button id="btn-restore" class="btn-icon" title="Restore note" aria-label="Restore note" style="display:none">↩️</button>
@@ -228,5 +230,37 @@
 
   <script src="/static/js/annotation.js"></script>
   <script src="/static/js/app.js"></script>
+
+  <!-- Milestone 10 stubs: "Coming soon" handler for disabled toolbar buttons -->
+  <script>
+  (function () {
+    var m10Buttons = ['btn-email-pdf', 'btn-batch-export'];
+    m10Buttons.forEach(function (id) {
+      var btn = document.getElementById(id);
+      if (!btn) return;
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        var existing = document.getElementById('m10-coming-soon-banner');
+        if (!existing) {
+          var banner = document.createElement('div');
+          banner.id = 'm10-coming-soon-banner';
+          banner.setAttribute('role', 'status');
+          banner.setAttribute('aria-live', 'polite');
+          banner.style.cssText = [
+            'position:fixed', 'bottom:16px', 'left:50%',
+            'transform:translateX(-50%)',
+            'background:#444', 'color:#fff',
+            'padding:10px 20px', 'border-radius:6px',
+            'font-size:14px', 'z-index:9999',
+            'box-shadow:0 2px 8px rgba(0,0,0,.4)'
+          ].join(';');
+          banner.textContent = '\u23F3 Coming soon \u2014 this feature is planned for Milestone 10.';
+          document.body.appendChild(banner);
+          setTimeout(function () { banner.remove(); }, 3500);
+        }
+      });
+    });
+  })();
+  </script>
 </body>
 </html>

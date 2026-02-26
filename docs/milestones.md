@@ -282,3 +282,46 @@ surfacing merge-conflict copies when offline edits race with server updates.
 | M7 | PDF Export | ✅ Complete |
 | M8 | Hardening, QA, Polish & Operational Readiness | ✅ Complete |
 | M9 | Version History & Conflict Copy Management | ✅ Complete |
+| M10 | Direct Email PDF + Batch Export | 🔲 Planned |
+
+---
+
+## Milestone 10 — Direct Email PDF + Batch Export (planned)
+
+**Goal:** Allow users to email a note's PDF directly from the app and to bulk-export multiple notes as a ZIP or combined PDF.
+
+> Detailed planning is in [docs/milestone-10.md](milestone-10.md).
+
+### Deliverables
+
+- [ ] `POST /api/notes/<id>/email-pdf` — send note PDF by email (SMTP, rate-limited)
+- [ ] `POST /api/batch-export` — export selected notes as ZIP or multi-note PDF
+- [ ] SMTP configuration via environment variables (host, port, user, pass, from)
+- [ ] Feature flag (`ENABLE_EMAIL_EXPORT`) — disabled by default until implemented
+- [ ] UI: "Email PDF" toolbar button + "Batch Export" action (currently disabled/stub)
+- [ ] Rate limiting on email endpoint (per-user, e.g. max 10/hour)
+- [ ] Input validation: note ownership, batch size cap (e.g. max 50 notes)
+- [ ] Full test coverage for email path (mocked SMTP) and batch export
+
+### Acceptance Criteria
+
+- [ ] Authenticated user can email a PDF of any of their own notes to their registered address.
+- [ ] Batch export downloads a ZIP containing PDF/text for each selected note.
+- [ ] Email send is rate-limited; excess requests return 429.
+- [ ] Unauthenticated requests return 401; other-user's notes return 404.
+- [ ] SMTP credentials are never logged or committed to the repository.
+- [ ] Feature remains disabled (`ENABLE_EMAIL_EXPORT=false`) until explicitly activated.
+- [ ] No Docker or container runtime required.
+
+### Feature Status (stubs in place)
+
+| Component | Status |
+|---|---|
+| `POST /api/notes/<id>/email-pdf` | ✅ Stub (returns 403/501) |
+| `POST /api/batch-export` | ✅ Stub (returns 403/501) |
+| `ENABLE_EMAIL_EXPORT` env flag | ✅ Added to `.env.example` |
+| UI button "Email PDF" (disabled) | ✅ Added to toolbar |
+| UI button "Batch Export" (hidden) | ✅ Added to toolbar |
+| "Coming soon" toast on click | ✅ Implemented |
+| Full email sending implementation | 🔲 Planned |
+| Full batch export implementation | 🔲 Planned |

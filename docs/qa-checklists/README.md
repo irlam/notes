@@ -305,3 +305,36 @@ Run each checklist on at least the following combinations:
 | R-05 | Offline banner appears / disappears correctly |
 | R-06 | No JavaScript console errors on any page |
 | R-07 | HTTPS active and certificate valid |
+
+---
+
+## Milestone 10 — Email PDF + Batch Export Stubs
+
+> These checks cover the M10 stub state (feature not yet implemented).
+> Update this section when full M10 implementation is delivered.
+
+### M10-A: Email PDF Stub
+
+| # | Check | Pass/Fail | Notes |
+|---|---|---|---|
+| M10-A-01 | ✉️ "Email PDF" button is visible but disabled in editor toolbar | | |
+| M10-A-02 | Clicking the disabled button shows a "Coming soon" toast (not an error) | | |
+| M10-A-03 | `POST /api/notes/<id>/email-pdf` (unauthenticated) returns 302 redirect | | |
+| M10-A-04 | `POST /api/notes/<id>/email-pdf` (authenticated, flag off) returns 403 JSON | | |
+| M10-A-05 | Response JSON contains `"feature": "email_pdf"` and `"milestone": 10` | | |
+
+### M10-B: Batch Export Stub
+
+| # | Check | Pass/Fail | Notes |
+|---|---|---|---|
+| M10-B-01 | `POST /api/batch-export` (unauthenticated) returns 302 redirect | | |
+| M10-B-02 | `POST /api/batch-export` (authenticated, flag off) returns 403 JSON | | |
+| M10-B-03 | Response JSON contains `"feature": "batch_export"` and `"milestone": 10` | | |
+
+### M10-C: Feature Flag
+
+| # | Check | Pass/Fail | Notes |
+|---|---|---|---|
+| M10-C-01 | `.env.example` contains `ENABLE_EMAIL_EXPORT=false` | | |
+| M10-C-02 | With `ENABLE_EMAIL_EXPORT=true`, endpoints return 501 (not 403) | | |
+| M10-C-03 | With `ENABLE_EMAIL_EXPORT=false` (default), endpoints return 403 | | |

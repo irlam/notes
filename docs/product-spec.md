@@ -20,56 +20,77 @@ A fast, distraction-free personal note-taking web application that behaves like 
 2. **Autosave** — no explicit "Save" button; changes are persisted automatically.
 3. **Offline resilience** — notes can be read and edited without a network connection; writes are queued and synced on reconnect.
 4. **Sync status transparency** — the UI always shows whether the last save succeeded, is pending, or failed.
-5. **Single-user-first** — no login required in v1; the data model supports adding users later without a migration.
+5. **Authentication required** — login is required; all data is isolated per user; accounts are created via `flask create-user`.
 6. **No Docker** — deployment is directly on the Plesk server via Passenger WSGI; container-only workflows are explicitly out of scope.
 
 ---
 
 ## 3. Feature Catalogue
 
-### 3.1 Note Management (v0.1 — implemented)
+### 3.1 Note Management (✅ implemented)
 
 | ID | Feature | Notes |
 |---|---|---|
 | F-01 | Create note | Blank note, auto-titled by date if left empty |
 | F-02 | View note list | Two-pane layout; sorted by `updated_at` descending |
 | F-03 | Edit note | Title + body; autosave after 1.5 s of inactivity |
-| F-04 | Delete note | Confirmation dialog; 204 response |
+| F-04 | Delete note | Confirmation dialog; move to trash, then permanent delete |
 | F-05 | Offline indicator | Banner shown when `navigator.onLine` is false |
 | F-06 | PWA install | Manifest + service worker; add-to-home-screen prompt |
+| F-07 | Archive / trash notes | Archive and trash tabs; restore or permanently delete |
+| F-08 | Note pinning | Pinned notes always appear at the top of the list |
 
-### 3.2 Sync Status (planned — Milestone 2)
+### 3.2 Sync Status (✅ implemented — Milestone 2)
 
 | ID | Feature | Notes |
 |---|---|---|
 | F-10 | Sync status chip | Displays: Saved ✓ / Saving… / Unsaved changes / Error ✗ |
 | F-11 | Offline write queue | IndexedDB queue; flushes on `online` event |
-| F-12 | Conflict resolution | Last-write-wins in v1; timestamp-based |
+| F-12 | Conflict detection | `client_updated_at` timestamp-based; creates conflict copy |
 
-### 3.3 Rich Content (planned — Milestone 3)
-
-| ID | Feature | Notes |
-|---|---|---|
-| F-20 | Markdown / rich-text editing | Toolbar with bold, italic, heading, list, code |
-| F-21 | Image attachment | Drag-and-drop or file picker; stored server-side |
-| F-22 | Image annotation | Canvas overlay drawing on attached images |
-| F-23 | PDF export | Client-side render via `window.print()` or a PDF library |
-
-### 3.4 Organisation (planned — Milestone 4)
+### 3.3 Rich Content (✅ implemented — Milestones 3, 4, 7)
 
 | ID | Feature | Notes |
 |---|---|---|
-| F-30 | Full-text search | Client-side filter for speed; server-side FTS as fallback |
-| F-31 | Tags / labels | Free-form tags; colour coding optional |
-| F-32 | Note pinning | Pin up to 3 notes to top of list |
+| F-20 | Image attachment | File picker or camera capture; stored server-side in `uploads/` |
+| F-21 | Image annotation | Canvas overlay; pen, highlighter, arrow, rectangle, circle, text tools |
+| F-22 | PDF export | Server-side via ReportLab; `GET /api/notes/<id>/export.pdf` |
 
-### 3.5 Multi-User / Auth (future — Milestone 5+)
+### 3.4 Organisation (✅ implemented — Milestone 3)
 
 | ID | Feature | Notes |
 |---|---|---|
-| F-40 | User registration & login | Email + password; bcrypt hashed |
-| F-41 | Session management | Server-side sessions; CSRF protection |
-| F-42 | Per-user data isolation | `user_id` FK already in schema |
+| F-30 | Full-text search | LIKE-based search on title, body, and tag name |
+| F-31 | Folders | Create/rename/delete folders; assign notes to a folder |
+| F-32 | Tags / labels | Free-form tags; filter by tag |
+| F-33 | Note pinning | Pin notes to top of list regardless of sort order |
+| F-34 | Sort options | Recently edited, newest first, title A–Z |
+
+### 3.5 Multi-User / Auth (✅ implemented — Milestone 5)
+
+| ID | Feature | Notes |
+|---|---|---|
+| F-40 | Login / logout | Username + password; bcrypt hashed; session cookies |
+| F-41 | Session management | Server-side sessions; HttpOnly + SameSite=Lax cookies |
+| F-42 | Per-user data isolation | All queries scoped to `user_id = session['user_id']` |
+| F-43 | CLI user creation | `flask create-user <username>` for initial bootstrap |
+| F-44 | Settings page | Change password, dark mode toggle |
+
+### 3.6 Version History (✅ implemented — Milestone 9)
+
+| ID | Feature | Notes |
+|---|---|---|
+| F-50 | Version snapshots | Every save creates a `note_versions` record |
+| F-51 | Version history panel | Slide-in drawer; restore any previous version |
+| F-52 | Conflict copies | Stale `client_updated_at` creates a `[Conflict Copy]` note |
+| F-53 | Conflict management | Dedicated ⚠ Conflicts tab; delete conflict copies permanently |
+
+### 3.7 Email PDF + Batch Export (🔲 planned — Milestone 10)
+
+| ID | Feature | Notes |
+|---|---|---|
+| F-60 | Email PDF | `POST /api/notes/<id>/email-pdf` — SMTP, rate-limited (stub: 403/501) |
+| F-61 | Batch export | `POST /api/batch-export` — ZIP or combined PDF (stub: 403/501) |
 
 ---
 
@@ -86,25 +107,23 @@ A fast, distraction-free personal note-taking web application that behaves like 
 
 ---
 
-## 5. Out of Scope (v1)
+## 5. Out of Scope (current)
 
 - Real-time collaborative editing
 - Native mobile apps (iOS/Android)
 - Docker / container deployment
-- Email notifications
 - Note sharing / public links
+- Email PDF and Batch Export are **planned for Milestone 10** (not out of scope permanently)
 
 ---
 
-## 6. Open Decisions
+## 6. Open Decisions (resolved)
 
-> These must be confirmed before Milestone 2 coding begins.
-
-| # | Question | Options | Decision |
-|---|---|---|---|
-| OD-1 | Offline write storage mechanism | IndexedDB vs localStorage | **TBD** |
-| OD-2 | Rich-text format stored in DB | HTML vs Markdown vs Delta (Quill) | **TBD** |
-| OD-3 | Image storage location | Server filesystem vs SQLite BLOB vs object store | **TBD** |
-| OD-4 | PDF export approach | `window.print()` CSS + `@media print` vs jsPDF vs Puppeteer server-side | **TBD** |
-| OD-5 | Annotation persistence format | SVG overlay vs Canvas PNG merged into image | **TBD** |
+| # | Question | Decision |
+|---|---|---|
+| OD-1 | Offline write storage mechanism | IndexedDB |
+| OD-2 | Rich-text format stored in DB | Plain text (contenteditable div) |
+| OD-3 | Image storage location | Server filesystem (`uploads/`) |
+| OD-4 | PDF export approach | Server-side ReportLab |
+| OD-5 | Annotation persistence format | Canvas PNG merged server-side (Pillow) |
 | OD-6 | Multi-user auth trigger milestone | After M4 or after M3? | **TBD** |
