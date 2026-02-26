@@ -1,10 +1,6 @@
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL,
-    is_active INTEGER NOT NULL DEFAULT 1,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+-- Migration 003: Add folders, tags, note_tags; add folder_id to notes
+-- Run once against an existing database after Milestone 2.
+-- NOTE: The ALTER TABLE line will fail if run a second time; that is expected.
 
 CREATE TABLE IF NOT EXISTS folders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,21 +20,6 @@ CREATE TABLE IF NOT EXISTS tags (
     UNIQUE (user_id, name)
 );
 
-CREATE TABLE IF NOT EXISTS notes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL DEFAULT 1,
-    folder_id INTEGER,
-    title TEXT NOT NULL DEFAULT '',
-    body TEXT NOT NULL DEFAULT '',
-    is_pinned INTEGER NOT NULL DEFAULT 0,
-    is_archived INTEGER NOT NULL DEFAULT 0,
-    is_trashed INTEGER NOT NULL DEFAULT 0,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (folder_id) REFERENCES folders (id)
-);
-
 CREATE TABLE IF NOT EXISTS note_tags (
     note_id INTEGER NOT NULL,
     tag_id INTEGER NOT NULL,
@@ -47,7 +28,8 @@ CREATE TABLE IF NOT EXISTS note_tags (
     FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_notes_user_id ON notes (user_id);
+ALTER TABLE notes ADD COLUMN folder_id INTEGER;
+
 CREATE INDEX IF NOT EXISTS idx_folders_user_id ON folders (user_id);
 CREATE INDEX IF NOT EXISTS idx_tags_user_id ON tags (user_id);
 CREATE INDEX IF NOT EXISTS idx_note_tags_note_id ON note_tags (note_id);
