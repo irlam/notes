@@ -11,10 +11,15 @@ let currentFilter = 'active';
 let currentFolderId = null;   // null = all, number = filter by folder
 let currentSort = 'updated_desc';
 let searchQuery = '';
+let pendingNoteIds = new Set();   // note IDs with unsynced local writes
+let flushInProgress = false;
+let flushRetryDelay = INITIAL_FLUSH_RETRY_DELAY_MS;
 
 /* ===== Constants ===== */
 const DAY_MS = 86400000;
 const SEARCH_DEBOUNCE_MS = 300;
+const INITIAL_FLUSH_RETRY_DELAY_MS = 2000;
+const MAX_FLUSH_RETRY_DELAY_MS = 60000;
 
 /* ===== DOM refs ===== */
 const noteList = document.getElementById('note-list');
@@ -92,6 +97,56 @@ function currentNote() {
   return notes.find(n => n.id === currentNoteId) || null;
 }
 
+/* ===== IndexedDB offline write queue ===== */
+const _DB_NAME = 'notes-pwa';
+const _DB_VERSION = 1;
+const _STORE = 'pending_writes';
+
+function _openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(_DB_NAME, _DB_VERSION);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore(_STORE, { keyPath: 'note_id' });
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+async function _queueWrite(note_id, title, body, is_pinned, folder_id) {
+  const db = await _openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(_STORE, 'readwrite');
+    tx.objectStore(_STORE).put({
+      note_id, title, body,
+      is_pinned, folder_id,
+      queued_at: Date.now(),
+    });
+    tx.oncomplete = resolve;
+    tx.onerror = e => reject(e.target.error);
+  });
+}
+
+async function _getPendingWrites() {
+  const db = await _openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(_STORE, 'readonly');
+    const req = tx.objectStore(_STORE).getAll();
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+async function _removePendingWrite(note_id) {
+  const db = await _openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(_STORE, 'readwrite');
+    tx.objectStore(_STORE).delete(note_id);
+    tx.oncomplete = resolve;
+    tx.onerror = e => reject(e.target.error);
+  });
+}
+
 /* ===== Rendering ===== */
 function renderList() {
   if (notes.length === 0) {
@@ -116,11 +171,15 @@ function renderList() {
           `<span class="note-tag-chip">${escapeHtml(t.name)}</span>`
         ).join('')}${n.tags.length > 3 ? `<span class="note-tag-more">+${n.tags.length - 3}</span>` : ''}</div>`
       : '';
+    const pendingBadge = pendingNoteIds.has(n.id)
+      ? '<span class="note-pending-badge" title="Unsynced local changes" aria-label="Unsynced">●</span>'
+      : '';
     return `
     <div class="note-item ${n.id === currentNoteId ? 'active' : ''}" data-id="${n.id}" role="listitem">
       <div class="note-item-header">
         <div class="note-item-title">${escapeHtml(getTitle(n))}</div>
         ${n.is_pinned ? '<span class="note-pin-badge" aria-label="Pinned">📌</span>' : ''}
+        ${pendingBadge}
       </div>
       <div class="note-item-subtitle">${escapeHtml(getSubtitle(n))}</div>
       ${tagHtml}
@@ -275,6 +334,22 @@ function setAutosave(msg) {
   if (autosaveEl) autosaveEl.textContent = msg;
 }
 
+/**
+ * Sets the sync state indicator in the editor header.
+ * @param {'synced'|'saving'|'local'|'failed'} state
+ */
+function setSyncState(state) {
+  if (!autosaveEl) return;
+  autosaveEl.dataset.syncState = state;
+  switch (state) {
+    case 'saving':  autosaveEl.textContent = 'Saving…'; break;
+    case 'synced':  autosaveEl.textContent = 'Saved ✓'; break;
+    case 'local':   autosaveEl.textContent = '⚠ Queued offline'; break;
+    case 'failed':  autosaveEl.textContent = '✗ Failed — tap to retry'; break;
+    default:        autosaveEl.textContent = ''; break;
+  }
+}
+
 /* ===== API ===== */
 async function apiRequest(method, path, body) {
   const opts = {
@@ -298,6 +373,53 @@ async function loadNotes() {
   } catch (e) {
     console.error('Failed to load notes', e);
   }
+}
+
+/* ===== Offline sync queue flush ===== */
+async function flushQueue() {
+  if (flushInProgress || !navigator.onLine) return;
+  let pending;
+  try {
+    pending = await _getPendingWrites();
+  } catch (e) {
+    console.error('[Sync] Could not read pending writes', e);
+    return;
+  }
+  if (pending.length === 0) return;
+
+  flushInProgress = true;
+  console.info('[Sync] Flushing', pending.length, 'pending write(s)');
+
+  // Sort by queued_at ascending so oldest writes go first
+  pending.sort((a, b) => a.queued_at - b.queued_at);
+
+  for (const entry of pending) {
+    try {
+      const { note_id, title, body, is_pinned, folder_id } = entry;
+      const updated = await apiRequest('PUT', `/api/notes/${note_id}`,
+        { title, body, is_pinned: is_pinned || 0, folder_id: folder_id || null });
+
+      const idx = notes.findIndex(n => n.id === note_id);
+      if (idx !== -1) notes[idx] = updated;
+
+      await _removePendingWrite(note_id);
+      pendingNoteIds.delete(note_id);
+      if (currentNoteId === note_id) setSyncState('synced');
+      renderList();
+      flushRetryDelay = INITIAL_FLUSH_RETRY_DELAY_MS; // reset backoff after success
+    } catch (e) {
+      console.error('[Sync] Flush failed for note', entry.note_id, e);
+      if (currentNoteId === entry.note_id) setSyncState('failed');
+      flushInProgress = false;
+      // Exponential backoff before retrying the queue
+      setTimeout(flushQueue, flushRetryDelay);
+      flushRetryDelay = Math.min(flushRetryDelay * 2, MAX_FLUSH_RETRY_DELAY_MS);
+      return;
+    }
+  }
+
+  flushInProgress = false;
+  console.info('[Sync] Queue flushed successfully');
 }
 
 async function loadFolders() {
@@ -342,21 +464,54 @@ async function saveNote() {
   const note = currentNote();
   if (!note || note.is_trashed) return;
   isSaving = true;
-  setAutosave('Saving…');
+
   const title = noteTitle.textContent.trim();
   const body = noteBody.textContent;
   const is_pinned = note.is_pinned ? 1 : 0;
   const folder_id = note.folder_id != null ? note.folder_id : null;
+
+  if (!navigator.onLine) {
+    // Store write in IndexedDB; will flush on reconnect
+    try {
+      await _queueWrite(currentNoteId, title, body, is_pinned, folder_id);
+      pendingNoteIds.add(currentNoteId);
+      setSyncState('local');
+      // Update local notes array so the list reflects edits while offline
+      const idx = notes.findIndex(n => n.id === currentNoteId);
+      if (idx !== -1) {
+        notes[idx] = { ...notes[idx], title, body, is_pinned, folder_id };
+      }
+      renderList();
+    } catch (e) {
+      console.error('[Sync] Failed to queue write', e);
+      setSyncState('failed');
+    }
+    isSaving = false;
+    return;
+  }
+
+  setSyncState('saving');
   try {
     const updated = await apiRequest('PUT', `/api/notes/${currentNoteId}`,
       { title, body, is_pinned, folder_id });
     const idx = notes.findIndex(n => n.id === currentNoteId);
     if (idx !== -1) notes[idx] = updated;
+    // Remove from pending queue if it was queued offline
+    await _removePendingWrite(currentNoteId);
+    pendingNoteIds.delete(currentNoteId);
+    setSyncState('synced');
     renderList();
-    setAutosave('Saved');
   } catch (e) {
-    setAutosave('Save failed');
-    console.error('Save failed', e);
+    setSyncState('failed');
+    // Queue for retry
+    try {
+      await _queueWrite(currentNoteId, title, body, is_pinned, folder_id);
+      pendingNoteIds.add(currentNoteId);
+    } catch (qe) {
+      console.error('[Sync] Failed to queue write after error', qe);
+    }
+    renderList();
+    console.error('[Sync] Save failed', e);
   } finally {
     isSaving = false;
   }
@@ -379,7 +534,7 @@ async function togglePin() {
     if (idx !== -1) notes[idx] = updated;
     updateEditorToolbar(updated);
     renderList();
-    setAutosave(newPinned ? 'Pinned' : 'Unpinned');
+    setSyncState('synced');
   } catch (e) {
     console.error('Pin toggle failed', e);
   }
@@ -465,7 +620,7 @@ async function changeNoteFolder(folderId) {
     const idx = notes.findIndex(n => n.id === currentNoteId);
     if (idx !== -1) notes[idx] = updated;
     renderList();
-    setAutosave('Saved');
+    setSyncState('synced');
   } catch (e) {
     console.error('Folder change failed', e);
   }
@@ -734,7 +889,7 @@ async function deleteFolder(folderId) {
 
 /* ===== Autosave ===== */
 function scheduleAutosave() {
-  setAutosave('');
+  setSyncState('');
   clearTimeout(autosaveTimer);
   autosaveTimer = setTimeout(saveNote, 1500);
 }
@@ -901,14 +1056,18 @@ inputCameraCapture.addEventListener('change', async () => {
 function updateOnlineStatus() {
   offlineBanner.classList.toggle('visible', !navigator.onLine);
 }
-window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('online', () => {
+  updateOnlineStatus();
+  // Flush any queued offline writes when connectivity is restored
+  flushQueue();
+});
 window.addEventListener('offline', updateOnlineStatus);
 updateOnlineStatus();
 
 /* ===== Service Worker ===== */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/static/sw.js').catch(console.error);
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(console.error);
   });
 }
 
@@ -918,3 +1077,20 @@ loadFolders();
 loadTags();
 loadNotes();
 if (typeof initAnnotationEditor === 'function') initAnnotationEditor();
+
+// Load pending note IDs from IndexedDB so list badges show on startup
+_getPendingWrites().then(pending => {
+  pending.forEach(p => pendingNoteIds.add(p.note_id));
+  if (pendingNoteIds.size > 0) renderList();
+  // Flush any pending writes if we're already online
+  if (navigator.onLine) flushQueue();
+}).catch(e => console.error('[Sync] Could not load pending writes on init', e));
+
+// Retry sync when user taps the failed indicator
+if (autosaveEl) {
+  autosaveEl.addEventListener('click', () => {
+    if (autosaveEl.dataset.syncState === 'failed') {
+      flushQueue();
+    }
+  });
+}

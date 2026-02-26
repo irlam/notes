@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, request, render_template, abort, session, redirect, url_for
+from flask import Blueprint, jsonify, request, render_template, abort, session, redirect, url_for, \
+    send_from_directory, current_app, make_response
 from .auth import login_required
 from .database import get_db, get_user_by_id
 
@@ -486,6 +487,70 @@ def delete_tag(tag_id):
                (tag_id, _current_user_id()))
     db.commit()
     return '', 204
+
+
+@bp.route('/sw.js')
+def service_worker():
+    """Serve the service worker from root scope with correct headers."""
+    response = make_response(
+        send_from_directory(current_app.static_folder, 'sw.js')
+    )
+    response.headers['Service-Worker-Allowed'] = '/'
+    response.headers['Cache-Control'] = 'no-cache'
+    return response
+
+
+@bp.route('/api/sync', methods=['POST'])
+@login_required
+def sync_notes():
+    """Bulk-sync endpoint: apply multiple pending offline writes at once.
+
+    Request body: { "updates": [{ "id": <int>, "title": <str>, "body": <str>,
+                                   "is_pinned": <0|1>, "folder_id": <int|null> }, ...] }
+    Response:     { "results": [{ "id": <int>, "ok": <bool>, "error": <str|null> }, ...] }
+    """
+    data = request.get_json(silent=True) or {}
+    updates = data.get('updates', [])
+    if not isinstance(updates, list):
+        abort(400)
+
+    db = get_db()
+    uid = _current_user_id()
+    results = []
+
+    for item in updates:
+        note_id = item.get('id')
+        if not isinstance(note_id, int):
+            results.append({'id': note_id, 'ok': False, 'error': 'invalid id'})
+            continue
+
+        existing = db.execute(
+            'SELECT id FROM notes WHERE id = ? AND user_id = ? AND is_trashed = 0',
+            (note_id, uid)
+        ).fetchone()
+        if existing is None:
+            results.append({'id': note_id, 'ok': False, 'error': 'not found'})
+            continue
+
+        title = item.get('title', '')
+        body = item.get('body', '')
+        is_pinned = int(bool(item.get('is_pinned', 0)))
+        folder_id = item.get('folder_id')
+        if folder_id is not None:
+            folder_id = int(folder_id)
+
+        try:
+            db.execute(
+                'UPDATE notes SET title = ?, body = ?, is_pinned = ?, folder_id = ?, '
+                'updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?',
+                (title, body, is_pinned, folder_id, note_id, uid)
+            )
+            results.append({'id': note_id, 'ok': True})
+        except Exception as e:
+            results.append({'id': note_id, 'ok': False, 'error': str(e)})
+
+    db.commit()
+    return jsonify({'results': results})
 
 
 @bp.errorhandler(404)
