@@ -33,10 +33,12 @@ CREATE TABLE IF NOT EXISTS notes (
     is_pinned INTEGER NOT NULL DEFAULT 0,
     is_archived INTEGER NOT NULL DEFAULT 0,
     is_trashed INTEGER NOT NULL DEFAULT 0,
+    conflict_of INTEGER,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (folder_id) REFERENCES folders (id)
+    FOREIGN KEY (folder_id) REFERENCES folders (id),
+    FOREIGN KEY (conflict_of) REFERENCES notes (id)
 );
 
 CREATE TABLE IF NOT EXISTS note_tags (
@@ -53,6 +55,7 @@ CREATE INDEX IF NOT EXISTS idx_tags_user_id ON tags (user_id);
 CREATE INDEX IF NOT EXISTS idx_note_tags_note_id ON note_tags (note_id);
 CREATE INDEX IF NOT EXISTS idx_note_tags_tag_id ON note_tags (tag_id);
 CREATE INDEX IF NOT EXISTS idx_notes_folder_id ON notes (folder_id);
+CREATE INDEX IF NOT EXISTS idx_notes_conflict_of ON notes (conflict_of);
 
 CREATE TABLE IF NOT EXISTS note_images (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,3 +76,17 @@ CREATE TABLE IF NOT EXISTS note_images (
 
 CREATE INDEX IF NOT EXISTS idx_note_images_note_id ON note_images (note_id);
 CREATE INDEX IF NOT EXISTS idx_note_images_user_id ON note_images (user_id);
+
+CREATE TABLE IF NOT EXISTS note_versions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    note_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    title TEXT NOT NULL DEFAULT '',
+    body TEXT NOT NULL DEFAULT '',
+    saved_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (note_id) REFERENCES notes (id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_note_versions_note_id ON note_versions (note_id);
+CREATE INDEX IF NOT EXISTS idx_note_versions_user_id ON note_versions (user_id);
