@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, render_template, abort, session, redirect, url_for
+from flask import Blueprint, jsonify, request, render_template, abort, session, redirect, url_for, current_app
 from .auth import login_required
 from .database import get_db, get_user_by_id
 
@@ -53,6 +53,15 @@ def index():
 def dashboard():
     user = get_user_by_id(_current_user_id())
     return render_template('dashboard.html', username=user['username'] if user else '')
+
+
+@bp.route('/sw.js')
+def service_worker():
+    """Serve the service worker from the root path so it has scope '/'."""
+    response = current_app.send_static_file('sw.js')
+    response.headers['Service-Worker-Allowed'] = '/'
+    response.headers['Cache-Control'] = 'no-cache'
+    return response
 
 
 @bp.route('/api/notes', methods=['GET'])
@@ -486,6 +495,73 @@ def delete_tag(tag_id):
                (tag_id, _current_user_id()))
     db.commit()
     return '', 204
+
+
+# ---------------------------------------------------------------------------
+# Bulk sync endpoint — accepts a list of pending offline writes
+# ---------------------------------------------------------------------------
+
+@bp.route('/api/sync', methods=['POST'])
+@login_required
+def bulk_sync():
+    """Apply a batch of offline note writes.
+
+    Request body: {"writes": [{"id": <note_id>, "title": ..., "body": ...}, ...]}
+    Response: {"results": [{"id": ..., "ok": true|false, "note": {...}|null}, ...]}
+    """
+    data = request.get_json(silent=True) or {}
+    writes = data.get('writes', [])
+    if not isinstance(writes, list):
+        abort(400)
+
+    db = get_db()
+    uid = _current_user_id()
+    results = []
+
+    for w in writes:
+        note_id = w.get('id')
+        title = w.get('title', '')
+        body = w.get('body', '')
+        is_pinned = int(bool(w.get('is_pinned', 0)))
+        folder_id_raw = w.get('folder_id')
+
+        if not isinstance(note_id, int):
+            results.append({'id': note_id, 'ok': False, 'note': None})
+            continue
+
+        existing = db.execute(
+            'SELECT id, folder_id FROM notes WHERE id = ? AND user_id = ? AND is_trashed = 0',
+            (note_id, uid)
+        ).fetchone()
+        if existing is None:
+            results.append({'id': note_id, 'ok': False, 'note': None})
+            continue
+
+        # Only update folder if explicitly supplied and valid
+        if folder_id_raw is not None:
+            folder_id = int(folder_id_raw)
+            if not db.execute(
+                'SELECT id FROM folders WHERE id = ? AND user_id = ?',
+                (folder_id, uid)
+            ).fetchone():
+                folder_id = existing['folder_id']
+        else:
+            folder_id = existing['folder_id']
+
+        db.execute(
+            'UPDATE notes SET title = ?, body = ?, is_pinned = ?, folder_id = ?, '
+            'updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?',
+            (title, body, is_pinned, folder_id, note_id, uid)
+        )
+        db.commit()
+        row = db.execute(
+            f'SELECT {_NOTE_FIELDS} FROM notes WHERE id = ?', (note_id,)
+        ).fetchone()
+        d = dict(row)
+        d['tags'] = _fetch_tags_for_notes(db, [note_id]).get(note_id, [])
+        results.append({'id': note_id, 'ok': True, 'note': d})
+
+    return jsonify({'results': results})
 
 
 @bp.errorhandler(404)

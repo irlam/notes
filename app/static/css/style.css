@@ -440,6 +440,46 @@ body {
   font-size: 12px;
   color: var(--text-muted);
   min-width: 0;
+  cursor: default;
+  border-radius: 6px;
+  padding: 2px 4px;
+  transition: background 0.12s, color 0.12s;
+}
+.autosave-indicator[data-sync-state="failed"] {
+  color: var(--danger);
+  cursor: pointer;
+  text-decoration: underline dotted;
+}
+.autosave-indicator[data-sync-state="local"] {
+  color: #b97800;
+}
+.autosave-indicator[data-sync-state="synced"] {
+  color: #2e7d32;
+}
+
+/* ===== Sync badges in note list ===== */
+.sync-badge {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+.sync-badge[data-state="local"] {
+  background: #f5a623;
+}
+.sync-badge[data-state="saving"] {
+  background: #64b5f6;
+  animation: sync-pulse 1s ease-in-out infinite;
+}
+.sync-badge[data-state="failed"] {
+  background: var(--danger);
+}
+@keyframes sync-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 
 /* Folder selector in editor header */
