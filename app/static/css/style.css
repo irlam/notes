@@ -766,3 +766,208 @@ body {
 .btn-image-ctrl:hover { background: var(--surface2); color: var(--text); }
 .btn-image-ctrl.btn-danger:hover { background: #fdecea; color: var(--danger); }
 .btn-image-ctrl:disabled { opacity: 0.3; cursor: default; }
+
+/* ===== Annotation Editor ===== */
+
+/* Full-screen modal overlay */
+.annotation-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  background: #1a1a1a;
+  color: #f0f0f0;
+}
+
+/* Header toolbar */
+.ann-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #2a2a2a;
+  border-bottom: 1px solid #444;
+  flex-shrink: 0;
+  min-height: 52px;
+}
+
+.ann-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.ann-tool-btn {
+  min-width: var(--min-tap);
+  min-height: var(--min-tap);
+  padding: 4px 8px;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: #3a3a3a;
+  color: #f0f0f0;
+  font-size: 16px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ann-tool-btn:hover { background: #4a4a4a; border-color: var(--accent); }
+.ann-tool-btn.active {
+  background: var(--accent);
+  border-color: var(--accent-dark);
+  color: #fff;
+}
+
+.ann-color-input {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.ann-width-slider {
+  width: 80px;
+  accent-color: var(--accent);
+}
+
+/* Action buttons */
+.ann-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.ann-action-btn {
+  min-width: var(--min-tap);
+  min-height: var(--min-tap);
+  padding: 4px 8px;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: #3a3a3a;
+  color: #f0f0f0;
+  font-size: 15px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.ann-action-btn:hover:not(:disabled) { background: #4a4a4a; }
+.ann-action-btn:disabled { opacity: 0.35; cursor: default; }
+.ann-action-btn.ann-btn-danger:hover { background: #7a1f1f; color: #fdd; }
+
+.ann-status {
+  font-size: 12px;
+  color: #aaa;
+  min-width: 60px;
+  text-align: center;
+}
+
+.ann-btn-save {
+  height: var(--min-tap);
+  padding: 0 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.ann-btn-save:hover:not(:disabled) { background: var(--accent-dark); }
+.ann-btn-save:disabled { opacity: 0.5; cursor: default; }
+
+.ann-btn-cancel {
+  height: var(--min-tap);
+  padding: 0 12px;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: #3a3a3a;
+  color: #f0f0f0;
+  font-size: 16px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.ann-btn-cancel:hover { background: #555; }
+
+/* Canvas wrap — takes remaining space, centred */
+.ann-canvas-wrap {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: #111;
+  touch-action: none;   /* prevent browser pan/zoom interfering */
+}
+
+/* Stage wraps image + canvas together so they overlap */
+.ann-stage {
+  position: relative;
+  display: inline-block;
+  transform-origin: center center;
+  line-height: 0;         /* prevent gap below img */
+}
+
+.ann-source-img {
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;   /* canvas is on top */
+  max-width: none;        /* override global img max-width */
+}
+
+.ann-canvas {
+  position: absolute;
+  inset: 0;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* Floating text input for the text tool */
+.ann-text-overlay {
+  position: fixed;
+  z-index: 600;
+  min-width: 120px;
+  min-height: 36px;
+  padding: 4px 8px;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  font-size: 16px;
+  font-family: var(--font);
+  resize: none;
+  outline: none;
+}
+
+/* Annotated-image canvas preview in note view */
+.image-block-canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 480px;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* Responsive adjustments for annotation editor on small screens */
+@media (max-width: 600px) {
+  .ann-header { padding: 4px 6px; gap: 4px; }
+  .ann-tool-btn { min-width: 36px; min-height: 36px; font-size: 14px; padding: 2px 6px; }
+  .ann-action-btn { min-width: 36px; min-height: 36px; font-size: 13px; padding: 2px 6px; }
+  .ann-width-slider { width: 60px; }
+  .ann-actions { margin-left: 0; }
+}
