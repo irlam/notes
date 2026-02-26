@@ -171,7 +171,7 @@ localStorage.removeItem('notes_sync_queue')
 ```
 
 ### Cache invalidation after a server update
-The service worker cache version is set to `notes-v2`.  After deploying an update that changes static files, bump the `CACHE_NAME` constant in `app/static/sw.js` to `notes-v3` (or higher).  This causes the old cache to be deleted on next activation.
+The service worker cache version is set to `notes-v2`.  After deploying an update that changes static files, bump the `CACHE_NAME` constant in `sw.js` (`app/static/sw.js`) to `notes-v3` (or higher).  This causes the old cache to be deleted on next activation.
 
 ### Plesk Passenger / WSGI headers
 To ensure static files are served with correct MIME types (required for SW registration), confirm Plesk's nginx configuration for `/static/` is not stripping the `Content-Type` header.  The `sw.js` file must be served as `text/javascript` or `application/javascript`.

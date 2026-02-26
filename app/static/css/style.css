@@ -986,7 +986,6 @@ body {
 .sync-badge--local {
   background: #e8a838;
   color: #fff;
-  title: "Unsaved (offline)";
 }
 
 .sync-badge--syncing {

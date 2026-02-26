@@ -23,8 +23,11 @@ const MAX_RETRIES    = 5;
 /* ---- internal helpers ---- */
 
 function _readJson(key, fallback) {
-  try { return JSON.parse(localStorage.getItem(key) || 'null') || fallback; }
-  catch { return fallback; }
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw) || fallback;
+  } catch { return fallback; }
 }
 
 function _writeJson(key, value) {
