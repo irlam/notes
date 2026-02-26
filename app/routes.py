@@ -1,28 +1,42 @@
-from flask import Blueprint, jsonify, request, render_template, abort
-from .database import get_db
+from flask import Blueprint, jsonify, request, render_template, abort, session, redirect, url_for
+from .auth import login_required
+from .database import get_db, get_user_by_id
 
 bp = Blueprint('main', __name__)
 
-USER_ID = 1
+
+def _current_user_id():
+    return session['user_id']
 
 
 @bp.route('/')
 def index():
-    return render_template('index.html')
+    if 'user_id' in session:
+        return redirect(url_for('main.dashboard'))
+    return redirect(url_for('auth.login'))
+
+
+@bp.route('/dashboard')
+@login_required
+def dashboard():
+    user = get_user_by_id(_current_user_id())
+    return render_template('dashboard.html', username=user['username'] if user else '')
 
 
 @bp.route('/api/notes', methods=['GET'])
+@login_required
 def list_notes():
     db = get_db()
     rows = db.execute(
         'SELECT id, title, body, created_at, updated_at FROM notes '
         'WHERE user_id = ? ORDER BY updated_at DESC',
-        (USER_ID,)
+        (_current_user_id(),)
     ).fetchall()
     return jsonify([dict(r) for r in rows])
 
 
 @bp.route('/api/notes', methods=['POST'])
+@login_required
 def create_note():
     data = request.get_json(silent=True) or {}
     title = data.get('title', '')
@@ -30,7 +44,7 @@ def create_note():
     db = get_db()
     cur = db.execute(
         'INSERT INTO notes (user_id, title, body) VALUES (?, ?, ?)',
-        (USER_ID, title, body)
+        (_current_user_id(), title, body)
     )
     db.commit()
     row = db.execute(
@@ -41,11 +55,12 @@ def create_note():
 
 
 @bp.route('/api/notes/<int:note_id>', methods=['GET'])
+@login_required
 def get_note(note_id):
     db = get_db()
     row = db.execute(
         'SELECT id, title, body, created_at, updated_at FROM notes WHERE id = ? AND user_id = ?',
-        (note_id, USER_ID)
+        (note_id, _current_user_id())
     ).fetchone()
     if row is None:
         abort(404)
@@ -53,10 +68,11 @@ def get_note(note_id):
 
 
 @bp.route('/api/notes/<int:note_id>', methods=['PUT'])
+@login_required
 def update_note(note_id):
     db = get_db()
     existing = db.execute(
-        'SELECT id FROM notes WHERE id = ? AND user_id = ?', (note_id, USER_ID)
+        'SELECT id FROM notes WHERE id = ? AND user_id = ?', (note_id, _current_user_id())
     ).fetchone()
     if existing is None:
         abort(404)
@@ -66,7 +82,7 @@ def update_note(note_id):
     db.execute(
         'UPDATE notes SET title = ?, body = ?, updated_at = CURRENT_TIMESTAMP '
         'WHERE id = ? AND user_id = ?',
-        (title, body, note_id, USER_ID)
+        (title, body, note_id, _current_user_id())
     )
     db.commit()
     row = db.execute(
@@ -77,14 +93,15 @@ def update_note(note_id):
 
 
 @bp.route('/api/notes/<int:note_id>', methods=['DELETE'])
+@login_required
 def delete_note(note_id):
     db = get_db()
     existing = db.execute(
-        'SELECT id FROM notes WHERE id = ? AND user_id = ?', (note_id, USER_ID)
+        'SELECT id FROM notes WHERE id = ? AND user_id = ?', (note_id, _current_user_id())
     ).fetchone()
     if existing is None:
         abort(404)
-    db.execute('DELETE FROM notes WHERE id = ? AND user_id = ?', (note_id, USER_ID))
+    db.execute('DELETE FROM notes WHERE id = ? AND user_id = ?', (note_id, _current_user_id()))
     db.commit()
     return '', 204
 
