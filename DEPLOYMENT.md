@@ -128,7 +128,67 @@ touch passenger_wsgi.py      # restart Passenger
 
 ---
 
-## Troubleshooting
+## Milestone 2: Notes CRUD & Status Columns
+
+### Database Migration
+
+Milestone 2 adds three new columns to the `notes` table (`is_pinned`, `is_archived`,
+`is_trashed`). **Apply the migration before restarting the application** on an
+existing database:
+
+```bash
+cd /var/www/vhosts/yourdomain.com/notes
+source venv/bin/activate
+python3 -c "
+import sqlite3, os
+db_path = os.environ.get('DATABASE_PATH', 'notes.db')
+db = sqlite3.connect(db_path)
+with open('migrations/002_add_note_status.sql') as f:
+    db.executescript(f.read())
+db.close()
+print('Migration 002 applied.')
+"
+deactivate
+```
+
+Fresh installations (new `notes.db`) do **not** need to run this migration because
+the updated `schema.sql` already includes the new columns.
+
+### New API Endpoints (Milestone 2)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/notes?filter=active\|archived\|trashed` | List notes by status |
+| `PUT` | `/api/notes/<id>` | Update title/body/is_pinned |
+| `POST` | `/api/notes/<id>/archive` | Toggle archive status |
+| `POST` | `/api/notes/<id>/restore` | Restore from trash |
+| `DELETE` | `/api/notes/<id>` | Move note to trash (soft delete) |
+| `DELETE` | `/api/notes/<id>/permanent` | Permanently delete (must be in trash) |
+
+### Manual QA Checklist
+
+- [ ] Create a note — appears in the active list
+- [ ] Edit title and body — autosave indicator shows "Saving…" then "Saved" after ~1.5 s
+- [ ] Pin a note — 📌 appears in the list and pinned note sorts to the top
+- [ ] Unpin a note — returns to normal sort order
+- [ ] Archive a note — disappears from active; visible under **Archived** tab
+- [ ] Unarchive a note — returns to active list
+- [ ] Trash a note — disappears from active; visible under **Trash** tab
+- [ ] Restore from trash — returns to active list
+- [ ] Permanently delete — note gone from trash; GET returns 404
+- [ ] Offline banner appears when network is disconnected
+- [ ] Mobile ≤ 767 px: sidebar shown first; tapping a note opens editor full-screen; back button returns to list
+- [ ] Tablet / desktop: sidebar and editor visible side by side
+
+### Edge Cases
+
+- **Empty note created** — title and body blank; note is saved with defaults (handled)
+- **Switch note while autosave pending** — pending save for previous note is flushed before opening next
+- **Trashed note editor** — title and body are read-only; only Restore and Permanent Delete buttons shown
+- **Archiving a trashed note** — returns 404 (not allowed)
+- **Permanent delete of non-trashed note** — returns 404 (must trash first)
+- **Data loss prevention** — back button flushes pending autosave immediately
+
 
 | Issue | Solution |
 |-------|----------|

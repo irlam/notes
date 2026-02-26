@@ -4,115 +4,100 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f5a623" />
-  <title>Dashboard – Notes</title>
+  <title>Notes</title>
   <link rel="manifest" href="/static/manifest.json" />
   <link rel="stylesheet" href="/static/css/style.css" />
-  <style>
-    html, body { height: 100%; overflow: auto; }
-    .dashboard-wrap {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: var(--bg);
-    }
-    .topbar {
-      height: 56px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      flex-shrink: 0;
-    }
-    .topbar-brand {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.3px;
-    }
-    .topbar-brand span { color: var(--accent); }
-    .topbar-user {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-    .btn-logout {
-      height: 36px;
-      padding: 0 16px;
-      background: var(--surface2);
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-      font-family: var(--font);
-      transition: background 0.12s;
-    }
-    .btn-logout:hover { background: var(--border); }
-    .dashboard-body {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 24px;
-    }
-    .placeholder-card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-md);
-      padding: 48px 40px;
-      width: min(480px, 100%);
-      text-align: center;
-    }
-    .placeholder-card .icon { font-size: 56px; margin-bottom: 20px; opacity: 0.6; }
-    .placeholder-card h2 {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 10px;
-    }
-    .placeholder-card p {
-      font-size: 15px;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-    .placeholder-card .badge {
-      display: inline-block;
-      margin-top: 18px;
-      background: #fff8ec;
-      color: var(--accent-dark);
-      border: 1px solid #fddfa3;
-      border-radius: 20px;
-      padding: 4px 14px;
-      font-size: 13px;
-      font-weight: 600;
-    }
-  </style>
 </head>
 <body>
-  <div class="dashboard-wrap">
-    <header class="topbar">
-      <div class="topbar-brand">📝 <span>Notes</span></div>
-      <div class="topbar-user">
-        <span>{{ username }}</span>
-        <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0">
-          <button type="submit" class="btn-logout">Sign out</button>
-        </form>
-      </div>
-    </header>
+  <div id="app">
+    <div id="offline-banner">You are offline — changes will sync when reconnected.</div>
 
-    <main class="dashboard-body">
-      <div class="placeholder-card">
-        <div class="icon">🗒️</div>
-        <h2>Welcome, {{ username }}!</h2>
-        <p>You're signed in. Notes are coming soon&nbsp;— check back after Milestone&nbsp;2.</p>
-        <span class="badge">Milestone 1 complete ✓</span>
+    <div class="main-layout">
+
+      <!-- ===== Sidebar ===== -->
+      <nav class="sidebar">
+        <div class="sidebar-header">
+          <h1>📝 Notes</h1>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button id="btn-new" class="btn-new" title="New note" aria-label="New note">+</button>
+          </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="filter-tabs" role="tablist">
+          <button class="filter-tab active" data-filter="active" role="tab" aria-selected="true">Notes</button>
+          <button class="filter-tab" data-filter="archived" role="tab" aria-selected="false">Archived</button>
+          <button class="filter-tab" data-filter="trashed" role="tab" aria-selected="false">Trash</button>
+        </div>
+
+        <div id="note-list" role="list"></div>
+
+        <!-- Sign out at the bottom -->
+        <div class="sidebar-footer">
+          <span class="sidebar-user">{{ username }}</span>
+          <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0">
+            <button type="submit" class="btn-signout">Sign out</button>
+          </form>
+        </div>
+      </nav>
+
+      <!-- ===== Editor Pane ===== -->
+      <div class="editor-pane">
+        <!-- Welcome / no-note state -->
+        <div id="editor-welcome" class="editor-welcome">
+          <div class="icon">🗒️</div>
+          <p>Select a note or tap <strong>+</strong> to create one.</p>
+        </div>
+
+        <!-- Editor content -->
+        <div id="editor-content" style="display:none; flex-direction:column; height:100%;">
+          <div class="editor-header">
+            <button id="btn-back" title="Back to list" aria-label="Back">‹</button>
+            <span id="autosave-indicator" class="autosave-indicator" aria-live="polite"></span>
+            <button id="btn-pin" class="btn-icon" title="Pin note" aria-label="Pin note">📌</button>
+            <button id="btn-archive" class="btn-icon" title="Archive note" aria-label="Archive note">📥</button>
+            <button id="btn-trash" class="btn-icon btn-trash-note" title="Move to trash" aria-label="Move to trash">🗑️</button>
+            <button id="btn-restore" class="btn-icon" title="Restore note" aria-label="Restore note" style="display:none">↩️</button>
+            <button id="btn-delete-permanent" class="btn-icon btn-danger" title="Delete permanently" aria-label="Delete permanently" style="display:none">❌</button>
+          </div>
+
+          <div class="editor-body">
+            <div
+              id="note-title"
+              class="note-title-input"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Note title"
+              aria-multiline="false"
+              spellcheck="true"
+            ></div>
+            <div
+              id="note-body"
+              class="note-body-input"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Note body"
+              aria-multiline="true"
+              spellcheck="true"
+            ></div>
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
   </div>
+
+  <!-- Confirm permanent delete dialog -->
+  <div id="dialog-overlay" class="dialog-overlay" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+    <div class="dialog">
+      <h2 id="dialog-title">Delete permanently?</h2>
+      <p>This note will be deleted forever and cannot be recovered.</p>
+      <div class="dialog-actions">
+        <button id="btn-cancel-delete" class="btn btn-cancel">Cancel</button>
+        <button id="btn-confirm-delete" class="btn btn-confirm-delete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
 </body>
 </html>
