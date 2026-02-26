@@ -681,3 +681,88 @@ body {
 
   .note-folder-select { max-width: 100px; }
 }
+
+/* ===== Image toolbar & blocks ===== */
+.image-toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.btn-image-add {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  white-space: nowrap;
+}
+.btn-image-add:hover { background: var(--border); border-color: var(--accent); }
+.btn-image-add:disabled { opacity: 0.5; cursor: default; }
+
+.image-upload-status {
+  font-size: 12px;
+  color: var(--text-muted);
+  min-height: 18px;
+}
+.image-upload-status.error { color: var(--danger); }
+
+.image-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 16px;
+}
+
+.image-block {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface2);
+}
+
+.image-block img {
+  display: block;
+  max-width: 100%;
+  max-height: 480px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+.image-block-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.92);
+  border-top: 1px solid var(--border);
+}
+
+.btn-image-ctrl {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  line-height: 1;
+  transition: background 0.1s, color 0.1s;
+  min-width: 28px;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-image-ctrl:hover { background: var(--surface2); color: var(--text); }
+.btn-image-ctrl.btn-danger:hover { background: #fdecea; color: var(--danger); }
+.btn-image-ctrl:disabled { opacity: 0.3; cursor: default; }

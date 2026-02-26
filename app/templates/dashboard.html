@@ -124,6 +124,21 @@
               aria-multiline="true"
               spellcheck="true"
             ></div>
+
+            <!-- Image blocks -->
+            <div id="image-toolbar" class="image-toolbar" style="display:none;">
+              <button id="btn-upload-image" class="btn-image-add" type="button"
+                title="Add image from file" aria-label="Add image from file">🖼 Add image</button>
+              <button id="btn-camera-capture" class="btn-image-add" type="button"
+                title="Capture from camera" aria-label="Capture from camera">📷 Camera</button>
+              <!-- Hidden file inputs -->
+              <input type="file" id="input-upload-image" accept="image/*"
+                style="display:none;" aria-hidden="true" />
+              <input type="file" id="input-camera-capture" accept="image/*"
+                capture="environment" style="display:none;" aria-hidden="true" />
+            </div>
+            <div id="image-upload-status" class="image-upload-status" aria-live="polite"></div>
+            <div id="image-blocks" class="image-blocks"></div>
           </div>
         </div>
       </div>

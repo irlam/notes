@@ -23,6 +23,12 @@ def create_app():
         'DATABASE_PATH',
         os.path.join(os.path.dirname(os.path.dirname(__file__)), 'notes.db')
     )
+    app.config['MEDIA_PATH'] = os.environ.get(
+        'MEDIA_PATH',
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
+    )
+    # 12 MB hard limit (covers 10 MB image + multipart overhead)
+    app.config['MAX_CONTENT_LENGTH'] = 12 * 1024 * 1024
 
     # --- Session / cookie security ---
     app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -46,6 +52,9 @@ def create_app():
 
     from .routes import bp
     app.register_blueprint(bp)
+
+    from .media import media_bp
+    app.register_blueprint(media_bp)
 
     # --- CLI: create initial user ---
     @app.cli.command('create-user')

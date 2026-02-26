@@ -2,6 +2,7 @@
 let notes = [];
 let folders = [];
 let tags = [];
+let images = [];   // images for the currently open note
 let currentNoteId = null;
 let autosaveTimer = null;
 let searchTimer = null;
@@ -47,6 +48,13 @@ const tagBar = document.getElementById('tag-bar');
 const tagChipsEl = document.getElementById('tag-chips');
 const tagInput = document.getElementById('tag-input');
 const tagDatalist = document.getElementById('tag-datalist');
+const imageToolbar = document.getElementById('image-toolbar');
+const btnUploadImage = document.getElementById('btn-upload-image');
+const btnCameraCapture = document.getElementById('btn-camera-capture');
+const inputUploadImage = document.getElementById('input-upload-image');
+const inputCameraCapture = document.getElementById('input-camera-capture');
+const imageUploadStatus = document.getElementById('image-upload-status');
+const imageBlocksEl = document.getElementById('image-blocks');
 
 /* ===== Helpers ===== */
 function formatDate(dateStr) {
@@ -200,6 +208,10 @@ function showEditor(show) {
     editorContent.style.display = 'none';
     editorWelcome.style.display = '';
     currentNoteId = null;
+    images = [];
+    if (imageBlocksEl) imageBlocksEl.innerHTML = '';
+    if (imageToolbar) imageToolbar.style.display = 'none';
+    setImageStatus('');
   }
 }
 
@@ -230,6 +242,9 @@ function updateEditorToolbar(note) {
   tagInput.style.display = trashed ? 'none' : '';
   renderTagChips(note);
   updateTagDatalist();
+
+  // Image toolbar
+  if (imageToolbar) imageToolbar.style.display = trashed ? 'none' : '';
 }
 
 function openNote(id) {
@@ -248,6 +263,10 @@ function openNote(id) {
   showEditor(true);
   updateEditorToolbar(note);
   renderList();
+  images = [];
+  renderImageBlocks();
+  setImageStatus('');
+  loadImages(id);
 
   mainLayout.classList.add('editor-open');
 }
@@ -506,6 +525,153 @@ async function removeTagFromNote(tagId) {
   }
 }
 
+/* ===== Image handling ===== */
+function setImageStatus(msg, isError) {
+  imageUploadStatus.textContent = msg;
+  imageUploadStatus.className = 'image-upload-status' + (isError ? ' error' : '');
+}
+
+function renderImageBlocks() {
+  if (!imageBlocksEl) return;
+  imageBlocksEl.innerHTML = '';
+  images.forEach((img, idx) => {
+    const block = document.createElement('div');
+    block.className = 'image-block';
+    block.dataset.id = img.id;
+
+    const imgEl = document.createElement('img');
+    imgEl.src = img.url;
+    imgEl.alt = escapeHtml(img.original_filename || 'Image');
+    imgEl.loading = 'lazy';
+    block.appendChild(imgEl);
+
+    const controls = document.createElement('div');
+    controls.className = 'image-block-controls';
+
+    const btnUp = document.createElement('button');
+    btnUp.className = 'btn-image-ctrl';
+    btnUp.title = 'Move up';
+    btnUp.setAttribute('aria-label', 'Move image up');
+    btnUp.textContent = '↑';
+    btnUp.disabled = idx === 0;
+    btnUp.addEventListener('click', () => moveImage(img.id, -1));
+
+    const btnDown = document.createElement('button');
+    btnDown.className = 'btn-image-ctrl';
+    btnDown.title = 'Move down';
+    btnDown.setAttribute('aria-label', 'Move image down');
+    btnDown.textContent = '↓';
+    btnDown.disabled = idx === images.length - 1;
+    btnDown.addEventListener('click', () => moveImage(img.id, 1));
+
+    const btnDel = document.createElement('button');
+    btnDel.className = 'btn-image-ctrl btn-danger';
+    btnDel.title = 'Remove image';
+    btnDel.setAttribute('aria-label', 'Remove image');
+    btnDel.textContent = '🗑';
+    btnDel.addEventListener('click', () => removeImage(img.id));
+
+    const label = document.createElement('span');
+    label.style.cssText = 'flex:1;font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-left:4px;';
+    label.textContent = img.original_filename || '';
+
+    controls.appendChild(btnUp);
+    controls.appendChild(btnDown);
+    controls.appendChild(btnDel);
+    controls.appendChild(label);
+    block.appendChild(controls);
+    imageBlocksEl.appendChild(block);
+  });
+}
+
+async function loadImages(noteId) {
+  try {
+    images = await apiRequest('GET', `/api/notes/${noteId}/images`);
+    renderImageBlocks();
+  } catch (e) {
+    console.error('Failed to load images', e);
+  }
+}
+
+async function uploadImageFile(file) {
+  if (!currentNoteId || !file) return;
+  const note = currentNote();
+  if (!note || note.is_trashed) return;
+
+  setImageStatus('Uploading…');
+  btnUploadImage.disabled = true;
+  btnCameraCapture.disabled = true;
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    const res = await fetch(`/api/notes/${currentNoteId}/images`, {
+      method: 'POST',
+      body: formData,
+    });
+    if (res.status === 413) {
+      setImageStatus('Image too large (max 10 MB).', true);
+      return;
+    }
+    if (res.status === 400) {
+      setImageStatus('Unsupported file type. Please use JPEG, PNG, GIF, or WebP.', true);
+      return;
+    }
+    if (!res.ok) {
+      setImageStatus(`Upload failed (${res.status}). Please try again.`, true);
+      return;
+    }
+    const img = await res.json();
+    images.push(img);
+    renderImageBlocks();
+    setImageStatus('');
+  } catch (e) {
+    setImageStatus('Upload failed. Check your connection and try again.', true);
+    console.error('Image upload failed', e);
+  } finally {
+    btnUploadImage.disabled = false;
+    btnCameraCapture.disabled = false;
+    inputUploadImage.value = '';
+    inputCameraCapture.value = '';
+  }
+}
+
+async function removeImage(imageId) {
+  if (!currentNoteId) return;
+  try {
+    await apiRequest('DELETE', `/api/notes/${currentNoteId}/images/${imageId}`);
+    images = images.filter(i => i.id !== imageId);
+    renderImageBlocks();
+    setImageStatus('');
+  } catch (e) {
+    setImageStatus('Could not remove image. Please try again.', true);
+    console.error('Image delete failed', e);
+  }
+}
+
+async function moveImage(imageId, delta) {
+  const idx = images.findIndex(i => i.id === imageId);
+  if (idx < 0) return;
+  const newIdx = idx + delta;
+  if (newIdx < 0 || newIdx >= images.length) return;
+
+  // Swap in local array
+  [images[idx], images[newIdx]] = [images[newIdx], images[idx]];
+  renderImageBlocks();
+
+  try {
+    await apiRequest('PUT', `/api/notes/${currentNoteId}/images/reorder`,
+      { image_ids: images.map(i => i.id) });
+  } catch (e) {
+    // Roll back on failure
+    [images[idx], images[newIdx]] = [images[newIdx], images[idx]];
+    renderImageBlocks();
+    setImageStatus('Could not reorder images. Please try again.', true);
+    console.error('Image reorder failed', e);
+  }
+}
+
 async function createFolder(name) {
   name = name.trim();
   if (!name) return;
@@ -684,6 +850,20 @@ tagInput.addEventListener('keydown', async e => {
   } else if (e.key === 'Escape') {
     tagInput.value = '';
   }
+});
+
+/* ===== Image upload events ===== */
+btnUploadImage.addEventListener('click', () => inputUploadImage.click());
+btnCameraCapture.addEventListener('click', () => inputCameraCapture.click());
+
+inputUploadImage.addEventListener('change', async () => {
+  const file = inputUploadImage.files[0];
+  if (file) await uploadImageFile(file);
+});
+
+inputCameraCapture.addEventListener('change', async () => {
+  const file = inputCameraCapture.files[0];
+  if (file) await uploadImageFile(file);
 });
 
 /* ===== Offline detection ===== */
