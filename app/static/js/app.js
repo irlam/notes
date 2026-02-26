@@ -368,7 +368,7 @@ function renderList() {
         }" aria-label="Sync status"></span>`
       : '';
     const isConflict = !!n.conflict_of;
-    const dateLabel = isConflict ? 'Conflict copy' : `Edited ${formatDate(n.updated_at)}`;
+    const dateLabel = isConflict ? 'Conflict Copy' : `Edited ${formatDate(n.updated_at)}`;
     return `
     <div class="note-item ${n.id === currentNoteId ? 'active' : ''}${isConflict ? ' conflict-item' : ''}" data-id="${n.id}" role="listitem">
       <div class="note-item-header">
@@ -1047,7 +1047,7 @@ async function openHistoryPanel(noteId) {
   try {
     const versions = await apiRequest('GET', `/api/notes/${noteId}/versions`);
     if (versions.length === 0) {
-      historyList.innerHTML = '<div class="history-empty">No versions saved yet.<br>Versions are created automatically each time you save.</div>';
+      historyList.innerHTML = '<div class="history-empty">No versions saved yet.<br>Versions are created automatically when you update this note.</div>';
       return;
     }
     historyList.innerHTML = versions.map(v => {

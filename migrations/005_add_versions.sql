@@ -16,4 +16,5 @@ CREATE INDEX IF NOT EXISTS idx_note_versions_note_id ON note_versions (note_id);
 CREATE INDEX IF NOT EXISTS idx_note_versions_user_id ON note_versions (user_id);
 
 -- conflict_of: NULL = normal note; non-NULL = conflict copy of that note id
-ALTER TABLE notes ADD COLUMN conflict_of INTEGER REFERENCES notes (id);
+ALTER TABLE notes ADD COLUMN conflict_of INTEGER;
+CREATE INDEX IF NOT EXISTS idx_notes_conflict_of ON notes (conflict_of);
