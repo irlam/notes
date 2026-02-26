@@ -54,7 +54,10 @@ def index():
 @login_required
 def dashboard():
     user = get_user_by_id(_current_user_id())
-    return render_template('dashboard.html', username=user['username'] if user else '')
+    enable_email = current_app.config.get('ENABLE_EMAIL_EXPORT', False)
+    return render_template('dashboard.html',
+                           username=user['username'] if user else '',
+                           enable_email_export=enable_email)
 
 
 @bp.route('/sw.js')

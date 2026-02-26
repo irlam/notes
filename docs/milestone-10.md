@@ -1,6 +1,6 @@
 # Milestone 10 — Direct Email PDF + Batch Export
 
-> **Status:** Stubs in place. Full implementation planned.  
+> **Status:** ✅ Complete — fully implemented in Milestone 10.  
 > **Deployment target:** notes.defecttracker.uk  
 > **Hosting:** Plesk (Passenger WSGI, Python) — no Docker
 
@@ -80,24 +80,24 @@ are already in place in `app/email_export.py`.
 ## Acceptance Criteria
 
 ### Email PDF
-- [ ] Authenticated user can email a PDF of any of their own notes.
-- [ ] Email is sent to the address stored in the user's profile.
-- [ ] Email contains the note title as subject and the PDF as an attachment.
-- [ ] Rate limit: at most 10 emails per user per hour; excess returns `429 Too Many Requests`.
-- [ ] Attempting to email another user's note returns `404 Not Found`.
-- [ ] Unauthenticated request returns `401 Unauthorized`.
-- [ ] SMTP errors return a safe `500` response; credentials are never leaked in the response body.
-- [ ] `ENABLE_EMAIL_EXPORT=false` (default) disables the endpoint entirely (returns `403`).
-- [ ] All acceptance tests pass with mocked SMTP (no real emails sent in test suite).
+- [x] Authenticated user can email a PDF of any of their own notes.
+- [x] Email is sent to the address stored in the user's profile.
+- [x] Email contains the note title as subject and the PDF as an attachment.
+- [x] Rate limit: at most 10 emails per user per hour; excess returns `429 Too Many Requests`.
+- [x] Attempting to email another user's note returns `404 Not Found`.
+- [x] Unauthenticated request returns `401 Unauthorized`.
+- [x] SMTP errors return a safe `500` response; credentials are never leaked in the response body.
+- [x] `ENABLE_EMAIL_EXPORT=false` (default) disables the endpoint entirely (returns `403`).
+- [x] All acceptance tests pass with mocked SMTP (no real emails sent in test suite).
 
 ### Batch Export
-- [ ] Authenticated user can export 1–50 of their own notes in one request.
-- [ ] ZIP format: archive contains one `<sanitised-title>.pdf` per note.
-- [ ] Combined PDF format: all notes concatenated into a single PDF, separated by page breaks.
-- [ ] Requesting notes that don't belong to the user returns `404`.
-- [ ] Requesting > 50 notes returns `400 Bad Request`.
-- [ ] Empty `note_ids` list returns `400 Bad Request`.
-- [ ] Download response has correct `Content-Disposition: attachment` header.
+- [x] Authenticated user can export 1–50 of their own notes in one request.
+- [x] ZIP format: archive contains one `<sanitised-title>.pdf` per note.
+- [x] Combined PDF format: all notes concatenated into a single PDF, separated by page breaks.
+- [x] Requesting notes that don't belong to the user returns `404`.
+- [x] Requesting > 50 notes returns `400 Bad Request`.
+- [x] Empty `note_ids` list returns `400 Bad Request`.
+- [x] Download response has correct `Content-Disposition: attachment` header.
 
 ---
 

@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     is_active INTEGER NOT NULL DEFAULT 1,
+    email TEXT,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -90,3 +91,13 @@ CREATE TABLE IF NOT EXISTS note_versions (
 
 CREATE INDEX IF NOT EXISTS idx_note_versions_note_id ON note_versions (note_id);
 CREATE INDEX IF NOT EXISTS idx_note_versions_user_id ON note_versions (user_id);
+
+CREATE TABLE IF NOT EXISTS email_send_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    note_id INTEGER NOT NULL,
+    sent_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_email_send_log_user_id ON email_send_log (user_id);

@@ -43,9 +43,23 @@ def get_user_by_id(user_id):
     """Return user row for *user_id* or None."""
     db = get_db()
     return db.execute(
-        'SELECT id, username, is_active FROM users WHERE id = ?',
+        'SELECT id, username, is_active, email FROM users WHERE id = ?',
         (user_id,)
     ).fetchone()
+
+
+def get_user_email(user_id):
+    """Return the stored email address for *user_id*, or None."""
+    db = get_db()
+    row = db.execute('SELECT email FROM users WHERE id = ?', (user_id,)).fetchone()
+    return row['email'] if row else None
+
+
+def set_user_email(user_id, email):
+    """Store *email* for *user_id*. Pass None to clear."""
+    db = get_db()
+    db.execute('UPDATE users SET email = ? WHERE id = ?', (email, user_id))
+    db.commit()
 
 
 def create_user(username, password):

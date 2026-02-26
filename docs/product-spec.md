@@ -85,12 +85,13 @@ A fast, distraction-free personal note-taking web application that behaves like 
 | F-52 | Conflict copies | Stale `client_updated_at` creates a `[Conflict Copy]` note |
 | F-53 | Conflict management | Dedicated ⚠ Conflicts tab; delete conflict copies permanently |
 
-### 3.7 Email PDF + Batch Export (🔲 planned — Milestone 10)
+### 3.7 Email PDF + Batch Export (✅ implemented — Milestone 10)
 
 | ID | Feature | Notes |
 |---|---|---|
-| F-60 | Email PDF | `POST /api/notes/<id>/email-pdf` — SMTP, rate-limited (stub: 403/501) |
-| F-61 | Batch export | `POST /api/batch-export` — ZIP or combined PDF (stub: 403/501) |
+| F-60 | Email PDF | `POST /api/notes/<id>/email-pdf` — SMTP, rate-limited (10/hour); requires `ENABLE_EMAIL_EXPORT=true` |
+| F-61 | Batch export | `POST /api/batch-export` — ZIP (one PDF/note) or combined PDF; max 50 notes; requires `ENABLE_EMAIL_EXPORT=true` |
+| F-62 | User email address | Stored in `users.email`; editable on Settings page; used as the To: address for Email PDF |
 
 ---
 
@@ -113,7 +114,6 @@ A fast, distraction-free personal note-taking web application that behaves like 
 - Native mobile apps (iOS/Android)
 - Docker / container deployment
 - Note sharing / public links
-- Email PDF and Batch Export are **planned for Milestone 10** (not out of scope permanently)
 
 ---
 

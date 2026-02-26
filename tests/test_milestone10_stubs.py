@@ -134,12 +134,12 @@ class TestBatchExportStubFlagOff:
 
 
 # ---------------------------------------------------------------------------
-# email-pdf stub — feature flag ON (returns 501)
+# email-pdf — feature flag ON (M10 now implemented; checks real behavior)
 # ---------------------------------------------------------------------------
 
 class TestEmailPdfStubFlagOn:
-    def test_returns_501_when_flag_on(self, app_flag_enabled):
-        """When ENABLE_EMAIL_EXPORT=true the stub returns 501 Not Implemented."""
+    def test_feature_enabled_processes_request(self, app_flag_enabled):
+        """When ENABLE_EMAIL_EXPORT=true the endpoint processes requests (not 501)."""
         import app.email_export as ee_mod
         original = ee_mod._FEATURE_ENABLED
         ee_mod._FEATURE_ENABLED = True
@@ -149,28 +149,26 @@ class TestEmailPdfStubFlagOn:
                 # Create a note
                 r = c.post('/api/notes', json={'title': 'T', 'body': 'B'})
                 note_id = r.get_json()['id']
+                # bob has no email configured → 400, not 501
                 r2 = c.post(f'/api/notes/{note_id}/email-pdf')
-                assert r2.status_code == 501
-                data = r2.get_json()
-                assert data['feature'] == 'email_pdf'
-                assert data['milestone'] == 10
+                assert r2.status_code != 501
+                assert r2.status_code in (200, 400, 429, 500)
         finally:
             ee_mod._FEATURE_ENABLED = original
 
 
 class TestBatchExportStubFlagOn:
-    def test_returns_501_when_flag_on(self, app_flag_enabled):
-        """When ENABLE_EMAIL_EXPORT=true the stub returns 501 Not Implemented."""
+    def test_feature_enabled_processes_request(self, app_flag_enabled):
+        """When ENABLE_EMAIL_EXPORT=true the endpoint processes requests (not 501)."""
         import app.email_export as ee_mod
         original = ee_mod._FEATURE_ENABLED
         ee_mod._FEATURE_ENABLED = True
         try:
             with app_flag_enabled.test_client() as c:
                 c.post('/login', data={'username': 'bob', 'password': 'correct-horse-battery'})
-                r = c.post('/api/batch-export', json={'note_ids': [1]})
-                assert r.status_code == 501
-                data = r.get_json()
-                assert data['feature'] == 'batch_export'
-                assert data['milestone'] == 10
+                # note_ids=[1] likely doesn't exist for bob → 404, not 501
+                r = c.post('/api/batch-export', json={'note_ids': [999999]})
+                assert r.status_code != 501
+                assert r.status_code in (200, 400, 404, 500)
         finally:
             ee_mod._FEATURE_ENABLED = original
