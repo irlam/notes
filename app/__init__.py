@@ -59,6 +59,48 @@ def create_app():
     from .pdf import pdf_bp
     app.register_blueprint(pdf_bp)
 
+    from .settings import settings_bp
+    app.register_blueprint(settings_bp)
+
+    # --- Security headers ---
+    @app.after_request
+    def add_security_headers(response):
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+        response.headers['Permissions-Policy'] = (
+            'camera=(), microphone=(), geolocation=(), payment=()'
+        )
+        # Content-Security-Policy: allow self + data/blob for images (PWA canvas)
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self'; "
+            "script-src 'self'; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data: blob:; "
+            "font-src 'self'; "
+            "connect-src 'self'; "
+            "worker-src 'self';"
+        )
+        return response
+
+    # --- Global 500 error handler ---
+    @app.errorhandler(500)
+    def internal_error(e):
+        from flask import request as _req, jsonify
+        app.logger.exception('Unhandled exception: %s', e)
+        if _req.path.startswith('/api/'):
+            return jsonify({'error': 'Internal server error'}), 500
+        from flask import render_template as _rt
+        return _rt('error.html', code=500,
+                   message='An unexpected error occurred.'), 500
+
+    @app.errorhandler(413)
+    def request_entity_too_large(e):
+        from flask import request as _req, jsonify
+        if _req.path.startswith('/api/'):
+            return jsonify({'error': 'File too large (max 10 MB)'}), 413
+        return jsonify({'error': 'Request too large'}), 413
+
     # --- CLI: create initial user ---
     @app.cli.command('create-user')
     @click.argument('username')

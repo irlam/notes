@@ -169,6 +169,53 @@ Run each checklist on at least the following combinations:
 
 ---
 
+## Milestone 8 — Hardening QA
+
+### M8-A: Security Headers
+
+| # | Check | Pass/Fail | Notes |
+|---|---|---|---|
+| M8-A-01 | `X-Frame-Options: DENY` present on all responses | | |
+| M8-A-02 | `X-Content-Type-Options: nosniff` present on all responses | | |
+| M8-A-03 | `Referrer-Policy: strict-origin-when-cross-origin` present | | |
+| M8-A-04 | `Permissions-Policy` restricts camera, microphone, geolocation | | |
+| M8-A-05 | `Content-Security-Policy` contains `default-src 'self'` | | |
+| M8-A-06 | No console CSP violations on dashboard page load | | |
+| M8-A-07 | App cannot be embedded in an iframe (verify in DevTools) | | |
+
+### M8-B: Input Validation
+
+| # | Check | Pass/Fail | Notes |
+|---|---|---|---|
+| M8-B-01 | Creating a note with a 501-character title returns 400 | | |
+| M8-B-02 | Creating a note with body > 100,000 characters returns 400 | | |
+| M8-B-03 | Updating a note with oversized title returns 400 | | |
+| M8-B-04 | Normal notes (short title, reasonable body) still save correctly | | |
+
+### M8-C: Settings Page
+
+| # | Check | Pass/Fail | Notes |
+|---|---|---|---|
+| M8-C-01 | `/settings` redirects to login when not authenticated | | |
+| M8-C-02 | Settings page loads at `/settings` when logged in | | |
+| M8-C-03 | Username is displayed on the settings page | | |
+| M8-C-04 | Correct current password + valid new password → success message | | |
+| M8-C-05 | Wrong current password → error message (no change) | | |
+| M8-C-06 | New passwords don't match → error message | | |
+| M8-C-07 | New password < 8 characters → error message | | |
+| M8-C-08 | After password change, old password no longer works at login | | |
+| M8-C-09 | Dark mode toggle persists across page reload (localStorage) | | |
+| M8-C-10 | Settings link (⚙️) visible in sidebar footer | | |
+
+### M8-D: Error Handling
+
+| # | Check | Pass/Fail | Notes |
+|---|---|---|---|
+| M8-D-01 | 404 for unknown API path returns JSON `{"error": "Not found"}` | | |
+| M8-D-02 | Uploading a file > 12 MB returns 413 with JSON error body | | |
+
+---
+
 ## Regression Checklist (run on every release)
 
 | # | Check |

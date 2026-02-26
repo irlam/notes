@@ -203,13 +203,42 @@ notes/
 
 ---
 
+---
+
+## Milestone 8 — Hardening, QA, Polish & Operational Readiness (complete)
+
+**Goal:** Production-ready hardening for personal use at notes.defecttracker.uk.
+
+### Deliverables
+- [x] HTTP security headers (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)
+- [x] Input length validation on note title (≤500 chars) and body (≤100 000 chars)
+- [x] 500 error handler — JSON for API routes, styled error page for browser routes
+- [x] 413 handler for oversized uploads
+- [x] Settings page (`/settings`) — username display, change password form, dark mode toggle
+- [x] Hardening summary (`docs/hardening-m8.md`)
+- [x] Release checklist (`docs/release-checklist.md`)
+- [x] Deployment runbook additions (`docs/deployment-notes.md` §16)
+- [x] M8 QA checklist (`docs/qa-checklists/README.md`)
+
+### Acceptance Criteria
+- [x] All automated tests pass (231 tests).
+- [x] Security headers verified present on all responses.
+- [x] Input validation rejects payloads exceeding configured limits.
+- [x] Settings page accessible only when authenticated.
+- [x] Password change validated and persisted; old password invalidated.
+- [x] Release checklist covers HTTPS, headers, auth, functional smoke test, backup, and monitoring.
+- [x] No Docker or container runtime required.
+
 ## Milestone Summary Table
 
 | Milestone | Theme | Status |
 |---|---|---|
 | M0 | Project Foundation & Architecture | ✅ Complete |
 | M1 | Foundation | ✅ Complete |
-| M2 | Sync Status & Offline Queue | 🔲 Planned |
-| M3 | Rich Content (Annotations, PDF) | 🔲 Planned |
-| M4 | Organisation (Search, Tags) | 🔲 Planned |
-| M5+ | Multi-User & Auth | 🔲 Future |
+| M2 | Sync Status & Offline Queue | ✅ Complete |
+| M3 | Rich Content (Annotations, PDF) | ✅ Complete |
+| M4 | Organisation (Search, Tags) | ✅ Complete |
+| M5 | Multi-User & Auth | ✅ Complete |
+| M6 | PWA & Offline Improvements | ✅ Complete |
+| M7 | PDF Export | ✅ Complete |
+| M8 | Hardening, QA, Polish & Operational Readiness | ✅ Complete |
