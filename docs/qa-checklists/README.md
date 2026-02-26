@@ -216,6 +216,84 @@ Run each checklist on at least the following combinations:
 
 ---
 
+## Milestone 9 — Version History & Conflict Copy Management QA
+
+> Full checklist is also included in `docs/versioning.md §4`.
+
+### M9-A: Version History Panel
+
+| # | Check | Pass/Fail | Notes |
+|---|---|---|---|
+| M9-A-01 | 🕐 (history) button is visible in the toolbar when a note is open | | |
+| M9-A-02 | Clicking 🕐 opens the Version History side panel | | |
+| M9-A-03 | A brand-new note shows "No versions saved yet" in the panel | | |
+| M9-A-04 | Editing and saving a note creates one version in the panel | | |
+| M9-A-05 | Versions are listed newest-first with date/time label | | |
+| M9-A-06 | Each version shows a truncated title preview | | |
+| M9-A-07 | Pressing Escape or clicking the backdrop closes the panel | | |
+| M9-A-08 | Clicking ✕ in the panel header closes it | | |
+| M9-A-09 | History button is hidden for trashed notes | | |
+| M9-A-10 | History button is hidden for conflict copies | | |
+
+### M9-B: Restore a Version
+
+| # | Check | Pass/Fail | Notes |
+|---|---|---|---|
+| M9-B-01 | Clicking **Restore** on a version shows a confirmation prompt | | |
+| M9-B-02 | Cancelling the prompt leaves the note unchanged | | |
+| M9-B-03 | Confirming restore updates the editor with the old content | | |
+| M9-B-04 | After restore, the version list grows by one (current content was snapshotted) | | |
+| M9-B-05 | The note list is refreshed to show the restored title | | |
+| M9-B-06 | Autosave indicator shows "Restored ✓" briefly | | |
+
+### M9-C: Version Retention
+
+| # | Check | Pass/Fail | Notes |
+|---|---|---|---|
+| M9-C-01 | Saving a note 55 times results in ≤ 50 versions in the panel | | |
+| M9-C-02 | Oldest versions are pruned (newest 50 retained) | | |
+
+### M9-D: Conflict Copy Creation
+
+| # | Check | Pass/Fail | Notes |
+|---|---|---|---|
+| M9-D-01 | Saving without `client_updated_at` does **not** create a conflict copy | | |
+| M9-D-02 | Saving with matching `client_updated_at` does **not** create a conflict copy | | |
+| M9-D-03 | Saving with a stale `client_updated_at` creates a conflict copy and shows the banner | | |
+| M9-D-04 | Conflict copy title starts with `[Conflict Copy]` | | |
+| M9-D-05 | Conflict copy body contains the server's previous content | | |
+| M9-D-06 | The ⚠️ conflict banner appears at the bottom of the screen | | |
+| M9-D-07 | **View Conflicts** in the banner switches to the Conflicts tab | | |
+| M9-D-08 | **✕** in the banner dismisses it | | |
+
+### M9-E: Conflict Copy Management
+
+| # | Check | Pass/Fail | Notes |
+|---|---|---|---|
+| M9-E-01 | **⚠ Conflicts** tab is visible in the sidebar | | |
+| M9-E-02 | The Conflicts tab lists all conflict copies (⚠ prefix on each) | | |
+| M9-E-03 | Conflict copies do **not** appear in the Notes / Archived / Trash tabs | | |
+| M9-E-04 | Opening a conflict copy shows the content in read-only mode | | |
+| M9-E-05 | Title and body are not editable in a conflict copy | | |
+| M9-E-06 | Pin / Archive / Folder / Tag controls are hidden for conflict copies | | |
+| M9-E-07 | 🕐 history button is hidden for conflict copies | | |
+| M9-E-08 | **🗑️ Delete Conflict** button is visible for a conflict copy | | |
+| M9-E-09 | Clicking **Delete Conflict** removes the copy from the list | | |
+| M9-E-10 | Attempting to delete a normal note via `DELETE /api/conflicts/<id>` returns 404 | | |
+| M9-E-11 | Folder section is hidden in the Conflicts view | | |
+
+### M9-F: Security & Access Control
+
+| # | Check | Pass/Fail | Notes |
+|---|---|---|---|
+| M9-F-01 | `GET /api/notes/<id>/versions` returns 401/302 when not logged in | | |
+| M9-F-02 | `GET /api/notes/<id>/versions` returns 404 for another user's note | | |
+| M9-F-03 | `POST /api/notes/<id>/versions/<vid>/restore` returns 404 for a version belonging to a different note | | |
+| M9-F-04 | `GET /api/conflicts` returns 401/302 when not logged in | | |
+| M9-F-05 | `DELETE /api/conflicts/<id>` returns 401/302 when not logged in | | |
+
+---
+
 ## Regression Checklist (run on every release)
 
 | # | Check |
