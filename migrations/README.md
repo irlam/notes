@@ -40,3 +40,4 @@ will read this value on startup to determine which migrations to apply automatic
 |---|---|---|
 | `001_add_users.sql` | Add users table; backfill placeholder admin row | Milestone 1 |
 | `002_add_note_status.sql` | Add `is_pinned`, `is_archived`, `is_trashed` columns to notes | Milestone 2 |
+| `003_add_folders_tags.sql` | Add `folders`, `tags`, `note_tags` tables; add `folder_id` to notes | Milestone 3 |
