@@ -1,5 +1,13 @@
-const CACHE_NAME = 'notes-v1';
-const APP_SHELL = ['/', '/static/css/style.css', '/static/js/app.js'];
+const CACHE_NAME = 'notes-v2';
+const APP_SHELL = [
+  '/dashboard',
+  '/static/css/style.css',
+  '/static/js/app.js',
+  '/static/js/annotation.js',
+  '/static/manifest.json',
+  '/static/icons/icon-192.png',
+  '/static/icons/icon-512.png'
+];
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -20,11 +28,11 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Network-first for API calls
+  // Network-first for API calls — offline handled by app.js (IndexedDB queue)
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(event.request).catch(() =>
-        new Response(JSON.stringify({ error: 'Offline' }), {
+        new Response(JSON.stringify({ error: 'offline' }), {
           status: 503,
           headers: { 'Content-Type': 'application/json' }
         })
@@ -33,7 +41,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Cache-first for app shell
+  // Cache-first for app shell assets
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
@@ -43,7 +51,7 @@ self.addEventListener('fetch', event => {
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }
         return response;
-      });
+      }).catch(() => cached || new Response('Offline', { status: 503 }));
     })
   );
 });
