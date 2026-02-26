@@ -229,6 +229,45 @@ notes/
 - [x] Release checklist covers HTTPS, headers, auth, functional smoke test, backup, and monitoring.
 - [x] No Docker or container runtime required.
 
+---
+
+## Milestone 9 — Version History & Conflict Copy Management (complete)
+
+**Goal:** Protect user data by keeping a version history for every note and
+surfacing merge-conflict copies when offline edits race with server updates.
+
+### Deliverables
+
+- [x] `note_versions` table — stores title + body snapshots (migration 005)
+- [x] `conflict_of` column on `notes` — marks a note as a conflict copy
+- [x] Snapshot on every save — current content snapshotted before overwriting
+- [x] `GET /api/notes/<id>/versions` — list versions newest-first
+- [x] `POST /api/notes/<id>/versions/<vid>/restore` — restore with pre-restore snapshot
+- [x] `GET /api/conflicts` — list all conflict copies
+- [x] `DELETE /api/conflicts/<id>` — permanently delete a conflict copy
+- [x] Conflict detection in `PUT /api/notes/<id>` — stale `client_updated_at` triggers copy
+- [x] Version History side panel (🕐 button, slide-in drawer, Restore buttons)
+- [x] Conflict banner on conflict creation, **View Conflicts** shortcut
+- [x] ⚠ Conflicts filter tab in sidebar; read-only conflict copy editor
+- [x] **🗑️ Delete Conflict** toolbar button for conflict copies
+- [x] 50-version cap per note with automatic pruning
+- [x] Full test suite — 26 new tests in `tests/test_milestone9.py` (257 total)
+- [x] `docs/versioning.md` — versioning model, conflict UX, retention notes, QA checklist
+- [x] M9 QA checklist added to `docs/qa-checklists/README.md`
+
+### Acceptance Criteria
+
+- [x] Editing a note and saving creates a version snapshot automatically.
+- [x] Restoring a previous version first saves the current content as a new snapshot.
+- [x] Sending a stale `client_updated_at` creates a `[Conflict Copy]` note and returns `conflict_note_id`.
+- [x] Conflict copies are visible in a dedicated ⚠ Conflicts tab and nowhere else.
+- [x] Conflict copies are read-only; a **Delete Conflict** button removes them permanently.
+- [x] A maximum of 50 versions per note are retained; older ones are pruned.
+- [x] Version/conflict endpoints return 404 for unowned resources.
+- [x] No Docker or container runtime required.
+
+---
+
 ## Milestone Summary Table
 
 | Milestone | Theme | Status |
@@ -242,3 +281,4 @@ notes/
 | M6 | PWA & Offline Improvements | ✅ Complete |
 | M7 | PDF Export | ✅ Complete |
 | M8 | Hardening, QA, Polish & Operational Readiness | ✅ Complete |
+| M9 | Version History & Conflict Copy Management | ✅ Complete |
