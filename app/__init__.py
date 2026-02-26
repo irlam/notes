@@ -56,6 +56,9 @@ def create_app():
     from .media import media_bp
     app.register_blueprint(media_bp)
 
+    from .pdf import pdf_bp
+    app.register_blueprint(pdf_bp)
+
     # --- CLI: create initial user ---
     @app.cli.command('create-user')
     @click.argument('username')

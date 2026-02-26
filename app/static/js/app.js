@@ -260,6 +260,7 @@ const btnNew = document.getElementById('btn-new');
 const btnBack = document.getElementById('btn-back');
 const btnPin = document.getElementById('btn-pin');
 const btnArchive = document.getElementById('btn-archive');
+const btnExportPdf = document.getElementById('btn-export-pdf');
 const btnTrash = document.getElementById('btn-trash');
 const btnRestore = document.getElementById('btn-restore');
 const btnDeletePermanent = document.getElementById('btn-delete-permanent');
@@ -1081,6 +1082,21 @@ btnPin.addEventListener('click', togglePin);
 btnArchive.addEventListener('click', toggleArchive);
 btnTrash.addEventListener('click', trashNote);
 btnRestore.addEventListener('click', restoreNote);
+
+if (btnExportPdf) {
+  btnExportPdf.addEventListener('click', () => {
+    if (!currentNoteId) return;
+    const note = currentNote();
+    const rawTitle = (note && note.title && note.title.trim()) || 'note';
+    const safeName = rawTitle.replace(/[^\w\s\-]/g, '_').slice(0, 50) || 'note';
+    const a = document.createElement('a');
+    a.href = `/api/notes/${currentNoteId}/export.pdf`;
+    a.download = `${safeName}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
+}
 
 btnDeletePermanent.addEventListener('click', () => {
   if (!currentNoteId) return;
