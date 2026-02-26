@@ -157,6 +157,50 @@
     </div>
   </div>
 
+  <!-- ===== Annotation Editor Modal ===== -->
+  <div id="annotation-modal" class="annotation-modal" role="dialog" aria-modal="true"
+       aria-label="Annotation editor" style="display:none;">
+    <div class="ann-header">
+      <!-- Tool buttons -->
+      <div class="ann-tools" role="toolbar" aria-label="Annotation tools">
+        <button id="ann-tool-pen"         class="ann-tool-btn active" title="Pen (P)"         aria-label="Pen">✏️</button>
+        <button id="ann-tool-highlighter" class="ann-tool-btn"        title="Highlighter (H)" aria-label="Highlighter">🖌</button>
+        <button id="ann-tool-arrow"       class="ann-tool-btn"        title="Arrow (A)"       aria-label="Arrow">↗</button>
+        <button id="ann-tool-rectangle"   class="ann-tool-btn"        title="Rectangle (R)"   aria-label="Rectangle">▭</button>
+        <button id="ann-tool-circle"      class="ann-tool-btn"        title="Circle (C)"      aria-label="Circle">◯</button>
+        <button id="ann-tool-text"        class="ann-tool-btn"        title="Text (T)"        aria-label="Text label">T</button>
+        <input  type="color" id="ann-color"  value="#e74c3c" class="ann-color-input"
+                title="Stroke colour" aria-label="Stroke colour" />
+        <input  type="range" id="ann-width" min="1" max="20" value="3" class="ann-width-slider"
+                title="Stroke width / font size" aria-label="Stroke width" />
+      </div>
+      <!-- Action buttons -->
+      <div class="ann-actions">
+        <button id="ann-undo"       class="ann-action-btn" title="Undo (Ctrl+Z)"   aria-label="Undo"       disabled>↩</button>
+        <button id="ann-redo"       class="ann-action-btn" title="Redo (Ctrl+Y)"   aria-label="Redo"       disabled>↪</button>
+        <button id="ann-zoom-in"    class="ann-action-btn" title="Zoom in"         aria-label="Zoom in">＋</button>
+        <button id="ann-zoom-out"   class="ann-action-btn" title="Zoom out"        aria-label="Zoom out">－</button>
+        <button id="ann-zoom-reset" class="ann-action-btn" title="Reset view"      aria-label="Reset view">⊡</button>
+        <button id="ann-clear"      class="ann-action-btn ann-btn-danger" title="Clear all annotations" aria-label="Clear all">🗑</button>
+        <span   id="ann-status"     class="ann-status"     aria-live="polite"></span>
+        <button id="ann-save"       class="ann-btn-save"   title="Save (Ctrl+S)"   aria-label="Save annotations">Save</button>
+        <button id="ann-cancel"     class="ann-btn-cancel" title="Cancel (Esc)"    aria-label="Cancel">✕</button>
+      </div>
+    </div>
+    <!-- Canvas area -->
+    <div id="annotation-canvas-wrap" class="ann-canvas-wrap">
+      <div id="annotation-stage" class="ann-stage">
+        <img id="ann-source-img" class="ann-source-img" alt="Image being annotated" />
+        <canvas id="annotation-canvas" class="ann-canvas"></canvas>
+      </div>
+    </div>
+    <!-- Floating text input for text tool -->
+    <textarea id="ann-text-overlay" class="ann-text-overlay"
+              rows="1" placeholder="Type text, Enter to place…"
+              aria-label="Annotation text input" style="display:none;"></textarea>
+  </div>
+
+  <script src="/static/js/annotation.js"></script>
   <script src="/static/js/app.js"></script>
 </body>
 </html>

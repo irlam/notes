@@ -249,6 +249,53 @@ def reorder_images(note_id):
 
 
 # ---------------------------------------------------------------------------
+# Save annotation data for an image
+# ---------------------------------------------------------------------------
+
+@media_bp.route('/api/notes/<int:note_id>/images/<int:image_id>', methods=['PUT'])
+@login_required
+def update_image(note_id, image_id):
+    import json as _json
+    db = get_db()
+    row = db.execute(
+        'SELECT id FROM note_images WHERE id = ? AND note_id = ? AND user_id = ?',
+        (image_id, note_id, _current_user_id())
+    ).fetchone()
+    if not row:
+        abort(404)
+
+    data = request.get_json(silent=True) or {}
+    if 'annotation_data' not in data:
+        abort(400)
+
+    annotation_data = data['annotation_data']
+    if annotation_data is not None:
+        if isinstance(annotation_data, (dict, list)):
+            annotation_data = _json.dumps(annotation_data)
+        elif isinstance(annotation_data, str):
+            try:
+                _json.loads(annotation_data)
+            except ValueError:
+                abort(400)
+        else:
+            abort(400)
+
+    db.execute(
+        'UPDATE note_images SET annotation_data = ? WHERE id = ?',
+        (annotation_data, image_id)
+    )
+    db.commit()
+
+    updated = db.execute(
+        'SELECT id, filename, original_filename, mime_type, file_size, '
+        'width, height, position, annotation_data, created_at '
+        'FROM note_images WHERE id = ?',
+        (image_id,)
+    ).fetchone()
+    return jsonify(_image_to_dict(updated))
+
+
+# ---------------------------------------------------------------------------
 # Serve a media file (only to the owning user)
 # ---------------------------------------------------------------------------
 

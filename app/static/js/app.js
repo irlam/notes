@@ -534,16 +534,34 @@ function setImageStatus(msg, isError) {
 function renderImageBlocks() {
   if (!imageBlocksEl) return;
   imageBlocksEl.innerHTML = '';
+  const note = currentNote();
+  const editable = note && !note.is_trashed;
+
   images.forEach((img, idx) => {
     const block = document.createElement('div');
     block.className = 'image-block';
     block.dataset.id = img.id;
 
-    const imgEl = document.createElement('img');
-    imgEl.src = img.url;
-    imgEl.alt = escapeHtml(img.original_filename || 'Image');
-    imgEl.loading = 'lazy';
-    block.appendChild(imgEl);
+    if (img.annotation_data) {
+      // Show composite canvas preview when annotations exist
+      const canvas = document.createElement('canvas');
+      canvas.className = 'image-block-canvas';
+      canvas.setAttribute('aria-label', escapeHtml(img.original_filename || 'Annotated image'));
+      const srcImg = new Image();
+      srcImg.onload = () => {
+        if (typeof renderAnnotationPreview === 'function') {
+          renderAnnotationPreview(canvas, srcImg, img.annotation_data);
+        }
+      };
+      srcImg.src = img.url;
+      block.appendChild(canvas);
+    } else {
+      const imgEl = document.createElement('img');
+      imgEl.src = img.url;
+      imgEl.alt = escapeHtml(img.original_filename || 'Image');
+      imgEl.loading = 'lazy';
+      block.appendChild(imgEl);
+    }
 
     const controls = document.createElement('div');
     controls.className = 'image-block-controls';
@@ -577,6 +595,19 @@ function renderImageBlocks() {
 
     controls.appendChild(btnUp);
     controls.appendChild(btnDown);
+    if (editable) {
+      const btnAnnotate = document.createElement('button');
+      btnAnnotate.className = 'btn-image-ctrl';
+      btnAnnotate.title = 'Annotate image';
+      btnAnnotate.setAttribute('aria-label', 'Annotate image');
+      btnAnnotate.textContent = '✏️';
+      btnAnnotate.addEventListener('click', () => {
+        if (typeof openAnnotationEditor === 'function') {
+          openAnnotationEditor(currentNoteId, img.id, img.url, img.annotation_data);
+        }
+      });
+      controls.appendChild(btnAnnotate);
+    }
     controls.appendChild(btnDel);
     controls.appendChild(label);
     block.appendChild(controls);
@@ -886,3 +917,4 @@ showEditor(false);
 loadFolders();
 loadTags();
 loadNotes();
+if (typeof initAnnotationEditor === 'function') initAnnotationEditor();
