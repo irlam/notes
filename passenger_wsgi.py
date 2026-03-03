@@ -1,13 +1,10 @@
-import sys, os
+import os, sys
 
-sys.path.insert(0, os.path.dirname(__file__))
+APP_ROOT = os.path.dirname(__file__)
+PYDEPS = os.path.join(APP_ROOT, "_pydeps")
 
-# Activate venv
-venv_path = os.path.join(os.path.dirname(__file__), 'venv', 'lib')
-if os.path.isdir(venv_path):
-    for d in os.listdir(venv_path):
-        site_packages = os.path.join(venv_path, d, 'site-packages')
-        if os.path.isdir(site_packages):
-            sys.path.insert(0, site_packages)
+for p in (PYDEPS, APP_ROOT):
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
-from wsgi import app as application
+from wsgi import application
