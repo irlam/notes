@@ -21,6 +21,33 @@ def close_db(e=None):
         db.close()
 
 
+def _apply_pending_migrations(db):
+    """Apply any schema migrations that are newer than the current user_version.
+
+    Fresh installs get the full schema via schema.sql (user_version stays 0 until
+    this function sets it).  Existing installs may have tables created by earlier
+    migrations that are missing newer columns; those gaps are filled here.
+
+    The SQLite PRAGMA user_version is used to track which migrations have been
+    applied.  Each migration block below is idempotent: it checks for the
+    presence of a column before adding it so the function is safe to re-run.
+    """
+    version = db.execute('PRAGMA user_version').fetchone()[0]
+
+    if version < 7:
+        # Migration 007: add caption column to note_images
+        # (fresh installs already have it via schema.sql; existing installs may not)
+        # PRAGMA table_info returns rows of (cid, name, type, notnull, dflt_value, pk)
+        cols = {row[1] for row in db.execute('PRAGMA table_info(note_images)').fetchall()}
+        if 'caption' not in cols:
+            db.execute(
+                "ALTER TABLE note_images ADD COLUMN caption TEXT NOT NULL DEFAULT ''"
+            )
+            db.commit()
+        db.execute('PRAGMA user_version = 7')
+        db.commit()
+
+
 def init_db(app):
     schema_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'schema.sql')
     with app.app_context():
@@ -28,6 +55,7 @@ def init_db(app):
         with open(schema_path, 'r') as f:
             db.executescript(f.read())
         db.commit()
+        _apply_pending_migrations(db)
 
 
 def get_user_by_username(username):

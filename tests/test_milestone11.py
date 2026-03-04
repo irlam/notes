@@ -239,3 +239,109 @@ class TestPdfExportWebPFix:
         r = auth_client.get(f'/api/notes/{note["id"]}/export.pdf')
         assert r.status_code == 200
         assert r.data[:4] == b'%PDF'
+
+
+# ---------------------------------------------------------------------------
+# Automatic migration: caption column added to pre-existing databases
+# ---------------------------------------------------------------------------
+
+def _table_columns(conn_or_cursor, table_name):
+    """Return the set of column names for *table_name* using PRAGMA table_info."""
+    # PRAGMA table_info returns rows of (cid, name, type, notnull, dflt_value, pk)
+    return {row[1] for row in conn_or_cursor.execute(
+        f'PRAGMA table_info({table_name})'
+    ).fetchall()}
+
+
+class TestCaptionMigration:
+    """Verify that init_db automatically adds the caption column to an existing
+    note_images table that was created before migration 007."""
+
+    def test_caption_column_added_to_existing_db(self, tmp_path):
+        """Simulate an existing install (no caption column) and confirm that
+        create_app() / init_db() automatically migrates the schema so that
+        GET /api/notes/<id>/images returns 200 instead of 500."""
+        import sqlite3
+        import tempfile
+
+        # Build a minimal pre-migration database with note_images but no caption.
+        db_fd, db_path = tempfile.mkstemp(suffix='.db')
+        os.close(db_fd)
+
+        try:
+            conn = sqlite3.connect(db_path)
+            conn.executescript("""
+                CREATE TABLE users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT NOT NULL UNIQUE,
+                    password_hash TEXT NOT NULL,
+                    is_active INTEGER NOT NULL DEFAULT 1,
+                    email TEXT,
+                    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+                CREATE TABLE notes (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL DEFAULT 1,
+                    folder_id INTEGER,
+                    title TEXT NOT NULL DEFAULT '',
+                    body TEXT NOT NULL DEFAULT '',
+                    is_pinned INTEGER NOT NULL DEFAULT 0,
+                    is_archived INTEGER NOT NULL DEFAULT 0,
+                    is_trashed INTEGER NOT NULL DEFAULT 0,
+                    conflict_of INTEGER,
+                    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+                CREATE TABLE note_images (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    note_id INTEGER NOT NULL,
+                    user_id INTEGER NOT NULL,
+                    filename TEXT NOT NULL UNIQUE,
+                    original_filename TEXT NOT NULL DEFAULT '',
+                    mime_type TEXT NOT NULL DEFAULT 'image/jpeg',
+                    file_size INTEGER NOT NULL DEFAULT 0,
+                    width INTEGER NOT NULL DEFAULT 0,
+                    height INTEGER NOT NULL DEFAULT 0,
+                    position INTEGER NOT NULL DEFAULT 0,
+                    annotation_data TEXT,
+                    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+            # Confirm caption is NOT present before migration
+            assert 'caption' not in _table_columns(conn, 'note_images')
+            conn.close()
+
+            media_path = str(tmp_path / 'uploads')
+            os.environ['SECRET_KEY'] = 'test-secret-key-migration-test-x'
+            os.environ['DATABASE_PATH'] = db_path
+            os.environ['MEDIA_PATH'] = media_path
+
+            from app import create_app
+            application = create_app()
+            application.config['TESTING'] = True
+            application.config['SESSION_COOKIE_SECURE'] = False
+
+            # After create_app(), caption column must now exist
+            with application.app_context():
+                from app.database import get_db, create_user
+                db = get_db()
+                assert 'caption' in _table_columns(db, 'note_images'), \
+                    'caption column was not added by automatic migration'
+
+                # Also verify the PRAGMA user_version was bumped
+                version = db.execute('PRAGMA user_version').fetchone()[0]
+                assert version >= 7
+
+                create_user('bob', 'correct-horse-battery-staple')
+
+            # Confirm the images endpoint does not 500 (empty list is fine)
+            with application.test_client() as c:
+                c.post('/login', data={'username': 'bob', 'password': 'correct-horse-battery-staple'})
+                note = c.post('/api/notes', json={'title': 'T', 'body': ''}).get_json()
+                r = c.get(f'/api/notes/{note["id"]}/images')
+                assert r.status_code == 200
+                assert r.get_json() == []
+        finally:
+            os.unlink(db_path)
+            os.environ.pop('MEDIA_PATH', None)
+            os.environ.pop('DATABASE_PATH', None)
