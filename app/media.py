@@ -1,6 +1,14 @@
 import os
 import uuid
-from flask import Blueprint, request, jsonify, abort, send_file, session, current_app
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    request,
+    send_from_directory,
+    session,
+)
 from .auth import login_required
 from .database import get_db
 
@@ -22,8 +30,32 @@ def _current_user_id():
     return session['user_id']
 
 
+def _resolve_media_dir(config_value):
+    """
+    Resolve MEDIA_PATH to an absolute path.
+
+    Rules:
+    - If MEDIA_PATH is already absolute: use it.
+    - Otherwise resolve it relative to the app's root directory.
+
+    This avoids Passenger/Plesk relative-path surprises.
+    """
+    raw = (config_value or '').strip()
+    if not raw:
+        raise RuntimeError('MEDIA_PATH is not configured')
+
+    if os.path.isabs(raw):
+        return raw
+
+    # current_app.root_path points to the 'app/' package directory.
+    # We want the project root (one level above 'app/').
+    project_root = os.path.abspath(os.path.join(current_app.root_path, os.pardir))
+    return os.path.join(project_root, raw)
+
+
 def _media_dir():
-    return current_app.config['MEDIA_PATH']
+    # Use resolved absolute directory for all IO.
+    return _resolve_media_dir(current_app.config['MEDIA_PATH'])
 
 
 def _get_note_for_user(db, note_id, user_id):
@@ -157,8 +189,18 @@ def upload_image(note_id):
     os.makedirs(media_dir, exist_ok=True)
     server_filename = f'{uuid.uuid4().hex}.{ext}'
     filepath = os.path.join(media_dir, server_filename)
-    with open(filepath, 'wb') as fh:
-        fh.write(compressed)
+
+    try:
+        with open(filepath, 'wb') as fh:
+            fh.write(compressed)
+    except Exception as e:
+        current_app.logger.exception(
+            'MEDIA upload write failed. media_dir=%r filepath=%r error=%r',
+            media_dir,
+            filepath,
+            e,
+        )
+        abort(500)
 
     # Next position after existing images
     row = db.execute(
@@ -308,14 +350,48 @@ def serve_media(filename):
 
     db = get_db()
     row = db.execute(
-        'SELECT id FROM note_images WHERE filename = ? AND user_id = ?',
+        'SELECT id, mime_type FROM note_images WHERE filename = ? AND user_id = ?',
         (filename, _current_user_id())
     ).fetchone()
     if not row:
         abort(404)
 
-    filepath = os.path.join(_media_dir(), filename)
-    if not os.path.isfile(filepath):
+    media_dir = _media_dir()
+    full_path = os.path.join(media_dir, filename)
+
+    if not os.path.isfile(full_path):
+        current_app.logger.warning(
+            'MEDIA missing on disk. MEDIA_PATH=%r resolved_dir=%r filename=%r full_path=%r',
+            current_app.config.get('MEDIA_PATH'),
+            media_dir,
+            filename,
+            full_path,
+        )
         abort(404)
 
-    return send_file(filepath)
+    if not os.access(full_path, os.R_OK):
+        current_app.logger.error(
+            'MEDIA not readable (permissions). full_path=%r',
+            full_path,
+        )
+        abort(500)
+
+    try:
+        resp = send_from_directory(
+            media_dir,
+            filename,
+            mimetype=row['mime_type'] or None,
+            as_attachment=False,
+            conditional=True,
+        )
+        resp.headers['Cache-Control'] = 'private, max-age=31536000, immutable'
+        return resp
+    except Exception as e:
+        current_app.logger.exception(
+            'MEDIA send failed. resolved_dir=%r filename=%r full_path=%r error=%r',
+            media_dir,
+            filename,
+            full_path,
+            e,
+        )
+        abort(500)
