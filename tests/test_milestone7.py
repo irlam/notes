@@ -170,11 +170,11 @@ class TestPdfExportResponse:
         r = auth_client.get(f'/api/notes/{note["id"]}/export.pdf')
         assert r.data[:4] == b'%PDF'
 
-    def test_content_disposition_attachment(self, auth_client):
+    def test_content_disposition_inline(self, auth_client):
         note = _note(auth_client)
         r = auth_client.get(f'/api/notes/{note["id"]}/export.pdf')
         cd = r.headers.get('Content-Disposition', '')
-        assert 'attachment' in cd
+        assert 'inline' in cd
 
     def test_filename_in_content_disposition(self, auth_client):
         note = _note(auth_client, title='My Note')
