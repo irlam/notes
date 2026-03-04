@@ -260,7 +260,7 @@ def export_note_pdf(note_id):
     note = dict(row)
 
     img_rows = db.execute(
-        'SELECT id, filename, original_filename, annotation_data '
+        'SELECT id, filename, original_filename, annotation_data, caption '
         'FROM note_images WHERE note_id = ? AND user_id = ? '
         'ORDER BY position ASC, id ASC '
         'LIMIT ?',
@@ -296,7 +296,7 @@ def build_pdf_bytes(note, img_rows, media_path):
         Must contain: title, body, created_at, updated_at.
     img_rows : iterable
         Rows from ``note_images``; each must have filename,
-        original_filename, annotation_data.
+        original_filename, annotation_data, caption.
     media_path : str
         Filesystem path to the media uploads directory.
 
@@ -409,10 +409,7 @@ def build_pdf_bytes(note, img_rows, media_path):
                 continue
 
             annotation_data = img_row['annotation_data']
-            composited_bytes = (
-                _composite_annotations(img_path, annotation_data)
-                if annotation_data else None
-            )
+            composited_bytes = _composite_annotations(img_path, annotation_data)
 
             # Determine pixel dimensions for correct aspect-ratio scaling
             try:
@@ -435,7 +432,7 @@ def build_pdf_bytes(note, img_rows, media_path):
                        if composited_bytes else img_path)
             story.append(RLImage(img_src, width=draw_w, height=draw_h))
 
-            caption = img_row['original_filename'] or ''
+            caption = img_row['caption'] or img_row['original_filename'] or ''
             if caption:
                 story.append(Paragraph(_safe_text(caption), style_caption))
             story.append(Spacer(1, 10))

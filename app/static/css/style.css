@@ -807,6 +807,29 @@ body {
 .btn-image-ctrl.btn-danger:hover { background: #fdecea; color: var(--danger); }
 .btn-image-ctrl:disabled { opacity: 0.3; cursor: default; }
 
+.image-caption {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  border: none;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 36px;
+  line-height: 1.4;
+  outline: none;
+}
+.image-caption:focus {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+.image-caption[readonly] { color: var(--text-muted); cursor: default; }
+.image-caption::placeholder { color: var(--text-muted); font-style: italic; }
+
 /* ===== Annotation Editor ===== */
 
 /* Full-screen modal overlay */
