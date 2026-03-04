@@ -246,7 +246,7 @@ class TestPWAManifest:
         assert data['display'] == 'standalone'
 
     def test_icons_are_served(self, client):
-        r192 = client.get('/static/icons/icon-192.png')
-        r512 = client.get('/static/icons/icon-512.png')
+        r192 = client.get('/static/icons/android-chrome-192x192.png')
+        r512 = client.get('/static/icons/android-chrome-512x512.png')
         assert r192.status_code == 200
         assert r512.status_code == 200
