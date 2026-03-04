@@ -1188,15 +1188,7 @@ btnRestore.addEventListener('click', restoreNote);
 if (btnExportPdf) {
   btnExportPdf.addEventListener('click', () => {
     if (!currentNoteId) return;
-    const note = currentNote();
-    const rawTitle = (note && note.title && note.title.trim()) || 'note';
-    const safeName = rawTitle.replace(/[^\w\s\-]/g, '_').slice(0, 50) || 'note';
-    const a = document.createElement('a');
-    a.href = `/api/notes/${currentNoteId}/export.pdf`;
-    a.download = `${safeName}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    window.open(`/api/notes/${currentNoteId}/export.pdf`, '_blank');
   });
 }
 

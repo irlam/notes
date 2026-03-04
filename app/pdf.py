@@ -283,7 +283,7 @@ def export_note_pdf(note_id):
 
     response = make_response(pdf_bytes)
     response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+    response.headers['Content-Disposition'] = f'inline; filename="{filename}"'
     return response
 
 

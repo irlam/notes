@@ -72,6 +72,15 @@ class TestServiceWorkerRoute:
         assert '/static/css/style.css' in content
         assert '/static/js/app.js' in content
 
+    def test_sw_js_icons_are_served(self, client):
+        """Icons referenced in the service worker app shell must be reachable."""
+        r = client.get('/sw.js')
+        content = r.data.decode('utf-8')
+        assert '/static/icons/icon-192x192.png' in content
+        assert '/static/icons/icon-512x512.png' in content
+        assert client.get('/static/icons/icon-192x192.png').status_code == 200
+        assert client.get('/static/icons/icon-512x512.png').status_code == 200
+
     def test_sw_js_contains_cache_name(self, client):
         """Service worker should declare a versioned cache name."""
         r = client.get('/sw.js')
