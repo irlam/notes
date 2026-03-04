@@ -143,7 +143,7 @@ def list_images(note_id):
         abort(404)
     rows = db.execute(
         'SELECT id, filename, original_filename, mime_type, file_size, '
-        'width, height, position, annotation_data, created_at '
+        'width, height, position, annotation_data, caption, created_at '
         'FROM note_images WHERE note_id = ? AND user_id = ? '
         'ORDER BY position ASC, id ASC',
         (note_id, _current_user_id())
@@ -222,7 +222,7 @@ def upload_image(note_id):
 
     new_row = db.execute(
         'SELECT id, filename, original_filename, mime_type, file_size, '
-        'width, height, position, annotation_data, created_at '
+        'width, height, position, annotation_data, caption, created_at '
         'FROM note_images WHERE id = ?',
         (cur.lastrowid,)
     ).fetchone()
@@ -282,7 +282,7 @@ def reorder_images(note_id):
 
     rows = db.execute(
         'SELECT id, filename, original_filename, mime_type, file_size, '
-        'width, height, position, annotation_data, created_at '
+        'width, height, position, annotation_data, caption, created_at '
         'FROM note_images WHERE note_id = ? AND user_id = ? '
         'ORDER BY position ASC, id ASC',
         (note_id, _current_user_id())
@@ -307,30 +307,46 @@ def update_image(note_id, image_id):
         abort(404)
 
     data = request.get_json(silent=True) or {}
-    if 'annotation_data' not in data:
+    if 'annotation_data' not in data and 'caption' not in data:
         abort(400)
 
-    annotation_data = data['annotation_data']
-    if annotation_data is not None:
-        if isinstance(annotation_data, (dict, list)):
-            annotation_data = _json.dumps(annotation_data)
-        elif isinstance(annotation_data, str):
-            try:
-                _json.loads(annotation_data)
-            except ValueError:
-                abort(400)
-        else:
-            abort(400)
+    updates = []
+    params = []
 
+    if 'annotation_data' in data:
+        annotation_data = data['annotation_data']
+        if annotation_data is not None:
+            if isinstance(annotation_data, (dict, list)):
+                annotation_data = _json.dumps(annotation_data)
+            elif isinstance(annotation_data, str):
+                try:
+                    _json.loads(annotation_data)
+                except ValueError:
+                    abort(400)
+            else:
+                abort(400)
+        updates.append('annotation_data = ?')
+        params.append(annotation_data)
+
+    if 'caption' in data:
+        caption = data['caption']
+        if not isinstance(caption, str):
+            abort(400)
+        updates.append('caption = ?')
+        params.append(caption[:2000])  # reasonable length limit
+
+    params.append(image_id)
+    # updates contains only hardcoded column names ('annotation_data = ?' / 'caption = ?'),
+    # so this join is safe against SQL injection.
     db.execute(
-        'UPDATE note_images SET annotation_data = ? WHERE id = ?',
-        (annotation_data, image_id)
+        f'UPDATE note_images SET {", ".join(updates)} WHERE id = ?',
+        params
     )
     db.commit()
 
     updated = db.execute(
         'SELECT id, filename, original_filename, mime_type, file_size, '
-        'width, height, position, annotation_data, created_at '
+        'width, height, position, annotation_data, caption, created_at '
         'FROM note_images WHERE id = ?',
         (image_id,)
     ).fetchone()

@@ -920,6 +920,28 @@ function renderImageBlocks() {
     controls.appendChild(btnDel);
     controls.appendChild(label);
     block.appendChild(controls);
+
+    // Caption textarea (shown for all images; editable when note is not trashed)
+    const captionArea = document.createElement('textarea');
+    captionArea.className = 'image-caption';
+    captionArea.placeholder = 'Add a caption or text…';
+    captionArea.value = img.caption || '';
+    captionArea.setAttribute('aria-label', 'Image caption');
+    captionArea.readOnly = !editable;
+    captionArea.addEventListener('blur', async () => {
+      const newCaption = captionArea.value;
+      if (newCaption === (img.caption || '')) return;
+      try {
+        const updated = await apiRequest('PUT',
+          `/api/notes/${currentNoteId}/images/${img.id}`,
+          { caption: newCaption });
+        img.caption = updated.caption;
+      } catch (e) {
+        console.error('Failed to save image caption', e);
+      }
+    });
+    block.appendChild(captionArea);
+
     imageBlocksEl.appendChild(block);
   });
 }
