@@ -162,13 +162,72 @@ Copy `.env.example` to `.env` and customise:
 
 All endpoints require authentication and return JSON. DELETE returns 204 No Content.
 
-## Testing
+## PDF Export Architecture
+
+**Entry point:** `GET /api/notes/<note_id>/export.pdf` — defined in `app/pdf.py`, registered as the `pdf_bp` blueprint.
+
+**Functions:**
+- `export_note_pdf(note_id)` — the Flask route; validates ownership, calls `build_pdf_bytes()`, returns `Content-Disposition: attachment`.
+- `build_pdf_bytes(note, img_rows, media_path)` — pure-Python PDF builder (no HTTP); used by the route and by `email_export.py` for email/batch export.
+- `_register_fonts()` — one-time TrueType font registration (DejaVu/Liberation/FreeSans or falls back to Helvetica).
+- `_composite_annotations(img_path, annotation_data)` — Pillow-based annotation compositing before embedding images.
+
+**Dependencies (pure-Python, no binaries):**
+- `reportlab==4.4.1` — PDF layout engine (A4 page, 1-inch margins, Paragraph, Image, Spacer).
+- `Pillow==12.1.1` — image handling and annotation compositing.
+
+**Layout:** A4 (595×842 pt), 1-inch margins, 22 pt bold title, 9 pt metadata, 11 pt body text (16 pt leading), checkbox items with left indent, images scaled to fit width (max 400 pt height), captions below each image.
+
+**No external assets needed:** Fonts fall back to Helvetica (built into ReportLab) if TrueType fonts are absent. No CDN, no network calls at runtime.
+
+**Plesk compatibility:** All dependencies stored in `_pydeps/` (injected via `passenger_wsgi.py`); no global site-packages required.
+
+## Running Tests
 
 ```bash
-python -m pytest tests/ -v
+PYTHONPATH=_pydeps python3 -m pytest tests/ -v
 ```
 
-Requires `requirements.txt` dependencies installed. Uses SQLite in-memory/tmp databases — no external services needed. See [docs/first-install.md](docs/first-install.md) for full test setup instructions.
+All dependencies are in `_pydeps/` — no virtualenv required. Tests use temporary SQLite databases and do not require external services.
+
+## Rebuild `_pydeps` Deterministically
+
+If `_pydeps` is missing or corrupted (e.g. after a platform change), rebuild it:
+
+```bash
+pip install --target _pydeps -r requirements.txt
+```
+
+> **Important:** `_pydeps` contains platform-specific compiled extensions (e.g. Pillow's `_imaging.so`). Always run `pip install --target _pydeps` on the **same OS/arch as the production server** (Linux x86_64 for Plesk). Do not copy `_pydeps` from a Windows or macOS machine.
+
+## PDF Export Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| `ImportError: cannot import name '_imaging' from 'PIL'` | `_pydeps/PIL` contains Windows `.pyd` files | Reinstall: `pip install --target _pydeps Pillow==12.1.1` on Linux |
+| PDF export returns 500 | Check Flask logs for `PDF generation failed` | See app log; usually a reportlab or Pillow import error |
+| Fonts appear as boxes / wrong characters | TrueType fonts not found | App falls back to Helvetica (Latin-1); install `fonts-dejavu` for full Unicode |
+| Images missing from PDF | `MEDIA_PATH` misconfigured | Ensure `MEDIA_PATH` env var points to the uploads directory |
+
+## Dependency Audit
+
+Run the dependency audit to verify `_pydeps` contents match what the app imports:
+
+```bash
+python3 scripts/audit_deps.py
+```
+
+Use `--strict` to fail if any unexpected packages are present.
+
+## PDF Smoke Test
+
+Generate a sample PDF to `/tmp/smoke_pdf_output.pdf` for visual inspection:
+
+```bash
+PYTHONPATH=_pydeps SECRET_KEY=test python3 scripts/smoke_pdf.py
+```
+
+
 
 ## Documentation Index
 

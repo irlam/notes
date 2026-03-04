@@ -250,7 +250,14 @@ def export_note_pdf(note_id):
     ).fetchall()
 
     media_path = current_app.config['MEDIA_PATH']
-    pdf_bytes = build_pdf_bytes(note, img_rows, media_path)
+    try:
+        pdf_bytes = build_pdf_bytes(note, img_rows, media_path)
+    except Exception:
+        current_app.logger.exception(
+            'PDF generation failed for note_id=%s user_id=%s', note_id, uid
+        )
+        from flask import jsonify
+        return jsonify({'error': 'PDF generation failed. Please try again later.'}), 500
 
     # Derive a safe filename from the note title
     raw = (note['title'] or 'note').strip() or 'note'
