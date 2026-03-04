@@ -236,110 +236,14 @@
   <script src="/static/js/annotation.js"></script>
   <script src="/static/js/app.js"></script>
 
-  <!-- Milestone 10: Email PDF and Batch Export handlers -->
-  <script>
-  (function () {
-    var emailEnabled = {{ 'true' if enable_email_export else 'false' }};
+  <!-- Feature flags/config available to external JS (CSP-safe because it's HTML attributes) -->
+  <div
+    id="app-config"
+    data-enable-email-export="{{ '1' if enable_email_export else '0' }}"
+    style="display:none;"
+    aria-hidden="true"
+  ></div>
 
-    function showToast(msg, color) {
-      color = color || '#444';
-      var existing = document.getElementById('m10-toast');
-      if (existing) existing.remove();
-      var banner = document.createElement('div');
-      banner.id = 'm10-toast';
-      banner.setAttribute('role', 'status');
-      banner.setAttribute('aria-live', 'polite');
-      banner.style.cssText = [
-        'position:fixed', 'bottom:16px', 'left:50%',
-        'transform:translateX(-50%)',
-        'background:' + color, 'color:#fff',
-        'padding:10px 20px', 'border-radius:6px',
-        'font-size:14px', 'z-index:9999',
-        'box-shadow:0 2px 8px rgba(0,0,0,.4)'
-      ].join(';');
-      banner.textContent = msg;
-      document.body.appendChild(banner);
-      setTimeout(function () { if (banner.parentNode) banner.remove(); }, 4000);
-    }
-
-    // "Coming soon" handler for when feature flag is OFF
-    if (!emailEnabled) {
-      ['btn-email-pdf', 'btn-batch-export'].forEach(function (id) {
-        var btn = document.getElementById(id);
-        if (!btn) return;
-        btn.addEventListener('click', function (e) {
-          e.preventDefault();
-          showToast('\u23F3 Coming soon \u2014 this feature is planned for Milestone 10.');
-        });
-      });
-      return;
-    }
-
-    // Email PDF — feature flag ON
-    var emailBtn = document.getElementById('btn-email-pdf');
-    if (emailBtn) {
-      emailBtn.addEventListener('click', function () {
-        var noteId = window.currentNoteId;
-        if (!noteId) return;
-        emailBtn.disabled = true;
-        emailBtn.title = 'Sending\u2026';
-        fetch('/api/notes/' + noteId + '/email-pdf', {method: 'POST'})
-          .then(function (r) { return r.json().then(function (d) { return {status: r.status, data: d}; }); })
-          .then(function (res) {
-            if (res.status === 200) {
-              showToast('\u2709\uFE0F PDF sent to ' + (res.data.to || 'your email') + '.', '#2a7a4b');
-            } else if (res.status === 400) {
-              showToast('\u26A0\uFE0F ' + (res.data.error || 'No email address set. Add one in Settings.'), '#b05010');
-            } else if (res.status === 429) {
-              showToast('\u23F3 Rate limit reached. Try again later.', '#b05010');
-            } else {
-              showToast('\u274C ' + (res.data.error || 'Failed to send email.'), '#b05010');
-            }
-          })
-          .catch(function () { showToast('\u274C Network error.', '#b05010'); })
-          .finally(function () { emailBtn.disabled = false; emailBtn.title = 'Email PDF'; });
-      });
-    }
-
-    // Batch Export — feature flag ON
-    var batchBtn = document.getElementById('btn-batch-export');
-    if (batchBtn) {
-      batchBtn.addEventListener('click', function () {
-        var noteId = window.currentNoteId;
-        if (!noteId) return;
-        var fmt = prompt('Export format: zip or pdf?', 'zip');
-        if (!fmt) return;
-        fmt = fmt.trim().toLowerCase();
-        if (fmt !== 'zip' && fmt !== 'pdf') {
-          showToast('Format must be zip or pdf.', '#b05010');
-          return;
-        }
-        fetch('/api/batch-export', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({note_ids: [noteId], format: fmt})
-        })
-        .then(function (r) {
-          if (!r.ok) {
-            return r.json().then(function (d) { throw new Error(d.error || 'Export failed.'); });
-          }
-          return r.blob();
-        })
-        .then(function (blob) {
-          var url = URL.createObjectURL(blob);
-          var a = document.createElement('a');
-          a.href = url;
-          a.download = 'notes_export.' + fmt;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          URL.revokeObjectURL(url);
-          showToast('\u2705 Export downloaded.', '#2a7a4b');
-        })
-        .catch(function (err) { showToast('\u274C ' + err.message, '#b05010'); });
-      });
-    }
-  })();
-  </script>
+  <script src="/static/js/m10.js"></script>
 </body>
 </html>

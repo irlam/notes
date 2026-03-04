@@ -59,6 +59,24 @@ _FONT_NORMAL = 'Helvetica'
 _FONT_BOLD = 'Helvetica-Bold'
 
 
+def _resolve_media_dir(config_value):
+    """
+    Resolve MEDIA_PATH to an absolute filesystem path.
+
+    If MEDIA_PATH is relative (e.g. 'uploads'), resolve relative to the project
+    root folder (one level above the Flask 'app/' package).
+    """
+    raw = (config_value or '').strip()
+    if not raw:
+        raise RuntimeError('MEDIA_PATH is not configured')
+
+    if os.path.isabs(raw):
+        return raw
+
+    project_root = os.path.abspath(os.path.join(current_app.root_path, os.pardir))
+    return os.path.join(project_root, raw)
+
+
 def _register_fonts():
     """Register TrueType fonts once per process for Unicode support."""
     global _fonts_registered, _FONT_NORMAL, _FONT_BOLD
@@ -249,7 +267,13 @@ def export_note_pdf(note_id):
         (note_id, uid, _MAX_IMAGES),
     ).fetchall()
 
-    media_path = current_app.config['MEDIA_PATH']
+    media_path = _resolve_media_dir(current_app.config.get('MEDIA_PATH'))
+    if not os.path.isdir(media_path):
+        current_app.logger.warning(
+            'PDF export: resolved media_dir does not exist. MEDIA_PATH=%r resolved=%r',
+            current_app.config.get('MEDIA_PATH'),
+            media_path,
+        )
     pdf_bytes = build_pdf_bytes(note, img_rows, media_path)
 
     # Derive a safe filename from the note title
