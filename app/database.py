@@ -47,6 +47,24 @@ def _apply_pending_migrations(db):
         db.execute('PRAGMA user_version = 7')
         db.commit()
 
+    if version < 8:
+        # Migration 008: add body_after column to notes and note_versions
+        # for text-after-images support.
+        cols_notes = {row[1] for row in db.execute('PRAGMA table_info(notes)').fetchall()}
+        if 'body_after' not in cols_notes:
+            db.execute(
+                "ALTER TABLE notes ADD COLUMN body_after TEXT NOT NULL DEFAULT ''"
+            )
+            db.commit()
+        cols_versions = {row[1] for row in db.execute('PRAGMA table_info(note_versions)').fetchall()}
+        if 'body_after' not in cols_versions:
+            db.execute(
+                "ALTER TABLE note_versions ADD COLUMN body_after TEXT NOT NULL DEFAULT ''"
+            )
+            db.commit()
+        db.execute('PRAGMA user_version = 8')
+        db.commit()
+
 
 def init_db(app):
     schema_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'schema.sql')

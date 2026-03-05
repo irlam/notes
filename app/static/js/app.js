@@ -149,12 +149,13 @@ function updateNoteItemBadge(noteId, state) {
 }
 
 /* ===== Pending writes queue ===== */
-async function queueWrite(noteId, title, body, is_pinned, folder_id) {
+async function queueWrite(noteId, title, body, body_after, is_pinned, folder_id) {
   try {
     await idbPut('pending_writes', {
       note_id: noteId,
       title,
       body,
+      body_after,
       is_pinned,
       folder_id: folder_id != null ? folder_id : null,
       queued_at: Date.now(),
@@ -222,6 +223,7 @@ async function flushQueue() {
       const updated = await apiRequest('PUT', `/api/notes/${w.note_id}`, {
         title: w.title,
         body: w.body,
+        body_after: w.body_after || '',
         is_pinned: w.is_pinned,
         folder_id: w.folder_id,
       });
@@ -261,6 +263,7 @@ async function flushQueue() {
 const noteList = document.getElementById('note-list');
 const noteTitle = document.getElementById('note-title');
 const noteBody = document.getElementById('note-body');
+const noteBodyAfter = document.getElementById('note-body-after');
 const autosaveEl = document.getElementById('autosave-indicator');
 const offlineBanner = document.getElementById('offline-banner');
 const btnNew = document.getElementById('btn-new');
@@ -497,6 +500,7 @@ function updateEditorToolbar(note) {
 
   noteTitle.contentEditable = (trashed || isConflict) ? 'false' : 'true';
   noteBody.contentEditable = (trashed || isConflict) ? 'false' : 'true';
+  if (noteBodyAfter) noteBodyAfter.contentEditable = (trashed || isConflict) ? 'false' : 'true';
 
   // Folder selector
   noteFolderSelect.value = note.folder_id != null ? String(note.folder_id) : '';
@@ -525,6 +529,7 @@ function openNote(id) {
   window.currentNoteId = id;
   noteTitle.textContent = note.title;
   noteBody.textContent = note.body;
+  if (noteBodyAfter) noteBodyAfter.textContent = note.body_after || '';
   showEditor(true);
   updateEditorToolbar(note);
   renderList();
@@ -637,16 +642,17 @@ async function saveNote() {
   isSaving = true;
   const title = noteTitle.textContent.trim();
   const body = noteBody.innerText;
+  const body_after = noteBodyAfter ? noteBodyAfter.innerText : '';
   const is_pinned = note.is_pinned ? 1 : 0;
   const folder_id = note.folder_id != null ? note.folder_id : null;
 
   if (!navigator.onLine) {
     // Save to IndexedDB queue; will sync on reconnect
-    await queueWrite(currentNoteId, title, body, is_pinned, folder_id);
+    await queueWrite(currentNoteId, title, body, body_after, is_pinned, folder_id);
     // Update local notes array so UI stays current
     const idx = notes.findIndex(n => n.id === currentNoteId);
     if (idx !== -1) {
-      notes[idx] = { ...notes[idx], title, body, is_pinned, folder_id };
+      notes[idx] = { ...notes[idx], title, body, body_after, is_pinned, folder_id };
       await idbPut('cached_notes', { ...notes[idx], cached_at: Date.now() });
     }
     setSyncState(currentNoteId, 'local');
@@ -658,7 +664,7 @@ async function saveNote() {
   setSyncState(currentNoteId, 'saving');
   try {
     const updated = await apiRequest('PUT', `/api/notes/${currentNoteId}`,
-      { title, body, is_pinned, folder_id });
+      { title, body, body_after, is_pinned, folder_id });
     const idx = notes.findIndex(n => n.id === currentNoteId);
     if (idx !== -1) notes[idx] = updated;
     // Remove from queue if it was previously queued
@@ -669,7 +675,7 @@ async function saveNote() {
     renderList();
   } catch (e) {
     // Queue for retry
-    await queueWrite(currentNoteId, title, body, is_pinned, folder_id);
+    await queueWrite(currentNoteId, title, body, body_after, is_pinned, folder_id);
     setSyncState(currentNoteId, 'failed');
     console.error('Save failed', e);
   } finally {
@@ -687,9 +693,10 @@ async function togglePin() {
   try {
     const title = noteTitle.textContent.trim();
     const body = noteBody.innerText;
+    const body_after = noteBodyAfter ? noteBodyAfter.innerText : '';
     const folder_id = note.folder_id != null ? note.folder_id : null;
     const updated = await apiRequest('PUT', `/api/notes/${currentNoteId}`,
-      { title, body, is_pinned: newPinned, folder_id });
+      { title, body, body_after, is_pinned: newPinned, folder_id });
     const idx = notes.findIndex(n => n.id === currentNoteId);
     if (idx !== -1) notes[idx] = updated;
     updateEditorToolbar(updated);
@@ -1117,6 +1124,7 @@ async function restoreVersion(noteId, versionId) {
     if (currentNoteId === noteId) {
       noteTitle.textContent = updated.title;
       noteBody.textContent = updated.body;
+      if (noteBodyAfter) noteBodyAfter.textContent = updated.body_after || '';
       updateEditorToolbar(updated);
     }
     setAutosave('Restored \u2713');
@@ -1246,6 +1254,7 @@ document.addEventListener('keydown', e => {
 
 noteTitle.addEventListener('input', scheduleAutosave);
 noteBody.addEventListener('input', scheduleAutosave);
+if (noteBodyAfter) noteBodyAfter.addEventListener('input', scheduleAutosave);
 
 noteTitle.addEventListener('keydown', e => {
   if (e.key === 'Enter') {

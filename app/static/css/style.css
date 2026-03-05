@@ -632,7 +632,7 @@ body {
 
 /* contenteditable body */
 .note-body-input {
-  flex: 1;
+  flex: 0 0 auto;
   font-size: 15px;
   color: var(--text);
   outline: none;
@@ -647,6 +647,30 @@ body {
 .note-body-input:empty::before {
   content: 'Start writing…';
   color: #ccc;
+}
+
+/* contenteditable body after images */
+.note-body-after-input {
+  flex: 0 0 auto;
+  font-size: 15px;
+  color: var(--text);
+  outline: none;
+  border: none;
+  width: 100%;
+  min-height: 120px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  caret-color: var(--accent);
+  line-height: 1.7;
+  padding-bottom: 16px;
+}
+.note-body-after-input:empty::before {
+  content: 'Continue writing after images…';
+  color: #ccc;
+}
+.note-body-after-input[style*="display:none"],
+.note-body-after-input[style*="display: none"] {
+  display: none;
 }
 
 /* Welcome / no-selection state */
