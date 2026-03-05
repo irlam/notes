@@ -141,6 +141,9 @@ function initAnnotationEditor() {
  * Open / Close
  * ------------------------------------------------------------------------- */
 function openAnnotationEditor(noteId, imageId, imgUrl, annotationData) {
+  if (!annModal) initAnnotationEditor();
+  if (!annModal) { console.warn('openAnnotationEditor: annotation modal not found in DOM'); return; }
+
   annState.noteId = noteId;
   annState.imageId = imageId;
   annState.strokes = [];

@@ -28,6 +28,9 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
+  // Only handle http/https — ignore chrome-extension://, data:, etc.
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
+
   // Network-first for API calls — offline handled by app.js (IndexedDB queue)
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
