@@ -420,7 +420,7 @@ class TestSectionTextMigration:
                     caption TEXT NOT NULL DEFAULT '',
                     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
-                PRAGMA user_version = 8;
+                PRAGMA user_version = 8;  -- version 8 = after migration 008 (body_after), before 009 (section_text)
             """)
             # Confirm section_text is NOT present before migration
             assert 'section_text' not in self._table_columns(conn, 'note_images')

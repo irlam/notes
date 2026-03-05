@@ -230,8 +230,7 @@ def _note_story_elements(note, img_rows, media_path):
             story.append(Spacer(1, 10))
 
             # Section text: paragraph text that appears after this image
-            section_text = (img_row['section_text'] if 'section_text' in img_row.keys() else None) or ''
-            section_text = section_text.rstrip()
+            section_text = (img_row['section_text'] or '').rstrip()
             if section_text:
                 story.append(Spacer(1, 6))
                 for line in section_text.split('\n'):

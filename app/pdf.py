@@ -240,6 +240,25 @@ def _safe_text(text):
             .replace('>', '&gt;'))
 
 
+def _append_text_lines(story, text, style_body, style_check, Paragraph, Spacer):
+    """Render *text* line-by-line into *story*, handling checkbox lines."""
+    for line in text.split('\n'):
+        stripped = line.rstrip()
+        if not stripped:
+            story.append(Spacer(1, 6))
+            continue
+        lower = stripped.lower()
+        if lower.startswith('[ ] ') or lower.startswith('[x] '):
+            checked = lower.startswith('[x] ')
+            item_text = stripped[4:]
+            prefix = '[x]' if checked else '[ ]'
+            story.append(
+                Paragraph(f'{prefix} {_safe_text(item_text)}', style_check)
+            )
+        else:
+            story.append(Paragraph(_safe_text(stripped), style_body))
+
+
 # ---------------------------------------------------------------------------
 # Export endpoint
 # ---------------------------------------------------------------------------
@@ -427,21 +446,7 @@ def build_pdf_bytes(note, img_rows, media_path):
     # Body
     body = (note['body'] or '').rstrip()
     if body:
-        for line in body.split('\n'):
-            stripped = line.rstrip()
-            if not stripped:
-                story.append(Spacer(1, 6))
-                continue
-            lower = stripped.lower()
-            if lower.startswith('[ ] ') or lower.startswith('[x] '):
-                checked = lower.startswith('[x] ')
-                item_text = stripped[4:]
-                prefix = '[x]' if checked else '[ ]'
-                story.append(
-                    Paragraph(f'{prefix} {_safe_text(item_text)}', style_check)
-                )
-            else:
-                story.append(Paragraph(_safe_text(stripped), style_body))
+        _append_text_lines(story, body, style_body, style_check, Paragraph, Spacer)
 
     # Images
     if img_rows:
@@ -491,46 +496,17 @@ def build_pdf_bytes(note, img_rows, media_path):
             story.append(Spacer(1, 10))
 
             # Section text: paragraph text that appears after this image
-            section_text = (img_row['section_text'] if 'section_text' in img_row.keys() else None) or ''
-            section_text = section_text.rstrip()
+            section_text = (img_row['section_text'] or '').rstrip()
             if section_text:
                 story.append(Spacer(1, 6))
-                for line in section_text.split('\n'):
-                    stripped = line.rstrip()
-                    if not stripped:
-                        story.append(Spacer(1, 6))
-                        continue
-                    lower = stripped.lower()
-                    if lower.startswith('[ ] ') or lower.startswith('[x] '):
-                        checked = lower.startswith('[x] ')
-                        item_text = stripped[4:]
-                        prefix = '[x]' if checked else '[ ]'
-                        story.append(
-                            Paragraph(f'{prefix} {_safe_text(item_text)}', style_check)
-                        )
-                    else:
-                        story.append(Paragraph(_safe_text(stripped), style_body))
+                _append_text_lines(story, section_text, style_body, style_check, Paragraph, Spacer)
                 story.append(Spacer(1, 10))
 
     # Notes after images
     body_after = (note.get('body_after') or '').rstrip()
     if body_after:
         story.append(Spacer(1, 14))
-        for line in body_after.split('\n'):
-            stripped = line.rstrip()
-            if not stripped:
-                story.append(Spacer(1, 6))
-                continue
-            lower = stripped.lower()
-            if lower.startswith('[ ] ') or lower.startswith('[x] '):
-                checked = lower.startswith('[x] ')
-                item_text = stripped[4:]
-                prefix = '[x]' if checked else '[ ]'
-                story.append(
-                    Paragraph(f'{prefix} {_safe_text(item_text)}', style_check)
-                )
-            else:
-                story.append(Paragraph(_safe_text(stripped), style_body))
+        _append_text_lines(story, body_after, style_body, style_check, Paragraph, Spacer)
 
     doc.build(story)
     return buf.getvalue()
