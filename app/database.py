@@ -65,6 +65,18 @@ def _apply_pending_migrations(db):
         db.execute('PRAGMA user_version = 8')
         db.commit()
 
+    if version < 9:
+        # Migration 009: add section_text column to note_images
+        # for text-between-images support.
+        cols = {row[1] for row in db.execute('PRAGMA table_info(note_images)').fetchall()}
+        if 'section_text' not in cols:
+            db.execute(
+                "ALTER TABLE note_images ADD COLUMN section_text TEXT NOT NULL DEFAULT ''"
+            )
+            db.commit()
+        db.execute('PRAGMA user_version = 9')
+        db.commit()
+
 
 def init_db(app):
     schema_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'schema.sql')

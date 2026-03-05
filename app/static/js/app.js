@@ -955,6 +955,27 @@ function renderImageBlocks() {
     });
     block.appendChild(captionArea);
 
+    // Section text: multi-line text area between this image and the next
+    const sectionTextArea = document.createElement('textarea');
+    sectionTextArea.className = 'image-section-text';
+    sectionTextArea.placeholder = 'Add text after this image…';
+    sectionTextArea.value = img.section_text || '';
+    sectionTextArea.setAttribute('aria-label', 'Text after image');
+    sectionTextArea.readOnly = !editable;
+    sectionTextArea.addEventListener('blur', async () => {
+      const newText = sectionTextArea.value;
+      if (newText === (img.section_text || '')) return;
+      try {
+        const updated = await apiRequest('PUT',
+          `/api/notes/${currentNoteId}/images/${img.id}`,
+          { section_text: newText });
+        img.section_text = updated.section_text;
+      } catch (e) {
+        console.error('Failed to save image section text', e);
+      }
+    });
+    block.appendChild(sectionTextArea);
+
     imageBlocksEl.appendChild(block);
   });
 }

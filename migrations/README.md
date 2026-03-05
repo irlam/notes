@@ -66,3 +66,4 @@ where supported, or guarded by `SELECT` checks) so they are safe to re-run.
 | `006_add_user_email.sql` | Add `email` column to `users`; add `email_send_log` table | M10 | ✅ |
 | `007_add_image_caption.sql` | Add `caption` column to `note_images` | M11 | ✅ |
 | `008_add_body_after.sql` | Add `body_after` column to `notes` and `note_versions` for text-after-images | M12 | ✅ |
+| `009_add_image_section_text.sql` | Add `section_text` column to `note_images` for text between images | M13 | ✅ |

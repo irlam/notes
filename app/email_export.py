@@ -229,6 +229,19 @@ def _note_story_elements(note, img_rows, media_path):
                 story.append(Paragraph(_safe_text(caption), style_caption))
             story.append(Spacer(1, 10))
 
+            # Section text: paragraph text that appears after this image
+            section_text = (img_row['section_text'] if 'section_text' in img_row.keys() else None) or ''
+            section_text = section_text.rstrip()
+            if section_text:
+                story.append(Spacer(1, 6))
+                for line in section_text.split('\n'):
+                    stripped = line.rstrip()
+                    if not stripped:
+                        story.append(Spacer(1, 6))
+                        continue
+                    story.append(Paragraph(_safe_text(stripped), style_body))
+                story.append(Spacer(1, 10))
+
     return story
 
 
@@ -286,7 +299,7 @@ def email_pdf(note_id: int):
 
     # Fetch images for this note
     img_rows = db.execute(
-        'SELECT id, filename, original_filename, annotation_data '
+        'SELECT id, filename, original_filename, annotation_data, caption, section_text '
         'FROM note_images WHERE note_id = ? AND user_id = ? '
         'ORDER BY position ASC, id ASC LIMIT 20',
         (note_id, uid),
@@ -374,7 +387,7 @@ def batch_export():
                     abort(404)
                 note = dict(row)
                 img_rows = db.execute(
-                    'SELECT id, filename, original_filename, annotation_data '
+                    'SELECT id, filename, original_filename, annotation_data, caption, section_text '
                     'FROM note_images WHERE note_id = ? AND user_id = ? '
                     'ORDER BY position ASC, id ASC LIMIT 20',
                     (note_id, uid),
@@ -419,7 +432,7 @@ def batch_export():
                 abort(404)
             note = dict(row)
             img_rows = db.execute(
-                'SELECT id, filename, original_filename, annotation_data '
+                'SELECT id, filename, original_filename, annotation_data, caption, section_text '
                 'FROM note_images WHERE note_id = ? AND user_id = ? '
                 'ORDER BY position ASC, id ASC LIMIT 20',
                 (note_id, uid),
