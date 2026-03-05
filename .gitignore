@@ -7,7 +7,12 @@ uploads/
 *.log
 dist/
 .DS_Store
-# Platform-specific compiled extensions – never commit these; they are
-# architecture/OS-specific and must be built on the target server.
+# Platform-specific compiled extensions – never commit generic .so/.pyd
+# files from _pydeps.  Pillow's manylinux wheel extensions are explicitly
+# allowed because they ship as a self-contained bundle (pillow.libs/) that
+# works on all modern Linux x86-64 hosts without any system libraries.
 _pydeps/**/*.pyd
 _pydeps/**/*.so
+!_pydeps/PIL/*.so
+!_pydeps/pillow.libs/*.so
+!_pydeps/pillow.libs/*.so.*
