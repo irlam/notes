@@ -69,7 +69,8 @@ def _compress_image(data, mime_type):
     """Resize and compress an image with Pillow.
 
     Returns (compressed_bytes, final_mime_type, file_extension, width, height).
-    Falls back to storing the raw bytes unchanged if Pillow is unavailable.
+    Falls back to storing the raw bytes unchanged if Pillow is unavailable or
+    its compiled C extensions cannot be loaded (e.g. missing _imaging module).
     """
     try:
         import io
@@ -113,8 +114,10 @@ def _compress_image(data, mime_type):
 
         return buf.getvalue(), final_mime, ext, w, h
 
-    except ImportError:
-        # Pillow not installed – store raw without compression
+    except (ImportError, OSError):
+        # Pillow not installed, or its compiled C extensions (_imaging) could
+        # not be loaded (e.g. wrong platform binaries in _pydeps).
+        # Store the raw bytes without compression so uploads still work.
         ext_map = {
             'image/jpeg': 'jpg',
             'image/png': 'png',

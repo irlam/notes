@@ -50,6 +50,29 @@ pip install -r requirements.txt
 deactivate
 ```
 
+> **Important — platform-specific packages (Pillow, MarkupSafe)**
+>
+> Some dependencies in `requirements.txt` (notably **Pillow**) include compiled
+> C extensions that are specific to the operating system and CPU architecture.
+> You **must** run `pip install -r requirements.txt` on the **target Linux server**,
+> not on a Windows or macOS machine.
+>
+> If you copy pre-installed packages from another machine (e.g. by committing or
+> copying a `_pydeps` folder), the compiled `.pyd` / `.so` extension files will be
+> wrong for the server's platform and Pillow will fail to import.  Symptoms include:
+>
+> ```
+> {"error": "PDF generation failed",
+>  "detail": "cannot import name '_imaging' from 'PIL' ..."}
+> ```
+>
+> **Fix:** re-run `pip install -r requirements.txt` inside the venv on the server,
+> or rebuild `_pydeps` on the server:
+>
+> ```bash
+> pip install --target _pydeps -r requirements.txt
+> ```
+
 ---
 
 ## 4. Configure Environment Variables

@@ -321,13 +321,40 @@ def build_pdf_bytes(note, img_rows, media_path):
     -------
     bytes
         Raw PDF data.
+
+    Raises
+    ------
+    ImportError
+        If Pillow is not installed or its compiled C extensions (_imaging)
+        are missing.  ReportLab requires Pillow at import time.
     """
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib.styles import ParagraphStyle
-    from reportlab.lib.units import inch
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-    from reportlab.platypus import Image as RLImage
-    from reportlab.lib import colors
+    # ReportLab's reportlab.lib.utils does ``from PIL import Image`` at module
+    # level, so Pillow (including its compiled _imaging C extension) must be
+    # available before we try to import any reportlab module.  Give the caller
+    # a clear, actionable error rather than a cryptic low-level ImportError.
+    try:
+        from PIL import Image as _pil_check  # noqa: F401 — triggers _imaging load
+    except ImportError as exc:
+        raise ImportError(
+            'PDF generation requires Pillow with compiled C extensions '
+            '(the _imaging extension was not found or could not be loaded). '
+            'Reinstall Pillow for your platform using one of: '
+            '(1) inside a virtualenv: pip install --force-reinstall Pillow  '
+            '(2) into the _pydeps bundle: '
+            'pip install --target _pydeps --force-reinstall Pillow'
+        ) from exc
+
+    try:
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import ParagraphStyle
+        from reportlab.lib.units import inch
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+        from reportlab.platypus import Image as RLImage
+        from reportlab.lib import colors
+    except ImportError as exc:
+        raise ImportError(
+            f'PDF generation requires reportlab to be installed: {exc}'
+        ) from exc
 
     buf = io.BytesIO()
     margin = inch

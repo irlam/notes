@@ -7,3 +7,7 @@ uploads/
 *.log
 dist/
 .DS_Store
+# Platform-specific compiled extensions – never commit these; they are
+# architecture/OS-specific and must be built on the target server.
+_pydeps/**/*.pyd
+_pydeps/**/*.so
