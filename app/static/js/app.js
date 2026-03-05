@@ -1,3 +1,9 @@
+/* ===== Dark mode preference ===== */
+// Apply before the rest of the page initialises to avoid a flash of light mode.
+if (localStorage.getItem('notes_dark_mode') === '1') {
+  document.documentElement.setAttribute('data-theme', 'dark');
+}
+
 /* ===== State ===== */
 let notes = [];
 let folders = [];
