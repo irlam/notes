@@ -240,6 +240,25 @@ def _safe_text(text):
             .replace('>', '&gt;'))
 
 
+def _append_text_lines(story, text, style_body, style_check, Paragraph, Spacer):
+    """Render *text* line-by-line into *story*, handling checkbox lines."""
+    for line in text.split('\n'):
+        stripped = line.rstrip()
+        if not stripped:
+            story.append(Spacer(1, 6))
+            continue
+        lower = stripped.lower()
+        if lower.startswith('[ ] ') or lower.startswith('[x] '):
+            checked = lower.startswith('[x] ')
+            item_text = stripped[4:]
+            prefix = '[x]' if checked else '[ ]'
+            story.append(
+                Paragraph(f'{prefix} {_safe_text(item_text)}', style_check)
+            )
+        else:
+            story.append(Paragraph(_safe_text(stripped), style_body))
+
+
 # ---------------------------------------------------------------------------
 # Export endpoint
 # ---------------------------------------------------------------------------
@@ -269,7 +288,7 @@ def export_note_pdf(note_id):
     note = dict(row)
 
     img_rows = db.execute(
-        'SELECT id, filename, original_filename, annotation_data, caption '
+        'SELECT id, filename, original_filename, annotation_data, caption, section_text '
         'FROM note_images WHERE note_id = ? AND user_id = ? '
         'ORDER BY position ASC, id ASC '
         'LIMIT ?',
@@ -313,7 +332,7 @@ def build_pdf_bytes(note, img_rows, media_path):
         Must contain: title, body, created_at, updated_at.
     img_rows : iterable
         Rows from ``note_images``; each must have filename,
-        original_filename, annotation_data, caption.
+        original_filename, annotation_data, caption, section_text.
     media_path : str
         Filesystem path to the media uploads directory.
 
@@ -427,21 +446,7 @@ def build_pdf_bytes(note, img_rows, media_path):
     # Body
     body = (note['body'] or '').rstrip()
     if body:
-        for line in body.split('\n'):
-            stripped = line.rstrip()
-            if not stripped:
-                story.append(Spacer(1, 6))
-                continue
-            lower = stripped.lower()
-            if lower.startswith('[ ] ') or lower.startswith('[x] '):
-                checked = lower.startswith('[x] ')
-                item_text = stripped[4:]
-                prefix = '[x]' if checked else '[ ]'
-                story.append(
-                    Paragraph(f'{prefix} {_safe_text(item_text)}', style_check)
-                )
-            else:
-                story.append(Paragraph(_safe_text(stripped), style_body))
+        _append_text_lines(story, body, style_body, style_check, Paragraph, Spacer)
 
     # Images
     if img_rows:
@@ -490,25 +495,18 @@ def build_pdf_bytes(note, img_rows, media_path):
                 story.append(Paragraph(_safe_text(caption), style_caption))
             story.append(Spacer(1, 10))
 
+            # Section text: paragraph text that appears after this image
+            section_text = (img_row['section_text'] or '').rstrip()
+            if section_text:
+                story.append(Spacer(1, 6))
+                _append_text_lines(story, section_text, style_body, style_check, Paragraph, Spacer)
+                story.append(Spacer(1, 10))
+
     # Notes after images
     body_after = (note.get('body_after') or '').rstrip()
     if body_after:
         story.append(Spacer(1, 14))
-        for line in body_after.split('\n'):
-            stripped = line.rstrip()
-            if not stripped:
-                story.append(Spacer(1, 6))
-                continue
-            lower = stripped.lower()
-            if lower.startswith('[ ] ') or lower.startswith('[x] '):
-                checked = lower.startswith('[x] ')
-                item_text = stripped[4:]
-                prefix = '[x]' if checked else '[ ]'
-                story.append(
-                    Paragraph(f'{prefix} {_safe_text(item_text)}', style_check)
-                )
-            else:
-                story.append(Paragraph(_safe_text(stripped), style_body))
+        _append_text_lines(story, body_after, style_body, style_check, Paragraph, Spacer)
 
     doc.build(story)
     return buf.getvalue()

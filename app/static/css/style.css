@@ -866,6 +866,30 @@ body {
 .image-caption[readonly] { color: var(--text-muted); cursor: default; }
 .image-caption::placeholder { color: var(--text-muted); font-style: italic; }
 
+.image-section-text {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: none;
+  border-top: 1px dashed var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+  line-height: 1.5;
+  outline: none;
+  white-space: pre-wrap;
+}
+.image-section-text:focus {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+.image-section-text[readonly] { color: var(--text-muted); cursor: default; }
+.image-section-text::placeholder { color: var(--text-muted); font-style: italic; }
+
 /* ===== Annotation Editor ===== */
 
 /* Full-screen modal overlay */

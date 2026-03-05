@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS note_images (
     position INTEGER NOT NULL DEFAULT 0,
     annotation_data TEXT,
     caption TEXT NOT NULL DEFAULT '',
+    section_text TEXT NOT NULL DEFAULT '',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (note_id) REFERENCES notes (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id)
