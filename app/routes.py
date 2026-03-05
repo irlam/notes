@@ -4,7 +4,7 @@ from .database import get_db, get_user_by_id
 
 bp = Blueprint('main', __name__)
 
-_NOTE_FIELDS = 'id, title, body, is_pinned, is_archived, is_trashed, folder_id, conflict_of, created_at, updated_at'
+_NOTE_FIELDS = 'id, title, body, body_after, is_pinned, is_archived, is_trashed, folder_id, conflict_of, created_at, updated_at'
 _MAX_TITLE = 500
 _MAX_BODY = 100_000
 
@@ -146,7 +146,8 @@ def create_note():
     data = request.get_json(silent=True) or {}
     title = data.get('title', '')
     body = data.get('body', '')
-    if len(title) > _MAX_TITLE or len(body) > _MAX_BODY:
+    body_after = data.get('body_after', '')
+    if len(title) > _MAX_TITLE or len(body) > _MAX_BODY or len(body_after) > _MAX_BODY:
         abort(400)
     folder_id = None
     if 'folder_id' in data and data['folder_id'] is not None:
@@ -159,8 +160,8 @@ def create_note():
             abort(400)
     db = get_db()
     cur = db.execute(
-        'INSERT INTO notes (user_id, title, body, folder_id) VALUES (?, ?, ?, ?)',
-        (_current_user_id(), title, body, folder_id)
+        'INSERT INTO notes (user_id, title, body, body_after, folder_id) VALUES (?, ?, ?, ?, ?)',
+        (_current_user_id(), title, body, body_after, folder_id)
     )
     db.commit()
     row = db.execute(
@@ -192,7 +193,7 @@ def get_note(note_id):
 def update_note(note_id):
     db = get_db()
     existing = db.execute(
-        'SELECT id, title, body, updated_at FROM notes WHERE id = ? AND user_id = ?',
+        'SELECT id, title, body, body_after, updated_at FROM notes WHERE id = ? AND user_id = ?',
         (note_id, _current_user_id())
     ).fetchone()
     if existing is None:
@@ -200,14 +201,15 @@ def update_note(note_id):
     data = request.get_json(silent=True) or {}
     title = data.get('title', '')
     body = data.get('body', '')
-    if len(title) > _MAX_TITLE or len(body) > _MAX_BODY:
+    body_after = data.get('body_after', '')
+    if len(title) > _MAX_TITLE or len(body) > _MAX_BODY or len(body_after) > _MAX_BODY:
         abort(400)
     is_pinned = int(bool(data.get('is_pinned', 0)))
 
     from .versions import _snapshot, _prune_versions
 
     # Snapshot current content before overwriting
-    _snapshot(db, note_id, _current_user_id(), existing['title'], existing['body'])
+    _snapshot(db, note_id, _current_user_id(), existing['title'], existing['body'], existing['body_after'])
 
     # Conflict detection: if client sends its last-known updated_at and it
     # differs from what the server has, create a conflict copy first.
@@ -216,9 +218,9 @@ def update_note(note_id):
     if client_updated_at and client_updated_at != existing['updated_at']:
         conflict_title = ('[Conflict Copy] ' + existing['title'])[:_MAX_TITLE]
         cur_conflict = db.execute(
-            'INSERT INTO notes (user_id, title, body, conflict_of, created_at, updated_at) '
-            'VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
-            (_current_user_id(), conflict_title, existing['body'], note_id)
+            'INSERT INTO notes (user_id, title, body, body_after, conflict_of, created_at, updated_at) '
+            'VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
+            (_current_user_id(), conflict_title, existing['body'], existing['body_after'], note_id)
         )
         conflict_note_id = cur_conflict.lastrowid
 
@@ -232,15 +234,15 @@ def update_note(note_id):
             ).fetchone():
                 abort(400)
         db.execute(
-            'UPDATE notes SET title = ?, body = ?, is_pinned = ?, folder_id = ?, '
+            'UPDATE notes SET title = ?, body = ?, body_after = ?, is_pinned = ?, folder_id = ?, '
             'updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?',
-            (title, body, is_pinned, new_folder_id, note_id, _current_user_id())
+            (title, body, body_after, is_pinned, new_folder_id, note_id, _current_user_id())
         )
     else:
         db.execute(
-            'UPDATE notes SET title = ?, body = ?, is_pinned = ?, updated_at = CURRENT_TIMESTAMP '
-            'WHERE id = ? AND user_id = ?',
-            (title, body, is_pinned, note_id, _current_user_id())
+            'UPDATE notes SET title = ?, body = ?, body_after = ?, is_pinned = ?, '
+            'updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?',
+            (title, body, body_after, is_pinned, note_id, _current_user_id())
         )
     db.commit()
     _prune_versions(db, note_id, _current_user_id())
@@ -559,6 +561,7 @@ def bulk_sync():
         note_id = w.get('id')
         title = w.get('title', '')
         body = w.get('body', '')
+        body_after = w.get('body_after', '')
         is_pinned = int(bool(w.get('is_pinned', 0)))
         folder_id_raw = w.get('folder_id')
 
@@ -586,9 +589,9 @@ def bulk_sync():
             folder_id = existing['folder_id']
 
         db.execute(
-            'UPDATE notes SET title = ?, body = ?, is_pinned = ?, folder_id = ?, '
+            'UPDATE notes SET title = ?, body = ?, body_after = ?, is_pinned = ?, folder_id = ?, '
             'updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?',
-            (title, body, is_pinned, folder_id, note_id, uid)
+            (title, body, body_after, is_pinned, folder_id, note_id, uid)
         )
         db.commit()
         row = db.execute(

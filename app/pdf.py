@@ -490,5 +490,25 @@ def build_pdf_bytes(note, img_rows, media_path):
                 story.append(Paragraph(_safe_text(caption), style_caption))
             story.append(Spacer(1, 10))
 
+    # Notes after images
+    body_after = (note.get('body_after') or '').rstrip()
+    if body_after:
+        story.append(Spacer(1, 14))
+        for line in body_after.split('\n'):
+            stripped = line.rstrip()
+            if not stripped:
+                story.append(Spacer(1, 6))
+                continue
+            lower = stripped.lower()
+            if lower.startswith('[ ] ') or lower.startswith('[x] '):
+                checked = lower.startswith('[x] ')
+                item_text = stripped[4:]
+                prefix = '[x]' if checked else '[ ]'
+                story.append(
+                    Paragraph(f'{prefix} {_safe_text(item_text)}', style_check)
+                )
+            else:
+                story.append(Paragraph(_safe_text(stripped), style_body))
+
     doc.build(story)
     return buf.getvalue()

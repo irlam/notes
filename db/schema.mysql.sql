@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS `notes` (
     `folder_id`   INT UNSIGNED,
     `title`       TEXT         NOT NULL,
     `body`        MEDIUMTEXT   NOT NULL,
+    `body_after`  MEDIUMTEXT   NOT NULL DEFAULT '',
     `is_pinned`   TINYINT(1)   NOT NULL DEFAULT 0,
     `is_archived` TINYINT(1)   NOT NULL DEFAULT 0,
     `is_trashed`  TINYINT(1)   NOT NULL DEFAULT 0,
@@ -123,12 +124,13 @@ CREATE TABLE IF NOT EXISTS `note_images` (
 -- note_versions
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `note_versions` (
-    `id`       INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `note_id`  INT UNSIGNED NOT NULL,
-    `user_id`  INT UNSIGNED NOT NULL,
-    `title`    TEXT         NOT NULL,
-    `body`     MEDIUMTEXT   NOT NULL,
-    `saved_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `note_id`    INT UNSIGNED NOT NULL,
+    `user_id`    INT UNSIGNED NOT NULL,
+    `title`      TEXT         NOT NULL,
+    `body`       MEDIUMTEXT   NOT NULL,
+    `body_after` MEDIUMTEXT   NOT NULL DEFAULT '',
+    `saved_at`   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `idx_note_versions_note_id` (`note_id`),
     KEY `idx_note_versions_user_id` (`user_id`),

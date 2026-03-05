@@ -7,7 +7,7 @@ from .database import get_db
 versions_bp = Blueprint('versions', __name__)
 
 _MAX_VERSIONS_PER_NOTE = 50
-_NOTE_FIELDS = 'id, title, body, is_pinned, is_archived, is_trashed, folder_id, conflict_of, created_at, updated_at'
+_NOTE_FIELDS = 'id, title, body, body_after, is_pinned, is_archived, is_trashed, folder_id, conflict_of, created_at, updated_at'
 
 
 def _current_user_id():
@@ -59,20 +59,20 @@ def restore_version(note_id, version_id):
     if note is None:
         abort(404)
     version = db.execute(
-        'SELECT id, title, body FROM note_versions WHERE id = ? AND note_id = ? AND user_id = ?',
+        'SELECT id, title, body, body_after FROM note_versions WHERE id = ? AND note_id = ? AND user_id = ?',
         (version_id, note_id, uid)
     ).fetchone()
     if version is None:
         abort(404)
 
     # Snapshot current content before restoring
-    _snapshot(db, note_id, uid, note['title'], note['body'])
+    _snapshot(db, note_id, uid, note['title'], note['body'], note['body_after'])
 
     # Apply the historical version
     db.execute(
-        'UPDATE notes SET title = ?, body = ?, updated_at = CURRENT_TIMESTAMP '
+        'UPDATE notes SET title = ?, body = ?, body_after = ?, updated_at = CURRENT_TIMESTAMP '
         'WHERE id = ? AND user_id = ?',
-        (version['title'], version['body'], note_id, uid)
+        (version['title'], version['body'], version['body_after'], note_id, uid)
     )
     db.commit()
     _prune_versions(db, note_id, uid)
@@ -122,11 +122,11 @@ def delete_conflict(conflict_id):
 # Helpers (also called from routes.py)
 # ---------------------------------------------------------------------------
 
-def _snapshot(db, note_id, user_id, title, body):
+def _snapshot(db, note_id, user_id, title, body, body_after=''):
     """Insert a version snapshot for a note."""
     db.execute(
-        'INSERT INTO note_versions (note_id, user_id, title, body) VALUES (?, ?, ?, ?)',
-        (note_id, user_id, title, body)
+        'INSERT INTO note_versions (note_id, user_id, title, body, body_after) VALUES (?, ?, ?, ?, ?)',
+        (note_id, user_id, title, body, body_after)
     )
 
 

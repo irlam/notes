@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS notes (
     folder_id INTEGER,
     title TEXT NOT NULL DEFAULT '',
     body TEXT NOT NULL DEFAULT '',
+    body_after TEXT NOT NULL DEFAULT '',
     is_pinned INTEGER NOT NULL DEFAULT 0,
     is_archived INTEGER NOT NULL DEFAULT 0,
     is_trashed INTEGER NOT NULL DEFAULT 0,
@@ -85,6 +86,7 @@ CREATE TABLE IF NOT EXISTS note_versions (
     user_id INTEGER NOT NULL,
     title TEXT NOT NULL DEFAULT '',
     body TEXT NOT NULL DEFAULT '',
+    body_after TEXT NOT NULL DEFAULT '',
     saved_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (note_id) REFERENCES notes (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id)
