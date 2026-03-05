@@ -636,7 +636,7 @@ async function saveNote() {
   if (!note || note.is_trashed || note.conflict_of) return;
   isSaving = true;
   const title = noteTitle.textContent.trim();
-  const body = noteBody.textContent;
+  const body = noteBody.innerText;
   const is_pinned = note.is_pinned ? 1 : 0;
   const folder_id = note.folder_id != null ? note.folder_id : null;
 
@@ -686,7 +686,7 @@ async function togglePin() {
   autosaveTimer = null;
   try {
     const title = noteTitle.textContent.trim();
-    const body = noteBody.textContent;
+    const body = noteBody.innerText;
     const folder_id = note.folder_id != null ? note.folder_id : null;
     const updated = await apiRequest('PUT', `/api/notes/${currentNoteId}`,
       { title, body, is_pinned: newPinned, folder_id });
@@ -773,7 +773,7 @@ async function changeNoteFolder(folderId) {
   autosaveTimer = null;
   try {
     const title = noteTitle.textContent.trim();
-    const body = noteBody.textContent;
+    const body = noteBody.innerText;
     const is_pinned = note.is_pinned ? 1 : 0;
     const updated = await apiRequest('PUT', `/api/notes/${currentNoteId}`,
       { title, body, is_pinned, folder_id: folderId || null });

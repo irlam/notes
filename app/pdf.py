@@ -27,7 +27,7 @@ import json
 import math
 import os
 
-from flask import Blueprint, abort, make_response, session, current_app
+from flask import Blueprint, abort, jsonify, make_response, session, current_app
 from .auth import login_required
 from .database import get_db
 
@@ -224,8 +224,17 @@ def _current_user_id():
 
 
 def _safe_text(text):
-    """Escape HTML special characters for use inside a reportlab Paragraph."""
-    return (str(text)
+    """Escape text for safe use inside a ReportLab Paragraph (XML context).
+
+    Strips characters not permitted in XML (control chars except TAB/LF/CR)
+    then escapes the five XML special characters.
+    """
+    # Remove characters that are illegal in XML 1.0
+    cleaned = ''.join(
+        c for c in str(text)
+        if ord(c) >= 0x20 or c in '\t\n\r'
+    )
+    return (cleaned
             .replace('&', '&amp;')
             .replace('<', '&lt;')
             .replace('>', '&gt;'))
@@ -274,7 +283,15 @@ def export_note_pdf(note_id):
             current_app.config.get('MEDIA_PATH'),
             media_path,
         )
-    pdf_bytes = build_pdf_bytes(note, img_rows, media_path)
+
+    try:
+        pdf_bytes = build_pdf_bytes(note, img_rows, media_path)
+    except Exception as exc:
+        current_app.logger.exception(
+            'PDF generation failed for note_id=%s user_id=%s: %s',
+            note_id, uid, exc,
+        )
+        return jsonify({'error': 'PDF generation failed', 'detail': str(exc)}), 500
 
     # Derive a safe filename from the note title
     raw = (note['title'] or 'note').strip() or 'note'
