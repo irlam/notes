@@ -411,12 +411,23 @@ def build_pdf_bytes(note, img_rows, media_path):
             annotation_data = img_row['annotation_data']
             composited_bytes = _composite_annotations(img_path, annotation_data)
 
+            # If compositing failed, fall back to a plain PIL → JPEG conversion
+            # so that formats unsupported by ReportLab (e.g. WebP) are handled
+            # safely.  If that also fails the image is silently skipped.
+            if composited_bytes is None:
+                try:
+                    from PIL import Image as PILImage
+                    with PILImage.open(img_path) as fallback_img:
+                        jpeg_buf = io.BytesIO()
+                        fallback_img.convert('RGB').save(jpeg_buf, 'JPEG', quality=85)
+                        composited_bytes = jpeg_buf.getvalue()
+                except Exception:
+                    continue  # can't process this image; skip it
+
             # Determine pixel dimensions for correct aspect-ratio scaling
             try:
                 from PIL import Image as PILImage
-                src = (io.BytesIO(composited_bytes)
-                       if composited_bytes else img_path)
-                with PILImage.open(src) as pil_img:
+                with PILImage.open(io.BytesIO(composited_bytes)) as pil_img:
                     iw, ih = pil_img.size
             except Exception:
                 continue
@@ -428,9 +439,7 @@ def build_pdf_bytes(note, img_rows, media_path):
             draw_w = iw * scale
             draw_h = ih * scale
 
-            img_src = (io.BytesIO(composited_bytes)
-                       if composited_bytes else img_path)
-            story.append(RLImage(img_src, width=draw_w, height=draw_h))
+            story.append(RLImage(io.BytesIO(composited_bytes), width=draw_w, height=draw_h))
 
             caption = img_row['caption'] or img_row['original_filename'] or ''
             if caption:
