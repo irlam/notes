@@ -61,7 +61,7 @@ const TOOLS = ['pen', 'highlighter', 'arrow', 'rectangle', 'circle', 'text'];
 let annModal, annCanvas, annCtx, annSourceImg, annStage, annWrap;
 let annColorInput, annWidthInput;
 let annUndoBtn, annRedoBtn, annClearBtn;
-let annSaveBtn, annCancelBtn;
+let annSaveBtn, annCancelBtn, annCloseBtn;
 let annZoomInBtn, annZoomOutBtn, annZoomResetBtn;
 let annStatusEl, annTextOverlay;
 const annToolBtns = {};
@@ -85,6 +85,7 @@ function initAnnotationEditor() {
   annClearBtn   = document.getElementById('ann-clear');
   annSaveBtn    = document.getElementById('ann-save');
   annCancelBtn  = document.getElementById('ann-cancel');
+  annCloseBtn   = document.getElementById('ann-close');
   annZoomInBtn  = document.getElementById('ann-zoom-in');
   annZoomOutBtn = document.getElementById('ann-zoom-out');
   annZoomResetBtn = document.getElementById('ann-zoom-reset');
@@ -109,6 +110,7 @@ function initAnnotationEditor() {
   annClearBtn.addEventListener('click', annClear);
   annSaveBtn.addEventListener('click', annSave);
   annCancelBtn.addEventListener('click', annCancel);
+  if (annCloseBtn) annCloseBtn.addEventListener('click', annCancel);
   annZoomInBtn.addEventListener('click', () => annSetZoom(annState.zoom * 1.3));
   annZoomOutBtn.addEventListener('click', () => annSetZoom(annState.zoom / 1.3));
   annZoomResetBtn.addEventListener('click', annResetView);

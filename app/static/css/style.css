@@ -217,6 +217,10 @@ body {
   font-weight: 600;
   color: var(--accent-dark);
 }
+[data-theme="dark"] .folder-item.active {
+  background: #2e2200;
+  color: var(--accent);
+}
 .folder-icon { font-size: 14px; flex-shrink: 0; }
 .folder-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .btn-delete-folder {
@@ -335,6 +339,10 @@ body {
   background: #fff8ec;
   border-left: 3px solid var(--accent);
   padding-left: 13px;
+}
+[data-theme="dark"] .note-item.active {
+  background: #2e2200;
+  border-left: 3px solid var(--accent);
 }
 
 .note-item-header {
@@ -1023,6 +1031,20 @@ body {
   transition: background 0.1s;
 }
 .ann-btn-cancel:hover { background: #555; }
+
+.ann-btn-close {
+  height: var(--min-tap);
+  padding: 0 12px;
+  border: 1px solid #744;
+  border-radius: 8px;
+  background: #4a2a2a;
+  color: #f0f0f0;
+  font-size: 16px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.ann-btn-close:hover { background: #7a3a3a; }
 
 /* Canvas wrap — takes remaining space, centred */
 .ann-canvas-wrap {
