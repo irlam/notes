@@ -124,6 +124,36 @@
           <button class="btn-icon btn-danger" id="btn-delete-conflict" title="Delete conflict copy" aria-label="Delete conflict copy" style="display:none">✕</button>
         </div>
 
+        <!-- Formatting toolbar -->
+        <div class="fmt-bar" id="fmt-bar" style="display:none" role="toolbar" aria-label="Text formatting">
+          <button class="fmt-btn" id="fmt-bold" title="Bold" aria-label="Bold"><b>B</b></button>
+          <button class="fmt-btn fmt-italic" id="fmt-italic" title="Italic" aria-label="Italic"><i>I</i></button>
+          <button class="fmt-btn fmt-underline" id="fmt-underline" title="Underline" aria-label="Underline"><u>U</u></button>
+          <button class="fmt-btn fmt-strike" id="fmt-strike" title="Strikethrough" aria-label="Strikethrough"><s>S</s></button>
+          <span class="fmt-sep"></span>
+          <label class="fmt-color-wrap" title="Text colour" aria-label="Text colour">
+            <span class="fmt-color-icon">A</span>
+            <input type="color" id="fmt-color" value="#e74c3c" aria-label="Text colour picker" />
+          </label>
+          <label class="fmt-color-wrap" title="Highlight colour" aria-label="Highlight colour">
+            <span class="fmt-color-icon fmt-hl-icon">H</span>
+            <input type="color" id="fmt-highlight" value="#ffff00" aria-label="Highlight colour picker" />
+          </label>
+          <span class="fmt-sep"></span>
+          <select class="fmt-size-select" id="fmt-size" aria-label="Font size">
+            <option value="">Size</option>
+            <option value="1">Small</option>
+            <option value="3">Normal</option>
+            <option value="5">Large</option>
+            <option value="6">Heading</option>
+          </select>
+          <span class="fmt-sep"></span>
+          <button class="fmt-btn" id="fmt-ul" title="Bullet list" aria-label="Bullet list">&#8226;&#8212;</button>
+          <button class="fmt-btn" id="fmt-ol" title="Numbered list" aria-label="Numbered list">1&#8212;</button>
+          <span class="fmt-sep"></span>
+          <button class="fmt-btn" id="fmt-clear" title="Clear formatting" aria-label="Clear formatting">&#10006;</button>
+        </div>
+
         <!-- Welcome state (no note selected) -->
         <div class="editor-welcome" id="editor-welcome">
           <div class="icon">📝</div>

@@ -25,6 +25,7 @@ import io
 import os
 import smtplib
 import zipfile
+from datetime import datetime
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -34,6 +35,22 @@ from .auth import login_required
 from .database import get_db, get_user_email
 
 email_export_bp = Blueprint('email_export', __name__)
+
+
+def _fmt_dt_uk(dt_str):
+    """Format a SQLite datetime string as DD/MM/YYYY HH:MM (UK format)."""
+    if not dt_str:
+        return ''
+    timed_fmts = (('%Y-%m-%d %H:%M:%S', '%d/%m/%Y %H:%M'),
+                  ('%Y-%m-%dT%H:%M:%S', '%d/%m/%Y %H:%M'),
+                  ('%Y-%m-%d %H:%M',    '%d/%m/%Y %H:%M'))
+    date_fmts  = (('%Y-%m-%d', '%d/%m/%Y'),)
+    for src_fmt, out_fmt in timed_fmts + date_fmts:
+        try:
+            return datetime.strptime(dt_str.strip(), src_fmt).strftime(out_fmt)
+        except ValueError:
+            continue
+    return dt_str
 
 # ---------------------------------------------------------------------------
 # Feature flag  (evaluated at request time, not module load, so tests can
@@ -178,8 +195,8 @@ def _note_story_elements(note, img_rows, media_path):
     title_text = (note['title'] or '').strip() or 'Untitled'
     story.append(Paragraph(_safe_text(title_text), style_title))
 
-    created = note['created_at'] or ''
-    updated = note['updated_at'] or ''
+    created = _fmt_dt_uk(note['created_at'])
+    updated = _fmt_dt_uk(note['updated_at'])
     meta = f'Created: {created}'
     if updated and updated != created:
         meta += f'  \u00b7  Updated: {updated}'
