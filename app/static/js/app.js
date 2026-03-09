@@ -309,6 +309,19 @@ const conflictBanner = document.getElementById('conflict-banner');
 const btnViewConflicts = document.getElementById('btn-view-conflicts');
 const btnDismissConflictBanner = document.getElementById('btn-dismiss-conflict-banner');
 
+/* ===== Formatting toolbar refs ===== */
+const fmtBar       = document.getElementById('fmt-bar');
+const fmtBtnBold   = document.getElementById('fmt-bold');
+const fmtBtnItalic = document.getElementById('fmt-italic');
+const fmtBtnUnder  = document.getElementById('fmt-underline');
+const fmtBtnStrike = document.getElementById('fmt-strike');
+const fmtColor     = document.getElementById('fmt-color');
+const fmtHighlight = document.getElementById('fmt-highlight');
+const fmtSize      = document.getElementById('fmt-size');
+const fmtBtnUl     = document.getElementById('fmt-ul');
+const fmtBtnOl     = document.getElementById('fmt-ol');
+const fmtBtnClear  = document.getElementById('fmt-clear');
+
 /* ===== Helpers ===== */
 function formatDate(dateStr) {
   const d = new Date(dateStr.replace(' ', 'T') + (dateStr.includes('T') ? '' : 'Z'));
@@ -318,13 +331,23 @@ function formatDate(dateStr) {
   const dayDiff = Math.round((today - itemDay) / DAY_MS);
 
   if (dayDiff === 0) {
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
   } else if (dayDiff === 1) {
     return 'Yesterday';
   } else if (dayDiff < 7) {
-    return d.toLocaleDateString([], { weekday: 'short' });
+    return d.toLocaleDateString('en-GB', { weekday: 'short' });
   } else {
-    return d.toLocaleDateString([], { day: 'numeric', month: 'short' });
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+}
+
+function stripHtml(html) {
+  if (!html) return '';
+  try {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+  } catch (_) {
+    return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   }
 }
 
@@ -333,7 +356,8 @@ function getTitle(note) {
 }
 
 function getSubtitle(note) {
-  const first = note.body.split('\n')[0];
+  const plain = stripHtml(note.body);
+  const first = plain.split('\n')[0];
   return first.trim() || '—';
 }
 
@@ -475,6 +499,7 @@ function showEditor(show) {
     images = [];
     if (imageBlocksEl) imageBlocksEl.innerHTML = '';
     if (imageToolbar) imageToolbar.style.display = 'none';
+    if (fmtBar) fmtBar.style.display = 'none';
     setImageStatus('');
   }
 }
@@ -513,6 +538,8 @@ function updateEditorToolbar(note) {
 
   // Image toolbar
   if (imageToolbar) imageToolbar.style.display = (trashed || isConflict) ? 'none' : '';
+  // Formatting toolbar
+  if (fmtBar) fmtBar.style.display = (trashed || isConflict) ? 'none' : '';
 }
 
 function openNote(id) {
@@ -528,8 +555,8 @@ function openNote(id) {
   currentNoteId = id;
   window.currentNoteId = id;
   noteTitle.textContent = note.title;
-  noteBody.textContent = note.body;
-  if (noteBodyAfter) noteBodyAfter.textContent = note.body_after || '';
+  noteBody.innerHTML = note.body;
+  if (noteBodyAfter) noteBodyAfter.innerHTML = note.body_after || '';
   showEditor(true);
   updateEditorToolbar(note);
   renderList();
@@ -641,8 +668,8 @@ async function saveNote() {
   if (!note || note.is_trashed || note.conflict_of) return;
   isSaving = true;
   const title = noteTitle.textContent.trim();
-  const body = noteBody.innerText;
-  const body_after = noteBodyAfter ? noteBodyAfter.innerText : '';
+  const body = noteBody.innerHTML;
+  const body_after = noteBodyAfter ? noteBodyAfter.innerHTML : '';
   const is_pinned = note.is_pinned ? 1 : 0;
   const folder_id = note.folder_id != null ? note.folder_id : null;
 
@@ -692,8 +719,8 @@ async function togglePin() {
   autosaveTimer = null;
   try {
     const title = noteTitle.textContent.trim();
-    const body = noteBody.innerText;
-    const body_after = noteBodyAfter ? noteBodyAfter.innerText : '';
+    const body = noteBody.innerHTML;
+    const body_after = noteBodyAfter ? noteBodyAfter.innerHTML : '';
     const folder_id = note.folder_id != null ? note.folder_id : null;
     const updated = await apiRequest('PUT', `/api/notes/${currentNoteId}`,
       { title, body, body_after, is_pinned: newPinned, folder_id });
@@ -780,7 +807,7 @@ async function changeNoteFolder(folderId) {
   autosaveTimer = null;
   try {
     const title = noteTitle.textContent.trim();
-    const body = noteBody.innerText;
+    const body = noteBody.innerHTML;
     const is_pinned = note.is_pinned ? 1 : 0;
     const updated = await apiRequest('PUT', `/api/notes/${currentNoteId}`,
       { title, body, is_pinned, folder_id: folderId || null });
@@ -1110,8 +1137,8 @@ async function openHistoryPanel(noteId) {
     }
     historyList.innerHTML = versions.map(v => {
       const d = new Date(v.saved_at.replace(' ', 'T') + 'Z');
-      const label = d.toLocaleString([], {
-        year: 'numeric', month: 'short', day: 'numeric',
+      const label = d.toLocaleString('en-GB', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
         hour: '2-digit', minute: '2-digit'
       });
       return `<div class="history-item" data-version-id="${v.id}">
@@ -1144,8 +1171,8 @@ async function restoreVersion(noteId, versionId) {
     if (idx !== -1) notes[idx] = updated;
     if (currentNoteId === noteId) {
       noteTitle.textContent = updated.title;
-      noteBody.textContent = updated.body;
-      if (noteBodyAfter) noteBodyAfter.textContent = updated.body_after || '';
+      noteBody.innerHTML = updated.body;
+      if (noteBodyAfter) noteBodyAfter.innerHTML = updated.body_after || '';
       updateEditorToolbar(updated);
     }
     setAutosave('Restored \u2713');
@@ -1441,4 +1468,56 @@ if (btnDismissConflictBanner) {
 
 if (btnDeleteConflict) {
   btnDeleteConflict.addEventListener('click', deleteConflictCopy);
+}
+
+/* ===== Formatting toolbar ===== */
+// Track which editable area is currently focused for formatting
+let _fmtTarget = null;
+[noteBody, noteBodyAfter].forEach(el => {
+  if (!el) return;
+  el.addEventListener('focus', () => { _fmtTarget = el; });
+});
+
+function _applyFmt(cmd, value) {
+  // Restore focus to the note body before executing command
+  if (_fmtTarget) _fmtTarget.focus();
+  else noteBody.focus();
+  document.execCommand(cmd, false, value || null);
+  scheduleAutosave();
+  _updateFmtActiveState();
+}
+
+function _updateFmtActiveState() {
+  if (fmtBtnBold)   fmtBtnBold.classList.toggle('active', document.queryCommandState('bold'));
+  if (fmtBtnItalic) fmtBtnItalic.classList.toggle('active', document.queryCommandState('italic'));
+  if (fmtBtnUnder)  fmtBtnUnder.classList.toggle('active', document.queryCommandState('underline'));
+  if (fmtBtnStrike) fmtBtnStrike.classList.toggle('active', document.queryCommandState('strikeThrough'));
+  if (fmtBtnUl)     fmtBtnUl.classList.toggle('active', document.queryCommandState('insertUnorderedList'));
+  if (fmtBtnOl)     fmtBtnOl.classList.toggle('active', document.queryCommandState('insertOrderedList'));
+}
+
+document.addEventListener('selectionchange', _updateFmtActiveState);
+
+if (fmtBtnBold)   fmtBtnBold.addEventListener('mousedown',   e => { e.preventDefault(); _applyFmt('bold'); });
+if (fmtBtnItalic) fmtBtnItalic.addEventListener('mousedown', e => { e.preventDefault(); _applyFmt('italic'); });
+if (fmtBtnUnder)  fmtBtnUnder.addEventListener('mousedown',  e => { e.preventDefault(); _applyFmt('underline'); });
+if (fmtBtnStrike) fmtBtnStrike.addEventListener('mousedown', e => { e.preventDefault(); _applyFmt('strikeThrough'); });
+if (fmtBtnUl)     fmtBtnUl.addEventListener('mousedown',     e => { e.preventDefault(); _applyFmt('insertUnorderedList'); });
+if (fmtBtnOl)     fmtBtnOl.addEventListener('mousedown',     e => { e.preventDefault(); _applyFmt('insertOrderedList'); });
+if (fmtBtnClear)  fmtBtnClear.addEventListener('mousedown',  e => { e.preventDefault(); _applyFmt('removeFormat'); });
+
+if (fmtColor) {
+  fmtColor.addEventListener('input', () => _applyFmt('foreColor', fmtColor.value));
+}
+
+if (fmtHighlight) {
+  fmtHighlight.addEventListener('input', () => _applyFmt('backColor', fmtHighlight.value));
+}
+
+if (fmtSize) {
+  fmtSize.addEventListener('change', () => {
+    if (!fmtSize.value) return;
+    _applyFmt('fontSize', fmtSize.value);
+    fmtSize.value = '';
+  });
 }

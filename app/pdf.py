@@ -26,6 +26,7 @@ import io
 import json
 import math
 import os
+from datetime import datetime
 
 from flask import Blueprint, abort, jsonify, make_response, session, current_app
 from .auth import login_required
@@ -57,6 +58,22 @@ _TTF_BOLD = [
 _fonts_registered = False
 _FONT_NORMAL = 'Helvetica'
 _FONT_BOLD = 'Helvetica-Bold'
+
+
+def _fmt_dt_uk(dt_str):
+    """Format a SQLite datetime string as DD/MM/YYYY HH:MM (UK format)."""
+    if not dt_str:
+        return ''
+    timed_fmts = (('%Y-%m-%d %H:%M:%S', '%d/%m/%Y %H:%M'),
+                  ('%Y-%m-%dT%H:%M:%S', '%d/%m/%Y %H:%M'),
+                  ('%Y-%m-%d %H:%M',    '%d/%m/%Y %H:%M'))
+    date_fmts  = (('%Y-%m-%d', '%d/%m/%Y'),)
+    for src_fmt, out_fmt in timed_fmts + date_fmts:
+        try:
+            return datetime.strptime(dt_str.strip(), src_fmt).strftime(out_fmt)
+        except ValueError:
+            continue
+    return dt_str  # fallback to raw string if unparseable
 
 
 def _resolve_media_dir(config_value):
@@ -436,8 +453,8 @@ def build_pdf_bytes(note, img_rows, media_path):
     story.append(Paragraph(_safe_text(title_text), style_title))
 
     # Timestamps
-    created = note['created_at'] or ''
-    updated = note['updated_at'] or ''
+    created = _fmt_dt_uk(note['created_at'])
+    updated = _fmt_dt_uk(note['updated_at'])
     meta = f'Created: {created}'
     if updated and updated != created:
         meta += f'  \u00b7  Updated: {updated}'
