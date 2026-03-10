@@ -114,10 +114,20 @@ ok "Python ${PY_VERSION} found at ${PYTHON}"
 step "Step 2 — Installing dependencies"
 
 if [[ "$USE_PLESK" = true ]]; then
-    # Plesk mode: install into _pydeps/ (used by passenger_wsgi.py)
-    mkdir -p _pydeps
-    "$PYTHON" -m pip install --target _pydeps --upgrade --quiet -r requirements.txt
-    ok "Dependencies installed into _pydeps/"
+    # Plesk / shared-hosting mode: load packages from _pydeps/ (used by passenger_wsgi.py)
+    if [[ -d "_pydeps" ]] && [[ -d "_pydeps/flask" ]] && [[ -d "_pydeps/PIL" ]]; then
+        ok "_pydeps/ already present with required packages — pre-bundled dependencies will be used as-is."
+        info "If you need to rebuild for your Python version, run:"
+        info "  pip install --target _pydeps --upgrade -r requirements.txt"
+    else
+        warn "_pydeps/ is empty or missing — attempting to install dependencies."
+        warn "This requires pip access. On shared hosting without pip rights,"
+        warn "upload a pre-built _pydeps/ folder built for the same Python version."
+        mkdir -p _pydeps
+        "$PYTHON" -m pip install --target _pydeps --upgrade --quiet -r requirements.txt \
+            && ok "Dependencies installed into _pydeps/" \
+            || { error "pip install failed. Upload a pre-built _pydeps/ for Python ${PY_VERSION}."; exit 1; }
+    fi
     info "passenger_wsgi.py will load packages from _pydeps/ automatically."
 else
     # Standard mode: virtual environment

@@ -5,9 +5,19 @@ This guide covers deploying the Notes app to a Plesk-managed server using Passen
 ## Prerequisites
 
 - Plesk Obsidian or newer
-- Python 3.8+ available on the server
-- SSH access to the server
+- **Python 3.12** on the server (the pre-bundled `_pydeps/` was compiled for CPython 3.12 x86-64)
+- SSH access **or** Plesk File Manager (no pip / admin rights required)
 - A domain / subdomain configured in Plesk
+
+> **Shared hosting — no pip required**
+>
+> The `dist/` package includes a ready-to-use `_pydeps/` folder containing **all Python
+> dependencies pre-installed** (Flask, Pillow, ReportLab, Werkzeug, Jinja2, etc.).
+> `passenger_wsgi.py` adds this folder to `sys.path` automatically, so you do **not**
+> need to run `pip install` or create a virtual environment on the server.
+>
+> This makes the package fully self-contained for shared Plesk hosting where
+> users do not have admin rights to install packages.
 
 ---
 
@@ -15,7 +25,7 @@ This guide covers deploying the Notes app to a Plesk-managed server using Passen
 
 1. Log in to Plesk.
 2. Go to **Domains → yourdomain.com → Python**.
-3. Set **Python version** to 3.8 or higher.
+3. Set **Python version** to **3.12** (required to match the pre-compiled extensions in `_pydeps/`; see the Dependencies section below if your host uses a different version).
 4. Set **Application root** to the directory where you will upload the app (e.g. `/var/www/vhosts/yourdomain.com/notes`).
 5. Set **Application startup file** to `passenger_wsgi.py`.
 6. Click **Apply**.
@@ -24,23 +34,44 @@ This guide covers deploying the Notes app to a Plesk-managed server using Passen
 
 ## 2. Upload the Application
 
-Via SSH or Plesk File Manager, copy the project files to the application root:
+Via SSH or Plesk File Manager, copy the **entire contents of `dist/`** to the application root.
+The folder structure should look like:
 
 ```
-notes/
+notes/                      ← application root in Plesk
+├── _pydeps/                ← pre-bundled Python dependencies (no pip needed)
+│   ├── PIL/
+│   ├── flask/
+│   ├── reportlab/
+│   ├── werkzeug/
+│   └── ...
 ├── app/
+├── migrations/
+├── scripts/
 ├── schema.sql
 ├── wsgi.py
-├── passenger_wsgi.py
+├── passenger_wsgi.py       ← Plesk startup file
 ├── requirements.txt
+├── .env.example
 └── ...
 ```
 
+> **File Manager tip**: upload as a ZIP (`make dist-zip` creates `notes-app.zip`) and
+> extract it directly in Plesk File Manager to preserve file permissions.
+
 ---
 
-## 3. Create the Virtual Environment and Install Dependencies
+## 3. Dependencies
 
-SSH into the server and run:
+**No action required for shared hosting.**
+
+`_pydeps/` is included in the distribution package and contains all dependencies
+pre-installed for Linux x86-64 / Python 3.12.  `passenger_wsgi.py` loads them
+automatically before your app starts.
+
+### If you have SSH / pip access (optional)
+
+You can optionally use a virtual environment instead of `_pydeps/`:
 
 ```bash
 cd /var/www/vhosts/yourdomain.com/notes
@@ -50,28 +81,16 @@ pip install -r requirements.txt
 deactivate
 ```
 
-> **Important — platform-specific packages (Pillow, MarkupSafe)**
->
-> Some dependencies in `requirements.txt` (notably **Pillow**) include compiled
-> C extensions that are specific to the operating system and CPU architecture.
-> You **must** run `pip install -r requirements.txt` on the **target Linux server**,
-> not on a Windows or macOS machine.
->
-> If you copy pre-installed packages from another machine (e.g. by committing or
-> copying a `_pydeps` folder), the compiled `.pyd` / `.so` extension files will be
-> wrong for the server's platform and Pillow will fail to import.  Symptoms include:
->
-> ```
-> {"error": "PDF generation failed",
->  "detail": "cannot import name '_imaging' from 'PIL' ..."}
-> ```
->
-> **Fix:** re-run `pip install -r requirements.txt` inside the venv on the server,
-> or rebuild `_pydeps` on the server:
->
-> ```bash
-> pip install --target _pydeps -r requirements.txt
-> ```
+### If the server runs a different Python version
+
+The bundled `_pydeps/` was compiled for **Python 3.12 x86-64**.  If your host uses
+Python 3.10 or 3.11 you must rebuild `_pydeps/` on (or for) that version:
+
+```bash
+pip install --target _pydeps --upgrade -r requirements.txt
+```
+
+Then re-upload `_pydeps/` to the server.
 
 ---
 
@@ -142,9 +161,11 @@ Check the Plesk error log if something is wrong:
 cd /var/www/vhosts/yourdomain.com/notes
 git pull origin main         # if using git
 
-source venv/bin/activate
-pip install -r requirements.txt
-deactivate
+# If requirements.txt changed, rebuild _pydeps/ (shared hosting)
+# or update the venv (if using one):
+#   pip install --target _pydeps --upgrade -r requirements.txt
+#   — or —
+#   source venv/bin/activate && pip install -r requirements.txt && deactivate
 
 touch passenger_wsgi.py      # restart Passenger
 ```
@@ -215,8 +236,9 @@ the updated `schema.sql` already includes the new columns.
 
 | Issue | Solution |
 |-------|----------|
-| 500 error on first load | Check `error_log`; usually a missing dependency or wrong `DATABASE_PATH` |
-| `ModuleNotFoundError: flask` | Re-run `pip install -r requirements.txt` inside the venv |
+| 500 error on first load | Check `error_log`; usually a missing `.env` or wrong `DATABASE_PATH` |
+| `ModuleNotFoundError: flask` | Ensure `_pydeps/` was uploaded; or run `pip install -r requirements.txt` inside the venv |
+| Pillow `_imaging` import error | Python version mismatch — rebuild `_pydeps/` with `pip install --target _pydeps -r requirements.txt` on the server |
 | Database permission error | Ensure the Plesk app user can write to the directory containing `notes.db` |
 | `.env` not loaded | Confirm `.env` exists and is readable; `passenger_wsgi.py` loads it via `python-dotenv` |
 | `RuntimeError: SECRET_KEY … must be set` | Set `SECRET_KEY` in `.env` to a random 32-byte hex string |

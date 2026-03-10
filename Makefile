@@ -43,12 +43,11 @@ dist:
 	@cp wsgi.py dist/wsgi.py
 	@cp .htaccess dist/.htaccess
 
-	@# Python dependencies list and bundled packages
+	@# Python dependencies list and pre-bundled packages
+	@# _pydeps/ is included so shared-hosting Plesk instances (no pip rights)
+	@# can run without any server-side package installation.
 	@cp requirements.txt dist/requirements.txt
-	@# Note: _pydeps/ is intentionally excluded from dist.
-	@#       Run 'pip install --target _pydeps -r requirements.txt' on the
-	@#       target server (or use 'bash install.sh --plesk') to build it
-	@#       for the correct platform architecture.
+	@cp -r _pydeps dist/_pydeps
 
 	@# Environment template
 	@cp .env.example dist/.env.example
