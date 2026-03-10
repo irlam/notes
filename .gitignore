@@ -5,7 +5,6 @@ __pycache__/
 *.db
 uploads/
 *.log
-dist/
 .DS_Store
 # Platform-specific compiled extensions – never commit generic .so/.pyd
 # files from _pydeps.  Pillow's manylinux wheel extensions are explicitly

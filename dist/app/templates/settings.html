@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5a623" />
+  <link rel="icon" href="/static/icons/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-touch-icon.png" />
+  <title>Settings – Notes</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    html, body { height: 100%; overflow: auto; }
+    .settings-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px;
+      background: var(--bg);
+    }
+    .settings-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      padding: 36px;
+      width: min(480px, 100%);
+    }
+    .settings-card h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .settings-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .settings-nav a {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    .settings-nav a:hover { color: var(--accent); }
+    .settings-section {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      margin-top: 24px;
+    }
+    .settings-section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 0;
+    }
+    .settings-section h2 {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      font-size: 15px;
+      color: var(--text);
+    }
+    .info-row span:last-child {
+      font-weight: 600;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-group input {
+      height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0 14px;
+      font-size: 15px;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--surface);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+      width: 100%;
+    }
+    .form-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(245,166,35,0.18);
+    }
+    .btn-save {
+      height: 42px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      padding: 0 24px;
+      transition: background 0.15s;
+    }
+    .btn-save:hover { background: var(--accent-dark); }
+    .btn-save:disabled { opacity: 0.5; cursor: default; }
+    .form-msg {
+      font-size: 13px;
+      margin-top: 8px;
+      min-height: 18px;
+    }
+    .form-msg.ok { color: #27ae60; }
+    .form-msg.err { color: var(--danger); }
+    .pref-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+    }
+    .pref-label {
+      font-size: 15px;
+      color: var(--text);
+    }
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    .toggle input:checked + .toggle-slider { background: var(--accent); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+  </style>
+</head>
+<body>
+  <div class="settings-wrap">
+    <div class="settings-card">
+      <div class="settings-nav">
+        <a href="{{ url_for('main.dashboard') }}">← Back to Notes</a>
+      </div>
+      <h1>⚙️ Settings</h1>
+
+      <!-- Account info -->
+      <div class="settings-section">
+        <h2>Account</h2>
+        <div class="info-row">
+          <span>Username</span>
+          <span>{{ username }}</span>
+        </div>
+      </div>
+
+      <!-- Email address (used for Email PDF feature) -->
+      <div class="settings-section">
+        <h2>Email Address</h2>
+        <form id="email-form" autocomplete="on" novalidate>
+          <div class="form-group">
+            <label for="user-email">Email address</label>
+            <input id="user-email" name="user-email" type="email"
+              autocomplete="email" placeholder="you@example.com"
+              value="{{ user_email or '' }}" maxlength="254" />
+          </div>
+          <button type="submit" class="btn-save" id="email-btn">Save email</button>
+          <p class="form-msg" id="email-msg"></p>
+        </form>
+      </div>
+
+      <!-- Change password -->
+      <div class="settings-section">
+        <h2>Change Password</h2>
+        <form id="pw-form" autocomplete="on" novalidate>
+          <div class="form-group">
+            <label for="current-pw">Current password</label>
+            <input id="current-pw" name="current-pw" type="password"
+              autocomplete="current-password" required />
+          </div>
+          <div class="form-group">
+            <label for="new-pw">New password</label>
+            <input id="new-pw" name="new-pw" type="password"
+              autocomplete="new-password" required minlength="8" />
+          </div>
+          <div class="form-group">
+            <label for="confirm-pw">Confirm new password</label>
+            <input id="confirm-pw" name="confirm-pw" type="password"
+              autocomplete="new-password" required minlength="8" />
+          </div>
+          <button type="submit" class="btn-save" id="pw-btn">Update password</button>
+          <p class="form-msg" id="pw-msg"></p>
+        </form>
+      </div>
+
+      <!-- Preferences -->
+      <div class="settings-section">
+        <h2>Preferences</h2>
+        <div class="pref-row">
+          <span class="pref-label">Dark mode</span>
+          <label class="toggle" aria-label="Toggle dark mode">
+            <input type="checkbox" id="pref-dark-mode" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/settings.js"></script>
+</body>
+</html>
