@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/static/icons/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-touch-icon.png" />
+  <title>Error {{ code }} – Notes</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    html, body { height: 100%; }
+    .error-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: var(--bg);
+    }
+    .error-card {
+      text-align: center;
+      max-width: 400px;
+    }
+    .error-card h1 { font-size: 64px; color: var(--accent); margin: 0 0 12px; }
+    .error-card p { color: var(--text-muted); font-size: 16px; margin-bottom: 24px; }
+    .error-card a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .error-card a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="error-wrap">
+    <div class="error-card">
+      <h1>{{ code }}</h1>
+      <p>{{ message }}</p>
+      <a href="{{ url_for('main.dashboard') }}">← Back to Notes</a>
+    </div>
+  </div>
+</body>
+</html>
