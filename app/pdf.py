@@ -22,11 +22,13 @@ Plesk compatibility
 Only pure-Python dependencies are used: ``reportlab`` (PDF) and ``Pillow``
 (already required for image handling).  No external binaries or services.
 """
+import html as _html_lib
 import io
 import json
 import math
 import os
 from datetime import datetime
+from html.parser import HTMLParser as _HTMLParser
 
 from flask import Blueprint, abort, jsonify, make_response, session, current_app
 from .auth import login_required
@@ -233,6 +235,77 @@ def _composite_annotations(img_path, annotation_data):
 
 
 # ---------------------------------------------------------------------------
+# HTML → plain-text conversion
+# ---------------------------------------------------------------------------
+
+class _HTMLToTextParser(_HTMLParser):
+    """Strip HTML tags to plain text, inserting newlines at block boundaries.
+
+    Block-level elements (``<div>``, ``<p>``, ``<br>``, headings, ``<li>``,
+    etc.) produce a newline so paragraph structure is preserved.
+    ``convert_charrefs=True`` (the default since Python 3.4) ensures that
+    HTML entities such as ``&amp;``, ``&lt;``, ``&#160;`` are decoded to
+    their Unicode equivalents automatically.
+    """
+
+    _NEWLINE_TAGS = frozenset({
+        'br', 'div', 'p',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'li', 'tr', 'blockquote', 'pre', 'hr',
+    })
+
+    def __init__(self):
+        # convert_charrefs=True (the default since Python 3.4) automatically
+        # decodes &amp;, &lt;, &#160; etc. during parsing.
+        super().__init__(convert_charrefs=True)
+        self._buf = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag in self._NEWLINE_TAGS:
+            self._buf.append('\n')
+
+    def handle_endtag(self, tag):
+        if tag in self._NEWLINE_TAGS:
+            self._buf.append('\n')
+
+    def handle_data(self, data):
+        self._buf.append(data)
+
+    def result(self):
+        text = ''.join(self._buf)
+        # Collapse runs of 3+ consecutive newlines to at most 2
+        while '\n\n\n' in text:
+            text = text.replace('\n\n\n', '\n\n')
+        return text.strip()
+
+
+def _html_to_plain_text(raw):
+    """Convert an HTML string to plain text suitable for PDF rendering.
+
+    * Strips all HTML tags (``<u>``, ``<b>``, ``<div>``, ``<span>``, …).
+    * Decodes HTML entities (``&amp;`` → ``&``, ``&lt;`` → ``<``, …).
+    * Converts block-level elements to newlines to preserve paragraph
+      structure.
+
+    If *raw* contains no ``<`` character it is treated as already-plain text
+    and only entity decoding is applied (handles ``&amp;`` in plain notes).
+    Any parse error falls back to a simple entity-decode so the function
+    never raises.
+    """
+    if not raw:
+        return ''
+    if '<' not in raw:
+        return _html_lib.unescape(raw)
+    parser = _HTMLToTextParser()
+    try:
+        parser.feed(raw)
+        return parser.result()
+    except Exception:
+        # Parsing failed — fall back to simple entity decode
+        return _html_lib.unescape(raw)
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
@@ -258,7 +331,14 @@ def _safe_text(text):
 
 
 def _append_text_lines(story, text, style_body, style_check, Paragraph, Spacer):
-    """Render *text* line-by-line into *story*, handling checkbox lines."""
+    """Render *text* line-by-line into *story*, handling checkbox lines.
+
+    *text* may be raw HTML (from the contenteditable editor) or plain text.
+    HTML tags are stripped and entities decoded before rendering so that
+    markup such as ``<u><b>Heading</b></u>`` or ``&amp;`` never leaks into
+    the PDF as literal characters.
+    """
+    text = _html_to_plain_text(text)
     for line in text.split('\n'):
         stripped = line.rstrip()
         if not stripped:

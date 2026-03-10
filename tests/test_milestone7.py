@@ -350,3 +350,109 @@ class TestPdfExportTrashedNote:
         r = auth_client.get(f'/api/notes/{note_id}/export.pdf')
         assert r.status_code == 200
         assert r.data[:4] == b'%PDF'
+
+
+# ---------------------------------------------------------------------------
+# HTML → plain-text conversion (_html_to_plain_text)
+# ---------------------------------------------------------------------------
+
+class TestHtmlToPlainText:
+    """Unit tests for _html_to_plain_text — no app context needed."""
+
+    def _fn(self):
+        from app.pdf import _html_to_plain_text
+        return _html_to_plain_text
+
+    def test_plain_text_unchanged(self):
+        fn = self._fn()
+        assert fn('Hello world') == 'Hello world'
+
+    def test_none_and_empty(self):
+        fn = self._fn()
+        assert fn('') == ''
+        assert fn(None) == ''
+
+    def test_strips_bold_underline_tags(self):
+        fn = self._fn()
+        result = fn('<u><b>ACTIVE FLOORING</b></u>')
+        assert result == 'ACTIVE FLOORING'
+        assert '<' not in result
+        assert '>' not in result
+
+    def test_strips_span_with_style(self):
+        fn = self._fn()
+        result = fn('<span style="background-color: rgb(0,0,0);">some text</span>')
+        assert result == 'some text'
+
+    def test_decodes_amp_entity(self):
+        fn = self._fn()
+        assert fn('3MW &amp; 3ME') == '3MW & 3ME'
+
+    def test_decodes_lt_gt_entities(self):
+        fn = self._fn()
+        assert fn('a &lt; b &gt; c') == 'a < b > c'
+
+    def test_div_produces_newline(self):
+        fn = self._fn()
+        result = fn('<div>Line one</div><div>Line two</div>')
+        assert 'Line one' in result
+        assert 'Line two' in result
+        assert '\n' in result
+
+    def test_br_produces_newline(self):
+        fn = self._fn()
+        result = fn('line one<br>line two')
+        assert 'line one' in result
+        assert 'line two' in result
+        assert '\n' in result
+
+    def test_complex_html_body(self):
+        """Reproduces the real-world HTML from the bug report."""
+        fn = self._fn()
+        html_body = (
+            'wall liners<br>'
+            '<u><b>ACTIVE FLOORING</b></u>'
+            '<span style="background-color: rgb(0, 0, 0);">\n</span>'
+            'screed infills<br>'
+            'decoration &amp; paint'
+        )
+        result = fn(html_body)
+        assert 'wall liners' in result
+        assert 'ACTIVE FLOORING' in result
+        assert 'screed infills' in result
+        assert 'decoration & paint' in result
+        # No raw HTML tags should survive
+        assert '<u>' not in result
+        assert '<b>' not in result
+        assert '<br>' not in result
+        assert '<span' not in result
+        # No escaped entities should survive
+        assert '&amp;' not in result
+        assert '&lt;' not in result
+
+    def test_no_html_with_entities_still_decoded(self):
+        """Plain-text notes with &amp; still get entity-decoded."""
+        fn = self._fn()
+        assert fn('Level 1&amp;2 stairs') == 'Level 1&2 stairs'
+
+    def test_pdf_generates_with_html_body(self, app):
+        """build_pdf_bytes succeeds with HTML-formatted body content."""
+        with app.app_context():
+            from app.pdf import build_pdf_bytes, _register_fonts
+            _register_fonts()
+            html_body = (
+                '<div><u><b>Section Header</b></u></div>'
+                '<div>Some text with &amp; entities</div>'
+                '<div><br></div>'
+                '<div>Final paragraph</div>'
+            )
+            note = {
+                'title': 'HTML Body Note',
+                'body': html_body,
+                'created_at': '2025-01-01 10:00:00',
+                'updated_at': '2025-01-01 12:00:00',
+            }
+            pdf_bytes = build_pdf_bytes(note, [], '/tmp')
+        assert isinstance(pdf_bytes, bytes)
+        assert pdf_bytes[:4] == b'%PDF'
+        assert len(pdf_bytes) > 1000
