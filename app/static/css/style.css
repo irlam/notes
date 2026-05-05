@@ -884,6 +884,12 @@ body {
   flex-wrap: wrap;
   padding-top: 4px;
 }
+.image-toolbar-bottom {
+  padding-top: 8px;
+  padding-bottom: 4px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
 
 .btn-image-add {
   height: 32px;

@@ -520,9 +520,9 @@ def build_pdf_bytes(note, img_rows, media_path):
     style_caption = ParagraphStyle(
         'NoteCaption',
         fontName=_FONT_NORMAL,
-        fontSize=8,
-        leading=10,
-        textColor=colors.HexColor('#888888'),
+        fontSize=11,
+        leading=14,
+        textColor=colors.HexColor('#555555'),
         spaceAfter=8,
     )
 
