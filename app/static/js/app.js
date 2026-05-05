@@ -1005,6 +1005,31 @@ function renderImageBlocks() {
 
     imageBlocksEl.appendChild(block);
   });
+
+  // Bottom toolbar: duplicate Add image / Camera buttons so the user
+  // doesn't have to scroll back to the top after adding several images.
+  if (editable && images.length > 0) {
+    const bottomToolbar = document.createElement('div');
+    bottomToolbar.className = 'image-toolbar image-toolbar-bottom';
+
+    const btnAddBottom = document.createElement('button');
+    btnAddBottom.className = 'btn-image-add';
+    btnAddBottom.title = 'Upload image';
+    btnAddBottom.setAttribute('aria-label', 'Upload image');
+    btnAddBottom.textContent = '📎 Add image';
+    btnAddBottom.addEventListener('click', () => inputUploadImage.click());
+
+    const btnCamBottom = document.createElement('button');
+    btnCamBottom.className = 'btn-image-add';
+    btnCamBottom.title = 'Capture from camera';
+    btnCamBottom.setAttribute('aria-label', 'Capture from camera');
+    btnCamBottom.textContent = '📷 Camera';
+    btnCamBottom.addEventListener('click', () => inputCameraCapture.click());
+
+    bottomToolbar.appendChild(btnAddBottom);
+    bottomToolbar.appendChild(btnCamBottom);
+    imageBlocksEl.appendChild(bottomToolbar);
+  }
 }
 
 async function loadImages(noteId) {
