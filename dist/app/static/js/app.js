@@ -341,13 +341,102 @@ function formatDate(dateStr) {
   }
 }
 
+const NOTE_MARKUP_TAG_RE = /<\/?(?:a|b|big|blockquote|br|code|div|em|font|h[1-6]|hr|i|li|mark|ol|p|pre|s|small|span|strike|strong|sub|sup|table|tbody|td|tfoot|th|thead|tr|u|ul)\b[^>]*>/i;
+const ENCODED_NOTE_MARKUP_RE = /&(?:amp;)*lt;\/?(?:a|b|big|blockquote|br|code|div|em|font|h[1-6]|hr|i|li|mark|ol|p|pre|s|small|span|strike|strong|sub|sup|table|tbody|td|tfoot|th|thead|tr|u|ul)\b/i;
+const ALLOWED_NOTE_TAGS = new Set([
+  'A', 'B', 'BIG', 'BLOCKQUOTE', 'BR', 'CODE', 'DIV', 'EM', 'FONT',
+  'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HR', 'I', 'LI', 'MARK',
+  'OL', 'P', 'PRE', 'S', 'SMALL', 'SPAN', 'STRIKE', 'STRONG',
+  'SUB', 'SUP', 'TABLE', 'TBODY', 'TD', 'TFOOT', 'TH', 'THEAD',
+  'TR', 'U', 'UL'
+]);
+const ALLOWED_NOTE_STYLES = new Set([
+  'background-color', 'color', 'font-family', 'font-size', 'font-style',
+  'font-weight', 'text-align', 'text-decoration'
+]);
+const ALLOWED_NOTE_ATTRS = {
+  A: new Set(['href', 'target', 'title']),
+  FONT: new Set(['color', 'face', 'size']),
+  LI: new Set(['value']),
+  OL: new Set(['start', 'type']),
+  TD: new Set(['colspan', 'rowspan']),
+  TH: new Set(['colspan', 'rowspan'])
+};
+
+function decodeLegacyEscapedMarkup(html) {
+  const source = String(html || '');
+  if (!ENCODED_NOTE_MARKUP_RE.test(source)) return source;
+
+  // Older/plain-text paste paths saved markup as &lt;div&gt; (sometimes more
+  // than once). Decode only when the result really contains supported markup.
+  let candidate = source;
+  const decoder = document.createElement('textarea');
+  for (let pass = 0; pass < 3; pass++) {
+    decoder.innerHTML = candidate;
+    const decoded = decoder.value;
+    if (decoded === candidate) break;
+    candidate = decoded;
+    if (NOTE_MARKUP_TAG_RE.test(candidate)) return candidate;
+  }
+  return source;
+}
+
+function sanitizeNoteHtml(html) {
+  const template = document.createElement('template');
+  template.innerHTML = String(html || '');
+
+  Array.from(template.content.querySelectorAll('*')).forEach(el => {
+    if (!ALLOWED_NOTE_TAGS.has(el.tagName)) {
+      el.replaceWith(...el.childNodes);
+      return;
+    }
+
+    const allowed = ALLOWED_NOTE_ATTRS[el.tagName] || new Set();
+    Array.from(el.attributes).forEach(attr => {
+      const name = attr.name.toLowerCase();
+      if (name === 'style') {
+        const parsed = document.createElement('span');
+        parsed.setAttribute('style', attr.value);
+        const safe = [];
+        Array.from(parsed.style).forEach(property => {
+          const value = parsed.style.getPropertyValue(property);
+          if (ALLOWED_NOTE_STYLES.has(property) &&
+              !/url\s*\(|expression\s*\(/i.test(value)) {
+            safe.push(`${property}: ${value}`);
+          }
+        });
+        if (safe.length) el.setAttribute('style', safe.join('; '));
+        else el.removeAttribute('style');
+        return;
+      }
+      if (!allowed.has(name)) el.removeAttribute(attr.name);
+    });
+
+    if (el.tagName === 'A' && el.hasAttribute('href')) {
+      const href = el.getAttribute('href').trim();
+      if (/^(?:javascript|vbscript|data):/i.test(href)) {
+        el.removeAttribute('href');
+      }
+      if (el.getAttribute('target') === '_blank') {
+        el.setAttribute('rel', 'noopener noreferrer');
+      }
+    }
+  });
+
+  return template.innerHTML;
+}
+
+function prepareNoteHtml(html) {
+  return sanitizeNoteHtml(decodeLegacyEscapedMarkup(html));
+}
+
 function stripHtml(html) {
   if (!html) return '';
   try {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const doc = new DOMParser().parseFromString(prepareNoteHtml(html), 'text/html');
     return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
   } catch (_) {
-    return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    return String(html).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   }
 }
 
@@ -555,8 +644,16 @@ function openNote(id) {
   currentNoteId = id;
   window.currentNoteId = id;
   noteTitle.textContent = note.title;
-  noteBody.innerHTML = note.body;
-  if (noteBodyAfter) noteBodyAfter.innerHTML = note.body_after || '';
+
+  const preparedBody = prepareNoteHtml(note.body);
+  const preparedBodyAfter = prepareNoteHtml(note.body_after || '');
+  const repairedMarkup = preparedBody !== note.body ||
+    preparedBodyAfter !== (note.body_after || '');
+  note.body = preparedBody;
+  note.body_after = preparedBodyAfter;
+  noteBody.innerHTML = preparedBody;
+  if (noteBodyAfter) noteBodyAfter.innerHTML = preparedBodyAfter;
+
   showEditor(true);
   updateEditorToolbar(note);
   renderList();
@@ -566,6 +663,12 @@ function openNote(id) {
   loadImages(id);
 
   mainLayout.classList.add('editor-open');
+
+  // Persist a one-time repair so PDF/export and other devices receive clean
+  // rich text instead of the legacy escaped markup.
+  if (repairedMarkup && !note.is_trashed && !note.conflict_of) {
+    scheduleAutosave();
+  }
 }
 
 function setAutosave(msg) {
@@ -1170,10 +1273,17 @@ async function restoreVersion(noteId, versionId) {
     const idx = notes.findIndex(n => n.id === noteId);
     if (idx !== -1) notes[idx] = updated;
     if (currentNoteId === noteId) {
+      const preparedBody = prepareNoteHtml(updated.body);
+      const preparedBodyAfter = prepareNoteHtml(updated.body_after || '');
+      const repairedMarkup = preparedBody !== updated.body ||
+        preparedBodyAfter !== (updated.body_after || '');
+      updated.body = preparedBody;
+      updated.body_after = preparedBodyAfter;
       noteTitle.textContent = updated.title;
-      noteBody.innerHTML = updated.body;
-      if (noteBodyAfter) noteBodyAfter.innerHTML = updated.body_after || '';
+      noteBody.innerHTML = preparedBody;
+      if (noteBodyAfter) noteBodyAfter.innerHTML = preparedBodyAfter;
       updateEditorToolbar(updated);
+      if (repairedMarkup) scheduleAutosave();
     }
     setAutosave('Restored \u2713');
     renderList();
@@ -1476,6 +1586,21 @@ let _fmtTarget = null;
 [noteBody, noteBodyAfter].forEach(el => {
   if (!el) return;
   el.addEventListener('focus', () => { _fmtTarget = el; });
+  el.addEventListener('paste', event => {
+    const plainText = event.clipboardData
+      ? event.clipboardData.getData('text/plain')
+      : '';
+
+    // When HTML source is copied from a message/code block, browsers paste it
+    // as literal text. Treat recognisable note markup as rich text instead.
+    if (!NOTE_MARKUP_TAG_RE.test(plainText)) return;
+
+    event.preventDefault();
+    _fmtTarget = el;
+    el.focus();
+    document.execCommand('insertHTML', false, sanitizeNoteHtml(plainText));
+    scheduleAutosave();
+  });
 });
 
 function _applyFmt(cmd, value) {
