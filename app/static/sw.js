@@ -1,4 +1,4 @@
-const CACHE_NAME = 'notes-v2';
+const CACHE_NAME = 'notes-v3';
 const APP_SHELL = [
   '/dashboard',
   '/static/css/style.css',
@@ -28,10 +28,15 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Only handle http/https — ignore chrome-extension://, data:, etc.
-  if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
+  // Let the browser handle writes normally. app.js queues failed API writes
+  // in IndexedDB and retries them when the connection returns.
+  if (event.request.method !== 'GET') return;
 
-  // Network-first for API calls — offline handled by app.js (IndexedDB queue)
+  // Only handle same-origin http(s) requests.
+  if ((url.protocol !== 'http:' && url.protocol !== 'https:') ||
+      url.origin !== self.location.origin) return;
+
+  // Network-first for API reads; never cache personal note JSON.
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(event.request).catch(() =>
@@ -44,17 +49,24 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Cache-first for app shell assets
+  const isAppShell = event.request.mode === 'navigate' ||
+    url.pathname.startsWith('/static/');
+  const isNoteMedia = url.pathname.startsWith('/media/');
+  if (!isAppShell && !isNoteMedia) return;
+
+  // Network-first keeps rich-text fixes and other deployments fresh while
+  // retaining the last good response for offline use.
   event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
-      return fetch(event.request).then(response => {
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => cached || new Response('Offline', { status: 503 }));
-    })
+    fetch(event.request).then(response => {
+      if (response.ok) {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+      }
+      return response;
+    }).catch(() =>
+      caches.match(event.request).then(cached =>
+        cached || new Response('Offline', { status: 503 })
+      )
+    )
   );
 });
