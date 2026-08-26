@@ -1156,30 +1156,95 @@ async function uploadImageFile(file) {
   const formData = new FormData();
   formData.append('image', file);
 
+  // The editor and API are deliberately same-origin. Explicit credentials make
+  // the session-cookie requirement clear and avoids suggesting a CORS workaround.
+  const uploadUrl = new URL(
+    `/api/notes/${currentNoteId}/images`,
+    window.location.origin
+  );
+
   try {
-    const res = await fetch(`/api/notes/${currentNoteId}/images`, {
+    const res = await fetch(uploadUrl.toString(), {
       method: 'POST',
       body: formData,
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { 'Accept': 'application/json' },
     });
+
+    const contentType = (res.headers.get('content-type') || '').toLowerCase();
+
+    // Flask's login_required decorator redirects expired API sessions to
+    // /login. fetch follows that redirect and receives HTML with HTTP 200;
+    // attempting res.json() then used to look like a network/CORS failure.
+    if (res.redirected && new URL(res.url).pathname === '/login') {
+      setImageStatus('Your session has expired. Reload the page and sign in again.', true);
+      return;
+    }
+    if (res.status === 401) {
+      setImageStatus('Your session has expired. Reload the page and sign in again.', true);
+      return;
+    }
     if (res.status === 413) {
       setImageStatus('Image too large (max 10 MB).', true);
       return;
     }
     if (res.status === 400) {
-      setImageStatus('Unsupported file type. Please use JPEG, PNG, GIF, or WebP.', true);
+      setImageStatus('Unsupported or invalid image. Please use JPEG, PNG, GIF, or WebP.', true);
+      return;
+    }
+    if (res.status === 403) {
+      setImageStatus('Server blocked the upload (403). Check Plesk ModSecurity rules.', true);
+      return;
+    }
+    if (res.status === 404) {
+      setImageStatus('Upload endpoint not found (404). Deploy the latest app/media.py.', true);
+      return;
+    }
+    if (res.status >= 500) {
+      setImageStatus(
+        `Server could not save the image (${res.status}). Check Plesk logs and upload-folder permissions.`,
+        true
+      );
       return;
     }
     if (!res.ok) {
       setImageStatus(`Upload failed (${res.status}). Please try again.`, true);
       return;
     }
+    if (!contentType.includes('application/json')) {
+      setImageStatus(
+        'Upload endpoint returned HTML instead of JSON. Reload and sign in again, then retry.',
+        true
+      );
+      console.error('Image upload returned non-JSON response', {
+        status: res.status,
+        url: res.url,
+        contentType,
+      });
+      return;
+    }
+
     const img = await res.json();
+    if (!img || !img.id || !img.url) {
+      setImageStatus('Upload returned an invalid response. Check the server log.', true);
+      console.error('Image upload response missing id/url', img);
+      return;
+    }
+
     images.push(img);
     renderImageBlocks();
     setImageStatus('');
   } catch (e) {
-    setImageStatus('Upload failed. Check your connection and try again.', true);
-    console.error('Image upload failed', e);
+    const detail = e && e.message ? ` (${e.message})` : '';
+    setImageStatus(`Could not reach the upload endpoint${detail}.`, true);
+    console.error('Image upload fetch failed', {
+      error: e,
+      url: uploadUrl.toString(),
+      noteId: currentNoteId,
+      fileType: file.type,
+      fileSize: file.size,
+    });
   } finally {
     btnUploadImage.disabled = false;
     btnCameraCapture.disabled = false;
