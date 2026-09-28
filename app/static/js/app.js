@@ -307,7 +307,13 @@ async function flushOperations() {
       const response = await fetch(`/api/notes/${noteId}/images`, {
         method: 'POST', body: form, credentials: 'same-origin', headers: { Accept: 'application/json' },
       });
+      if (response.redirected && new URL(response.url).pathname === '/login') {
+        throw new Error('Session expired — sign in to resume photo sync');
+      }
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!(response.headers.get('content-type') || '').toLowerCase().includes('application/json')) {
+        throw new Error('Upload returned an invalid response');
+      }
       const uploaded = await response.json();
       imageIds.set(op.local_image_id, uploaded.id);
       const remaining = await getPendingOperations();
@@ -316,6 +322,10 @@ async function flushOperations() {
       }
       await idbDelete('cached_images', `${op.note_id}:${op.local_image_id}`);
       await idbPut('cached_images', { ...uploaded, cache_key: `${noteId}:${uploaded.id}`, note_id: noteId });
+      if (currentNoteId === noteId || currentNoteId === op.note_id) {
+        images = images.map(image => image.id === op.local_image_id ? uploaded : image);
+        renderImageBlocks();
+      }
     } else if (op.type === 'delete_image') {
       const imageId = imageIds.get(op.image_id) || op.image_id;
       await apiRequest('DELETE', `/api/notes/${noteId}/images/${imageId}`);
@@ -351,6 +361,7 @@ async function flushQueue() {
     pending = await getPendingWrites();
   } catch (e) {
     console.error('[sync] operation flush failed', e);
+    if (e && e.message) setImageStatus(`Photo sync paused: ${e.message}`, true);
     anyFailed = true;
   }
   for (const w of pending) {
@@ -1332,8 +1343,15 @@ function renderImageBlocks() {
 
 async function loadImages(noteId) {
   try {
-    images = await apiRequest('GET', `/api/notes/${noteId}/images`);
-    await cacheImages(noteId, images);
+    const serverImages = await apiRequest('GET', `/api/notes/${noteId}/images`);
+    await cacheImages(noteId, serverImages);
+    // Never hide a locally captured photo merely because the server list was
+    // fetched before its queued upload completed.
+    const cached = await getCachedImages(noteId);
+    const localImages = cached
+      .filter(image => String(image.id).startsWith('local-'))
+      .map(image => image.file ? { ...image, url: URL.createObjectURL(image.file) } : image);
+    images = [...serverImages, ...localImages];
     renderImageBlocks();
   } catch (e) {
     const cached = await getCachedImages(noteId);

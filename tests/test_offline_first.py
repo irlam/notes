@@ -25,6 +25,12 @@ def test_failed_image_fetch_falls_back_to_local_queue():
     assert "annStatusEl.textContent = 'Saved locally'" in annotation_js
 
 
+def test_online_image_refresh_preserves_pending_local_photos():
+    assert "String(image.id).startsWith('local-')" in APP_JS
+    assert 'images = [...serverImages, ...localImages]' in APP_JS
+    assert 'images.map(image => image.id === op.local_image_id ? uploaded : image)' in APP_JS
+
+
 def test_queued_edits_include_conflict_base_timestamp():
     assert 'client_updated_at: w.client_updated_at' in APP_JS
     assert 'client_updated_at: note.updated_at' in APP_JS
@@ -36,7 +42,7 @@ def test_reconnect_and_startup_flush_durable_queue():
 
 
 def test_service_worker_caches_full_install_shell():
-    assert "CACHE_NAME = 'notes-v6'" in SW_JS
+    assert "CACHE_NAME = 'notes-v7'" in SW_JS
     for asset in (
         '/dashboard', '/static/css/style.css', '/static/js/app.js',
         '/static/manifest.json', '/static/icons/favicon.ico',
