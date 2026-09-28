@@ -422,4 +422,1511 @@ const historyPanel = document.getElementById('history-panel');
 const historyList = document.getElementById('history-list');
 const btnCloseHistory = document.getElementById('btn-close-history');
 const conflictBanner = document.getElementById('conflict-banner');
-const btnViewConflicts = document.getElementById('btn-v×m¼îÚ$z{-®éÜj×¢¶–ÖvW5¶–G…ÒÂ–ÖvW5¶æWt–G…ÕÒÒ¶–ÖvW5¶æWt–G…ÒÂ–ÖvW5¶–G…ÕÓ°¢&VæFW$–ÖvT&Æö6·2‚“°¢6WD–ÖvU7FGW2‚t6÷VÆBæ÷B&V÷&FW"–ÖvW2âÆV6RG'’v–âârÂG'VR“°¢6öç6öÆRæW'&÷"‚t–ÖvR&V÷&FW"f–ÆVBrÂR“°¢Ğ§Ğ ¦7–æ2gVæ7F–öâ7&VFTföÆFW"†æÖR’°¢æÖRÒæÖRçG&–Ò‚“°¢–b‚æÖR’&WGW&ã°¢G'’°¢6öç7BföÆFW"Òv—B•&WVW7B‚uõ5BrÂrö’öföÆFW'2rÂ²æÖRÒ“°¢föÆFW'2çW6‚†föÆFW"“°¢föÆFW'2ç6÷'B‚†Â"’ÓâææÖRæÆö6ÆT6ö×&R†"ææÖR’“°¢&VæFW$föÆFW$Æ—7B‚“°¢÷VÆFTföÆFW%6VÆV7B‚“°¢Ò6F6‚†R’°¢6öç6öÆRæW'&÷"‚tf–ÆVBFò7&VFRföÆFW"rÂR“°¢Ğ§Ğ ¦7–æ2gVæ7F–öâFVÆWFTföÆFW"†föÆFW$–B’°¢G'’°¢v—B•&WVW7B‚tDTÄUDRrÂö’öföÆFW'2òG¶föÆFW$–GÖ“°¢föÆFW'2ÒföÆFW'2æf–ÇFW"†bÓâbæ–BÓÒföÆFW$–B“°¢òòVæf–ÆRæ÷FW2Æö6ÆÇ¢æ÷FW2æf÷$V6‚†âÓâ²–b†âæföÆFW%ö–BÓÓÒföÆFW$–B’âæföÆFW%ö–BÒçVÆÃ²Ò“°¢–b†7W'&VçDföÆFW$–BÓÓÒföÆFW$–B’7W'&VçDföÆFW$–BÒçVÆÃ°¢&VæFW$föÆFW$Æ—7B‚“°¢÷VÆFTföÆFW%6VÆV7B‚“°¢&VæFW$Æ—7B‚“°¢Ò6F6‚†R’°¢6öç6öÆRæW'&÷"‚tf–ÆVBFòFVÆWFRföÆFW"rÂR“°¢Ğ§Ğ ¢ò¢ÓÓÓÓÒfW'6–öâ†—7F÷'’ÓÓÓÓÒ¢ğ¦7–æ2gVæ7F–öâ÷Vä†—7F÷'•æVÂ†æ÷FT–B’°¢†—7F÷'”æ÷FT–BÒæ÷FT–C°¢†—7F÷'”Æ—7Bæ–ææW$…DÔÂÒsÆF—b6Æ73Ò&†—7F÷'’ÖÆöF–ær#äÆöF–æuÇS##cÂöF—câs°¢†—7F÷'•æVÂç7G–ÆRæF—7Æ’Òrs°¢G'’°¢6öç7BfW'6–öç2Òv—B•&WVW7B‚ttUBrÂö’öæ÷FW2òG¶æ÷FT–GÒ÷fW'6–öç6“°¢–b‡fW'6–öç2æÆVæwF‚ÓÓÒ’°¢†—7F÷'”Æ—7Bæ–ææW$…DÔÂÒsÆF—b6Æ73Ò&†—7F÷'’ÖV×G’#äæòfW'6–öç26fVB–WBãÆ'#åfW'6–öç2&R7&VFVBWFöÖF–6ÆÇ’v†Vâ–÷RWFFRF†—2æ÷FRãÂöF—câs°¢&WGW&ã°¢Ğ¢†—7F÷'”Æ—7Bæ–ææW$…DÔÂÒfW'6–öç2æÖ‡bÓâ°¢6öç7BBÒæWrFFR‡bç6fVEöBç&WÆ6R‚rrÂuBr’²u¢r“°¢6öç7BÆ&VÂÒBçFôÆö6ÆU7G&–ær‚vVâÔt"rÂ°¢F“¢s"ÖF–v—BrÂÖöçFƒ¢s"ÖF–v—BrÂ–V#¢vçVÖW&–2rÀ¢†÷W#¢s"ÖF–v—BrÂÖ–çWFS¢s"ÖF–v—Bp¢Ò“°¢&WGW&âÆF—b6Æ73Ò&†—7F÷'’Ö—FVÒ"FF×fW'6–öâÖ–CÒ"G·bæ–GÒ#à¢ÆF—b6Æ73Ò&†—7F÷'’Ö—FVÒÖÖWF#à¢Ç7â6Æ73Ò&†—7F÷'’Ö—FVÒÖFFR#âG¶Æ&VÇÓÂ÷7ãà¢ÂöF—cà¢ÆF—b6Æ73Ò&†—7F÷'’Ö—FVÒ×F—FÆR#âG¶W66T‡FÖÂ‡bçF—FÆRÇÂuVçF—FÆVBr—ÓÂöF—cà¢Æ'WGFöâ6Æ73Ò&'Fâ×&W7F÷&R×fW'6–öâ"FF×fW'6–öâÖ–CÒ"G·bæ–GÒ"&–ÖÆ&VÃÒ%&W7F÷&RfW'6–öâg&öÒG¶Æ&VÇÒ#å&W7F÷&SÂö'WGFöãà¢ÂöF—cæ°¢Ò’æ¦ö–â‚rr“°¢†—7F÷'”Æ—7BçVW'•6VÆV7F÷$ÆÂ‚ræ'Fâ×&W7F÷&R×fW'6–öâr’æf÷$V6‚†'FâÓâ°¢'FâæFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ‚’Óâ&W7F÷&UfW'6–öâ†æ÷FT–BÂ'6T–çB†'FâæFF6WBçfW'6–öä–B’’“°¢Ò“°¢Ò6F6‚†R’°¢†—7F÷'”Æ—7Bæ–ææW$…DÔÂÒsÆF—b6Æ73Ò&†—7F÷'’ÖV×G’#äf–ÆVBFòÆöBfW'6–öâ†—7F÷'’ãÂöF—câs°¢6öç6öÆRæW'&÷"‚tf–ÆVBFòÆöB†—7F÷'’rÂR“°¢Ğ§Ğ ¦gVæ7F–öâ6Æ÷6T†—7F÷'•æVÂ‚’°¢†—7F÷'•æVÂç7G–ÆRæF—7Æ’ÒvæöæRs°¢†—7F÷'”æ÷FT–BÒçVÆÃ°§Ğ ¦7–æ2gVæ7F–öâ&W7F÷&UfW'6–öâ†æ÷FT–BÂfW'6–öä–B’°¢–b‚6öæf—&Ò‚u&W7F÷&RF†—2fW'6–öãòF†R7W'&VçB6öçFVçBv–ÆÂ&R6fVB2æWrfW'6–öâf—'7Bâr’’&WGW&ã°¢G'’°¢6öç7BWFFVBÒv—B•&WVW7B‚uõ5BrÂö’öæ÷FW2òG¶æ÷FT–GÒ÷fW'6–öç2òG·fW'6–öä–GÒ÷&W7F÷&V“°¢6öç7B–G‚Òæ÷FW2æf–æD–æFW‚†âÓââæ–BÓÓÒæ÷FT–B“°¢–b†–G‚ÓÒÓ’æ÷FW5¶–G…ÒÒWFFVC°¢–b†7W'&VçDæ÷FT–BÓÓÒæ÷FT–B’°¢6öç7B&W&VD&öG’Ò&W&Tæ÷FT‡FÖÂ‡WFFVBæ&öG’“°¢6öç7B&W&VD&öG”gFW"Ò&W&Tæ÷FT‡FÖÂ‡WFFVBæ&öG•ögFW"ÇÂrr“°¢6öç7B&W—&VDÖ&·WÒ&W&VD&öG’ÓÒWFFVBæ&öG’ÇÀ¢&W&VD&öG”gFW"ÓÒ‡WFFVBæ&öG•ögFW"ÇÂrr“°¢WFFVBæ&öG’Ò&W&VD&öG“°¢WFFVBæ&öG•ögFW"Ò&W&VD&öG”gFW#°¢æ÷FUF—FÆRçFW‡D6öçFVçBÒWFFVBçF—FÆS°¢æ÷FT&öG’æ–ææW$…DÔÂÒ&W&VD&öG“°¢–b†æ÷FT&öG”gFW"’æ÷FT&öG”gFW"æ–ææW$…DÔÂÒ&W&VD&öG”gFW#°¢WFFTVF—F÷%FööÆ&"‡WFFVB“°¢–b‡&W—&VDÖ&·W’66†VGVÆTWF÷6fR‚“°¢Ğ¢6WDWF÷6fR‚u&W7F÷&VBÇS#s2r“°¢&VæFW$Æ—7B‚“°¢6Æ÷6T†—7F÷'•æVÂ‚“°¢Ò6F6‚†R’°¢6öç6öÆRæW'&÷"‚tf–ÆVBFò&W7F÷&RfW'6–öârÂR“°¢ÆW'B‚tf–ÆVBFò&W7F÷&RfW'6–öââÆV6RG'’v–ââr“°¢Ğ§Ğ ¢ò¢ÓÓÓÓÒ6öæfÆ–7B&ææW"ÓÓÓÓÒ¢ğ¦gVæ7F–öâ6†÷t6öæfÆ–7D&ææW"‚’°¢–b†6öæfÆ–7D&ææW"’6öæfÆ–7D&ææW"ç7G–ÆRæF—7Æ’Òrs°§Ğ ¦gVæ7F–öâ†–FT6öæfÆ–7D&ææW"‚’°¢–b†6öæfÆ–7D&ææW"’6öæfÆ–7D&ææW"ç7G–ÆRæF—7Æ’ÒvæöæRs°§Ğ ¦7–æ2gVæ7F–öâFVÆWFT6öæfÆ–7D6÷’‚’°¢–b‚7W'&VçDæ÷FT–B’&WGW&ã°¢6öç7Bæ÷FRÒ7W'&VçDæ÷FR‚“°¢–b‚æ÷FRÇÂæ÷FRæ6öæfÆ–7Eööb’&WGW&ã°¢6öç7B–BÒ7W'&VçDæ÷FT–C°¢G'’°¢v—B•&WVW7B‚tDTÄUDRrÂö’ö6öæfÆ–7G2òG¶–GÖ“°¢æ÷FW2Òæ÷FW2æf–ÇFW"†âÓââæ–BÓÒ–B“°¢6†÷tVF—F÷"†fÇ6R“°¢Ö–äÆ–÷WBæ6Æ74Æ—7Bç&VÖ÷fR‚vVF—F÷"Ö÷Vâr“°¢&VæFW$Æ—7B‚“°¢6WDWF÷6fR‚rr“°¢Ò6F6‚†R’°¢6öç6öÆRæW'&÷"‚tf–ÆVBFòFVÆWFR6öæfÆ–7B6÷’rÂR“°¢Ğ§Ğ ¢ò¢ÓÓÓÓÒWF÷6fRÓÓÓÓÒ¢ğ¦gVæ7F–öâ66†VGVÆTWF÷6fR‚’°¢6WDWF÷6fR‚rr“°¢6ÆV%F–ÖV÷WB†WF÷6fUF–ÖW"“°¢WF÷6fUF–ÖW"Ò6WEF–ÖV÷WB‡6fTæ÷FRÂS“°§Ğ ¢ò¢ÓÓÓÓÒf–ÇFW"ò6÷'Bò6V&6‚ÓÓÓÓÒ¢ğ¦gVæ7F–öâ6WDf–ÇFW"†f–ÇFW"’°¢7W'&VçDf–ÇFW"Òf–ÇFW#°¢òò†–FRföÆFW"6V7F–öâ–âG&6‚æB6öæfÆ–7G2f–Ww0¢föÆFW%6V7F–öâç7G–ÆRæF—7Æ’Ò†f–ÇFW"ÓÓÒwG&6†VBrÇÂf–ÇFW"ÓÓÒv6öæfÆ–7G2r’òvæöæRr¢rs°¢–b†f–ÇFW"ÓÓÒwG&6†VBrÇÂf–ÇFW"ÓÓÒv6öæfÆ–7G2r’7W'&VçDföÆFW$–BÒçVÆÃ° ¢f–ÇFW%F'2æf÷$V6‚‡BÓâ°¢6öç7B—47F—fRÒBæFF6WBæf–ÇFW"ÓÓÒf–ÇFW#°¢Bæ6Æ74Æ—7BçFövvÆR‚v7F—fRrÂ—47F—fR“°¢Bç6WDGG&–'WFR‚v&–×6VÆV7FVBrÂ—47F—fRòwG'VRr¢vfÇ6Rr“°¢Ò“°¢–b†WF÷6fUF–ÖW"bb7W'&VçDæ÷FT–B’°¢6ÆV%F–ÖV÷WB†WF÷6fUF–ÖW"“°¢WF÷6fUF–ÖW"ÒçVÆÃ°¢Ğ¢6†÷tVF—F÷"†fÇ6R“°¢Ö–äÆ–÷WBæ6Æ74Æ—7Bç&VÖ÷fR‚vVF—F÷"Ö÷Vâr“°¢&VæFW$föÆFW$Æ—7B‚“°¢ÆöDæ÷FW2‚“°§Ğ ¦gVæ7F–öâ6WDföÆFW$f–ÇFW"†föÆFW$–B’°¢7W'&VçDföÆFW$–BÒföÆFW$–C°¢&VæFW$föÆFW$Æ—7B‚“°¢ÆöDæ÷FW2‚“°§Ğ ¦gVæ7F–öâ66†VGVÆU6V&6‚‚’°¢6ÆV%F–ÖV÷WB‡6V&6…F–ÖW"“°¢6V&6…F–ÖW"Ò6WEF–ÖV÷WB‚‚’Óâ°¢6V&6…VW'’Ò6V&6„–çWBçfÇVRçG&–Ò‚“°¢ÆöDæ÷FW2‚“°¢ÒÂ4T$4…ôDT$õTä4UôÕ2“°§Ğ ¢ò¢ÓÓÓÓÒWfVçG2ÓÓÓÓÒ¢ğ¦'FäæWræFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ7&VFTæ÷FR“° ¦'Fä&6²æFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ‚’Óâ°¢6ÆV%F–ÖV÷WB†WF÷6fUF–ÖW"“°¢WF÷6fUF–ÖW"ÒçVÆÃ°¢6öç7Bæ÷FRÒ7W'&VçDæ÷FR‚“°¢–b†7W'&VçDæ÷FT–Bbbæ÷FRbbæ÷FRæ—5÷G&6†VB’6fTæ÷FR‚“°¢Ö–äÆ–÷WBæ6Æ74Æ—7Bç&VÖ÷fR‚vVF—F÷"Ö÷Vâr“°§Ò“° ¦'Få–âæFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂFövvÆU–â“°¦'Fä&6†—fRæFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂFövvÆT&6†—fR“°¦'FåG&6‚æFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂG&6„æ÷FR“°¦'Få&W7F÷&RæFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ&W7F÷&Tæ÷FR“° ¦–b†'FäW‡÷'EFb’°¢'FäW‡÷'EFbæFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ‚’Óâ°¢–b‚7W'&VçDæ÷FT–B’&WGW&ã°¢v–æF÷ræ÷Vâ†ö’öæ÷FW2òG¶7W'&VçDæ÷FT–GÒöW‡÷'BçFfÂuö&Ææ²r“°¢Ò“°§Ğ ¦'FäFVÆWFUW&ÖæVçBæFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ‚’Óâ°¢–b‚7W'&VçDæ÷FT–B’&WGW&ã°¢F–Æöt÷fW&Æ’æ6Æ74Æ—7BæFB‚wf—6–&ÆRr“°§Ò“° ¦'Fä6æ6VÄFVÆWFRæFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ‚’Óâ°¢F–Æöt÷fW&Æ’æ6Æ74Æ—7Bç&VÖ÷fR‚wf—6–&ÆRr“°§Ò“° ¦'Fä6öæf—&ÔFVÆWFRæFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ7–æ2‚’Óâ°¢F–Æöt÷fW&Æ’æ6Æ74Æ—7Bç&VÖ÷fR‚wf—6–&ÆRr“°¢v—BW&ÖæVçDFVÆWFR‚“°§Ò“° ¦F–Æöt÷fW&Æ’æFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂRÓâ°¢–b†RçF&vWBÓÓÒF–Æöt÷fW&Æ’’F–Æöt÷fW&Æ’æ6Æ74Æ—7Bç&VÖ÷fR‚wf—6–&ÆRr“°§Ò“° ¦Fö7VÖVçBæFDWfVçDÆ—7FVæW"‚v¶W–F÷vârÂRÓâ°¢–b†Ræ¶W’ÓÓÒtW66RrbbF–Æöt÷fW&Æ’æ6Æ74Æ—7Bæ6öçF–ç2‚wf—6–&ÆRr’’°¢F–Æöt÷fW&Æ’æ6Æ74Æ—7Bç&VÖ÷fR‚wf—6–&ÆRr“°¢Ğ§Ò“° ¦æ÷FUF—FÆRæFDWfVçDÆ—7FVæW"‚v–çWBrÂ66†VGVÆTWF÷6fR“°¦æ÷FT&öG’æFDWfVçDÆ—7FVæW"‚v–çWBrÂ66†VGVÆTWF÷6fR“°¦–b†æ÷FT&öG”gFW"’æ÷FT&öG”gFW"æFDWfVçDÆ—7FVæW"‚v–çWBrÂ66†VGVÆTWF÷6fR“° ¦æ÷FUF—FÆRæFDWfVçDÆ—7FVæW"‚v¶W–F÷vârÂRÓâ°¢–b†Ræ¶W’ÓÓÒtVçFW"r’°¢Rç&WfVçDFVfVÇB‚“°¢æ÷FT&öG’æfö7W2‚“°¢Ğ§Ò“° ¦f–ÇFW%F'2æf÷$V6‚‡F"Óâ°¢F"æFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ‚’Óâ6WDf–ÇFW"‡F"æFF6WBæf–ÇFW"’“°§Ò“° §6V&6„–çWBæFDWfVçDÆ—7FVæW"‚v–çWBrÂ66†VGVÆU6V&6‚“° ¢òò6ÆV"6V&6‚öâW66P§6V&6„–çWBæFDWfVçDÆ—7FVæW"‚v¶W–F÷vârÂRÓâ°¢–b†Ræ¶W’ÓÓÒtW66Rr’°¢6V&6„–çWBçfÇVRÒrs°¢6V&6…VW'’Òrs°¢ÆöDæ÷FW2‚“°¢Ğ§Ò“° §6÷'E6VÆV7BæFDWfVçDÆ—7FVæW"‚v6†ævRrÂ‚’Óâ°¢7W'&VçE6÷'BÒ6÷'E6VÆV7BçfÇVS°¢ÆöDæ÷FW2‚“°§Ò“° ¦æ÷FTföÆFW%6VÆV7BæFDWfVçDÆ—7FVæW"‚v6†ævRrÂ‚’Óâ°¢6öç7B&rÒæ÷FTföÆFW%6VÆV7BçfÇVS°¢6†ævTæ÷FTföÆFW"‡&rò'6T–çB‡&r’¢çVÆÂ“°§Ò“° ¢òòæWrföÆFW"7&VF–öà¦'FäæWtföÆFW"æFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ‚’Óâ°¢æWtföÆFW$f÷&Òç7G–ÆRæF—7Æ’ÒæWtföÆFW$f÷&Òç7G–ÆRæF—7Æ’ÓÓÒvæöæRròrr¢væöæRs°¢–b†æWtföÆFW$f÷&Òç7G–ÆRæF—7Æ’ÓÒvæöæRr’°¢æWtföÆFW$–çWBçfÇVRÒrs°¢æWtföÆFW$–çWBæfö7W2‚“°¢Ğ§Ò“° ¦æWtföÆFW$–çWBæFDWfVçDÆ—7FVæW"‚v¶W–F÷vârÂ7–æ2RÓâ°¢–b†Ræ¶W’ÓÓÒtVçFW"r’°¢6öç7BæÖRÒæWtföÆFW$–çWBçfÇVRçG&–Ò‚“°¢–b†æÖR’v—B7&VFTföÆFW"†æÖR“°¢æWtföÆFW$f÷&Òç7G–ÆRæF—7Æ’ÒvæöæRs°¢æWtföÆFW$–çWBçfÇVRÒrs°¢ÒVÇ6R–b†Ræ¶W’ÓÓÒtW66Rr’°¢æWtföÆFW$f÷&Òç7G–ÆRæF—7Æ’ÒvæöæRs°¢æWtföÆFW$–çWBçfÇVRÒrs°¢Ğ§Ò“° ¢òòFr–çWB(	BFBFröâVçFW"÷"6öÖÖ§Ft–çWBæFDWfVçDÆ—7FVæW"‚v¶W–F÷vârÂ7–æ2RÓâ°¢–b†Ræ¶W’ÓÓÒtVçFW"rÇÂRæ¶W’ÓÓÒrÂr’°¢Rç&WfVçDFVfVÇB‚“°¢6öç7BæÖRÒFt–çWBçfÇVRç&WÆ6R‚rÂrÂrr’çG&–Ò‚“°¢–b†æÖR’v—BFEFuFôæ÷FR†æÖR“°¢Ft–çWBçfÇVRÒrs°¢ÒVÇ6R–b†Ræ¶W’ÓÓÒtW66Rr’°¢Ft–çWBçfÇVRÒrs°¢Ğ§Ò“° ¢ò¢ÓÓÓÓÒ–ÖvRWÆöBWfVçG2ÓÓÓÓÒ¢ğ¦'FåWÆöD–ÖvRæFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ‚’Óâ–çWEWÆöD–ÖvRæ6Æ–6²‚’“°¦'Fä6ÖW&6GW&RæFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ‚’Óâ–çWD6ÖW&6GW&Ræ6Æ–6²‚’“° ¦–çWEWÆöD–ÖvRæFDWfVçDÆ—7FVæW"‚v6†ævRrÂ7–æ2‚’Óâ°¢6öç7Bf–ÆRÒ–çWEWÆöD–ÖvRæf–ÆW5³Ó°¢–b†f–ÆR’v—BWÆöD–ÖvTf–ÆR†f–ÆR“°§Ò“° ¦–çWD6ÖW&6GW&RæFDWfVçDÆ—7FVæW"‚v6†ævRrÂ7–æ2‚’Óâ°¢6öç7Bf–ÆRÒ–çWD6ÖW&6GW&Ræf–ÆW5³Ó°¢–b†f–ÆR’v—BWÆöD–ÖvTf–ÆR†f–ÆR“°§Ò“° ¢ò¢ÓÓÓÓÒöffÆ–æRFWFV7F–öâÓÓÓÓÒ¢ğ¦gVæ7F–öâWFFTöæÆ–æU7FGW2‚’°¢öffÆ–æT&ææW"æ6Æ74Æ—7BçFövvÆR‚wf—6–&ÆRrÂæf–vF÷"æöäÆ–æR“°¢–b†æf–vF÷"æöäÆ–æR’°¢fÇW6…VWVR‚’çF†Vâ‚‚’Óâ&VæFW$Æ—7B‚’“°¢ÒVÇ6R°¢WFFTvÆö&Å7–æ57FGW2‚“°¢Ğ§Ğ§v–æF÷ræFDWfVçDÆ—7FVæW"‚vöæÆ–æRrÂWFFTöæÆ–æU7FGW2“°§v–æF÷ræFDWfVçDÆ—7FVæW"‚vöffÆ–æRrÂWFFTöæÆ–æU7FGW2“°§WFFTöæÆ–æU7FGW2‚“° ¢ò¢ÓÓÓÓÒ6W'f–6Rv÷&¶W"ÓÓÓÓÒ¢ğ¦–b‚w6W'f–6Uv÷&¶W"r–âæf–vF÷"’°¢v–æF÷ræFDWfVçDÆ—7FVæW"‚vÆöBrÂ‚’Óâ°¢æf–vF÷"ç6W'f–6Uv÷&¶W"ç&Vv—7FW"‚r÷7ræ§2r’æ6F6‚†6öç6öÆRæW'&÷"“°¢Ò“°§Ğ ¢ò¢ÓÓÓÓÒ–æ—BÓÓÓÓÒ¢ğ§6†÷tVF—F÷"†fÇ6R“°¦ÆöDföÆFW'2‚“°¦ÆöEFw2‚“°¦ÆöDæ÷FW2‚“°¦–b‡G—Vöb–æ—Dææ÷FF–öäVF—F÷"ÓÓÒvgVæ7F–öâr’–æ—Dææ÷FF–öäVF—F÷"‚“° ¢òò&W7F÷&RVWVR7FFRöâWfW'’7F'GWâ–æFW†VDD"7W'f—fW2F"ö&W7F'G2à¥&öÖ—6RæÆÂ…¶vWEVæF–æuw&—FW2‚’ÂvWEVæF–æt÷W&F–öç2‚•Ò’çF†Vâ‚…·VæF–ærÂ÷W&F–öç5Ò’Óâ°¢–b‡VæF–æræÆVæwF‚ÇÂ÷W&F–öç2æÆVæwF‚’°¢6öç6öÆRæÆör‚u·7–æ5Òf÷VæBrÂVæF–æræÆVæwF‚²÷W&F–öç2æÆVæwF‚ÂwVæF–ær6†ævR‡2’öâ7F'GWr“°¢VæF–æræf÷$V6‚‡rÓâ7–æ57FFW2ç6WB‡rææ÷FUö–BÂvÆö6Âr’“°¢WFFTvÆö&Å7–æ57FGW2†æf–vF÷"æöäÆ–æRòw7–æ6–ærr¢wVæF–ærr“°¢–b†æf–vF÷"æöäÆ–æR’fÇW6…VWVR‚’çF†Vâ‚‚’Óâ&VæFW$Æ—7B‚’“°¢ÒVÇ6R°¢WFFTvÆö&Å7–æ57FGW2‚w7–æ6VBr“°¢Ğ§Ò’æ6F6‚†6öç6öÆRæW'&÷"“° ¢òòWF÷6fR–æF–6F÷"6Æ–6²(	B&WG'’f–ÆVB7–æ70¦–b†WF÷6fTVÂ’°¢WF÷6fTVÂæFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ‚’Óâ°¢–b†WF÷6fTVÂæFF6WBç7–æ57FFRÓÓÒvf–ÆVBr’°¢fÇW6…&WG'”6÷VçBÒ°¢fÇW6„–å&öw&W72ÒfÇ6S°¢fÇW6…VWVR‚’çF†Vâ‚‚’Óâ&VæFW$Æ—7B‚’“°¢Ğ¢Ò“°§Ğ ¢ò¢ÓÓÓÓÒ†—7F÷'’æVÂWfVçG2ÓÓÓÓÒ¢ğ¦–b†'Fä†—7F÷'’’°¢'Fä†—7F÷'’æFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ‚’Óâ°¢–b†7W'&VçDæ÷FT–B’÷Vä†—7F÷'•æVÂ†7W'&VçDæ÷FT–B“°¢Ò“°§Ğ ¦–b†'Fä6Æ÷6T†—7F÷'’’°¢'Fä6Æ÷6T†—7F÷'’æFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ6Æ÷6T†—7F÷'•æVÂ“°§Ğ ¦–b††—7F÷'•æVÂ’°¢†—7F÷'•æVÂæFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂRÓâ°¢–b†RçF&vWBÓÓÒ†—7F÷'•æVÂ’6Æ÷6T†—7F÷'•æVÂ‚“°¢Ò“°§Ğ ¦Fö7VÖVçBæFDWfVçDÆ—7FVæW"‚v¶W–F÷vârÂRÓâ°¢–b†Ræ¶W’ÓÓÒtW66Rrbb†—7F÷'•æVÂbb†—7F÷'•æVÂç7G–ÆRæF—7Æ’ÓÒvæöæRr’°¢6Æ÷6T†—7F÷'•æVÂ‚“°¢Ğ§Ò“° ¢ò¢ÓÓÓÓÒ6öæfÆ–7B&ææW"WfVçG2ÓÓÓÓÒ¢ğ¦–b†'Fåf–Wt6öæfÆ–7G2’°¢'Fåf–Wt6öæfÆ–7G2æFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ‚’Óâ°¢†–FT6öæfÆ–7D&ææW"‚“°¢6WDf–ÇFW"‚v6öæfÆ–7G2r“°¢Ò“°§Ğ ¦–b†'FäF—6Ö—746öæfÆ–7D&ææW"’°¢'FäF—6Ö—746öæfÆ–7D&ææW"æFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂ†–FT6öæfÆ–7D&ææW"“°§Ğ ¦–b†'FäFVÆWFT6öæfÆ–7B’°¢'FäFVÆWFT6öæfÆ–7BæFDWfVçDÆ—7FVæW"‚v6Æ–6²rÂFVÆWFT6öæfÆ–7D6÷’“°§Ğ ¢ò¢ÓÓÓÓÒf÷&ÖGF–ærFööÆ&"ÓÓÓÓÒ¢ğ¢òòG&6²v†–6‚VF—F&ÆR&V—27W'&VçFÇ’fö7W6VBf÷"f÷&ÖGF–æp¦ÆWBöf×EF&vWBÒçVÆÃ°¥¶æ÷FT&öG’Âæ÷FT&öG”gFW%Òæf÷$V6‚†VÂÓâ°¢–b‚VÂ’&WGW&ã°¢VÂæFDWfVçDÆ—7FVæW"‚vfö7W2rÂ‚’Óâ²öf×EF&vWBÒVÃ²Ò“°¢VÂæFDWfVçDÆ—7FVæW"‚w7FRrÂWfVçBÓâ°¢6öç7BÆ–åFW‡BÒWfVçBæ6Æ—&ö&DFF¢òWfVçBæ6Æ—&ö&DFFævWDFF‚wFW‡B÷Æ–âr¢¢rs° ¢òòv†Vâ…DÔÂ6÷W&6R—26÷–VBg&öÒÖW76vRö6öFR&Æö6²Â'&÷w6W'27FR—@¢òò2Æ—FW&ÂFW‡BâG&VB&V6övæ—6&ÆRæ÷FRÖ&·W2&–6‚FW‡B–ç7FVBà¢–b‚äõDUôÔ$µUõDuõ$RçFW7B‡Æ–åFW‡B’’&WGW&ã° ¢WfVçBç&WfVçDFVfVÇB‚“°¢öf×EF&vWBÒVÃ°¢VÂæfö7W2‚“°¢Fö7VÖVçBæW†V46öÖÖæB‚v–ç6W'D…DÔÂrÂfÇ6RÂ6æ—F—¦Tæ÷FT‡FÖÂ‡Æ–åFW‡B’“°¢66†VGVÆTWF÷6fR‚“°¢Ò“°§Ò“° ¦gVæ7F–öâöÇ”f×B†6ÖBÂfÇVR’°¢òò&W7F÷&Rfö7W2FòF†Ræ÷FR&öG’&Vf÷&RW†V7WF–ær6öÖÖæ@¢–b…öf×EF&vWB’öf×EF&vWBæfö7W2‚“°¢VÇ6Ræ÷FT&öG’æfö7W2‚“°¢Fö7VÖVçBæW†V46öÖÖæB†6ÖBÂfÇ6RÂfÇVRÇÂçVÆÂ“°¢66†VGVÆTWF÷6fR‚“°¢÷WFFTf×D7F—fU7FFR‚“°§Ğ ¦gVæ7F–öâ÷WFFTf×D7F—fU7FFR‚’°¢–b†f×D'Fä&öÆB’f×D'Fä&öÆBæ6Æ74Æ—7BçFövvÆR‚v7F—fRrÂFö7VÖVçBçVW'”6öÖÖæE7FFR‚v&öÆBr’“°¢–b†f×D'Fä—FÆ–2’f×D'Fä—FÆ–2æ6Æ74Æ—7BçFövvÆR‚v7F—fRrÂFö7VÖVçBçVW'”6öÖÖæE7FFR‚v—FÆ–2r’“°¢–b†f×D'FåVæFW"’f×D'FåVæFW"æ6Æ74Æ—7BçFövvÆR‚v7F—fRrÂFö7VÖVçBçVW'”6öÖÖæE7FFR‚wVæFW&Æ–æRr’“°¢–b†f×D'Få7G&–¶R’f×D'Få7G&–¶Ræ6Æ74Æ—7BçFövvÆR‚v7F—fRrÂFö7VÖVçBçVW'”6öÖÖæE7FFR‚w7G&–¶UF‡&÷Vv‚r’“°¢–b†f×D'FåVÂ’f×D'FåVÂæ6Æ74Æ—7BçFövvÆR‚v7F—fRrÂFö7VÖVçBçVW'”6öÖÖæE7FFR‚v–ç6W'EVæ÷&FW&VDÆ—7Br’“°¢–b†f×D'FäöÂ’f×D'FäöÂæ6Æ74Æ—7BçFövvÆR‚v7F—fRrÂFö7VÖVçBçVW'”6öÖÖæE7FFR‚v–ç6W'D÷&FW&VDÆ—7Br’“°§Ğ ¦Fö7VÖVçBæFDWfVçDÆ—7FVæW"‚w6VÆV7F–öæ6†ævRrÂ÷WFFTf×D7F—fU7FFR“° ¦–b†f×D'Fä&öÆB’f×D'Fä&öÆBæFDWfVçDÆ—7FVæW"‚vÖ÷W6VF÷vârÂRÓâ²Rç&WfVçDFVfVÇB‚“²öÇ”f×B‚v&öÆBr“²Ò“°¦–b†f×D'Fä—FÆ–2’f×D'Fä—FÆ–2æFDWfVçDÆ—7FVæW"‚vÖ÷W6VF÷vârÂRÓâ²Rç&WfVçDFVfVÇB‚“²öÇ”f×B‚v—FÆ–2r“²Ò“°¦–b†f×D'FåVæFW"’f×D'FåVæFW"æFDWfVçDÆ—7FVæW"‚vÖ÷W6VF÷vârÂRÓâ²Rç&WfVçDFVfVÇB‚“²öÇ”f×B‚wVæFW&Æ–æRr“²Ò“°¦–b†f×D'Få7G&–¶R’f×D'Få7G&–¶RæFDWfVçDÆ—7FVæW"‚vÖ÷W6VF÷vârÂRÓâ²Rç&WfVçDFVfVÇB‚“²öÇ”f×B‚w7G&–¶UF‡&÷Vv‚r“²Ò“°¦–b†f×D'FåVÂ’f×D'FåVÂæFDWfVçDÆ—7FVæW"‚vÖ÷W6VF÷vârÂRÓâ²Rç&WfVçDFVfVÇB‚“²öÇ”f×B‚v–ç6W'EVæ÷&FW&VDÆ—7Br“²Ò“°¦–b†f×D'FäöÂ’f×D'FäöÂæFDWfVçDÆ—7FVæW"‚vÖ÷W6VF÷vârÂRÓâ²Rç&WfVçDFVfVÇB‚“²öÇ”f×B‚v–ç6W'D÷&FW&VDÆ—7Br“²Ò“°¦–b†f×D'Fä6ÆV"’f×D'Fä6ÆV"æFDWfVçDÆ—7FVæW"‚vÖ÷W6VF÷vârÂRÓâ²Rç&WfVçDFVfVÇB‚“²öÇ”f×B‚w&VÖ÷fTf÷&ÖBr“²Ò“° ¦–b†f×D6öÆ÷"’°¢f×D6öÆ÷"æFDWfVçDÆ—7FVæW"‚v–çWBrÂ‚’ÓâöÇ”f×B‚vf÷&T6öÆ÷"rÂf×D6öÆ÷"çfÇVR’“°§Ğ ¦–b†f×D†–v†Æ–v‡B’°¢f×D†–v†Æ–v‡BæFDWfVçDÆ—7FVæW"‚v–çWBrÂ‚’ÓâöÇ”f×B‚v&6´6öÆ÷"rÂf×D†–v†Æ–v‡BçfÇVR’“°§Ğ ¦–b†f×E6—¦R’°¢f×E6—¦RæFDWfVçDÆ—7FVæW"‚v6†ævRrÂ‚’Óâ°¢–b‚f×E6—¦RçfÇVR’&WGW&ã°¢öÇ”f×B‚vföçE6—¦RrÂf×E6—¦RçfÇVR“°¢f×E6—¦RçfÇVRÒrs°¢Ò“°§Ğ
+const btnViewConflicts = document.getElementById('btn-view-conflicts');
+const btnDismissConflictBanner = document.getElementById('btn-dismiss-conflict-banner');
+
+/* ===== Formatting toolbar refs ===== */
+const fmtBar       = document.getElementById('fmt-bar');
+const fmtBtnBold   = document.getElementById('fmt-bold');
+const fmtBtnItalic = document.getElementById('fmt-italic');
+const fmtBtnUnder  = document.getElementById('fmt-underline');
+const fmtBtnStrike = document.getElementById('fmt-strike');
+const fmtColor     = document.getElementById('fmt-color');
+const fmtHighlight = document.getElementById('fmt-highlight');
+const fmtSize      = document.getElementById('fmt-size');
+const fmtBtnUl     = document.getElementById('fmt-ul');
+const fmtBtnOl     = document.getElementById('fmt-ol');
+const fmtBtnClear  = document.getElementById('fmt-clear');
+
+/* ===== Helpers ===== */
+function formatDate(dateStr) {
+  const d = new Date(dateStr.replace(' ', 'T') + (dateStr.includes('T') ? '' : 'Z'));
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const itemDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const dayDiff = Math.round((today - itemDay) / DAY_MS);
+
+  if (dayDiff === 0) {
+    return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  } else if (dayDiff === 1) {
+    return 'Yesterday';
+  } else if (dayDiff < 7) {
+    return d.toLocaleDateString('en-GB', { weekday: 'short' });
+  } else {
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+}
+
+const NOTE_MARKUP_TAG_RE = /<\/?(?:a|b|big|blockquote|br|code|div|em|font|h[1-6]|hr|i|li|mark|ol|p|pre|s|small|span|strike|strong|sub|sup|table|tbody|td|tfoot|th|thead|tr|u|ul)\b[^>]*>/i;
+const ENCODED_NOTE_MARKUP_RE = /&(?:amp;)*lt;\/?(?:a|b|big|blockquote|br|code|div|em|font|h[1-6]|hr|i|li|mark|ol|p|pre|s|small|span|strike|strong|sub|sup|table|tbody|td|tfoot|th|thead|tr|u|ul)\b/i;
+const ALLOWED_NOTE_TAGS = new Set([
+  'A', 'B', 'BIG', 'BLOCKQUOTE', 'BR', 'CODE', 'DIV', 'EM', 'FONT',
+  'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HR', 'I', 'LI', 'MARK',
+  'OL', 'P', 'PRE', 'S', 'SMALL', 'SPAN', 'STRIKE', 'STRONG',
+  'SUB', 'SUP', 'TABLE', 'TBODY', 'TD', 'TFOOT', 'TH', 'THEAD',
+  'TR', 'U', 'UL'
+]);
+const ALLOWED_NOTE_STYLES = new Set([
+  'background-color', 'color', 'font-family', 'font-size', 'font-style',
+  'font-weight', 'text-align', 'text-decoration'
+]);
+const ALLOWED_NOTE_ATTRS = {
+  A: new Set(['href', 'target', 'title']),
+  FONT: new Set(['color', 'face', 'size']),
+  LI: new Set(['value']),
+  OL: new Set(['start', 'type']),
+  TD: new Set(['colspan', 'rowspan']),
+  TH: new Set(['colspan', 'rowspan'])
+};
+
+function decodeLegacyEscapedMarkup(html) {
+  const source = String(html || '');
+  if (!ENCODED_NOTE_MARKUP_RE.test(source)) return source;
+
+  // Older/plain-text paste paths saved markup as &lt;div&gt; (sometimes more
+  // than once). Decode only when the result really contains supported markup.
+  let candidate = source;
+  const decoder = document.createElement('textarea');
+  for (let pass = 0; pass < 3; pass++) {
+    decoder.innerHTML = candidate;
+    const decoded = decoder.value;
+    if (decoded === candidate) break;
+    candidate = decoded;
+    if (NOTE_MARKUP_TAG_RE.test(candidate)) return candidate;
+  }
+  return source;
+}
+
+function sanitizeNoteHtml(html) {
+  const template = document.createElement('template');
+  template.innerHTML = String(html || '');
+
+  Array.from(template.content.querySelectorAll('*')).forEach(el => {
+    if (!ALLOWED_NOTE_TAGS.has(el.tagName)) {
+      el.replaceWith(...el.childNodes);
+      return;
+    }
+
+    const allowed = ALLOWED_NOTE_ATTRS[el.tagName] || new Set();
+    Array.from(el.attributes).forEach(attr => {
+      const name = attr.name.toLowerCase();
+      if (name === 'style') {
+        const parsed = document.createElement('span');
+        parsed.setAttribute('style', attr.value);
+        const safe = [];
+        Array.from(parsed.style).forEach(property => {
+          const value = parsed.style.getPropertyValue(property);
+          if (ALLOWED_NOTE_STYLES.has(property) &&
+              !/url\s*\(|expression\s*\(/i.test(value)) {
+            safe.push(`${property}: ${value}`);
+          }
+        });
+        if (safe.length) el.setAttribute('style', safe.join('; '));
+        else el.removeAttribute('style');
+        return;
+      }
+      if (!allowed.has(name)) el.removeAttribute(attr.name);
+    });
+
+    if (el.tagName === 'A' && el.hasAttribute('href')) {
+      const href = el.getAttribute('href').trim();
+      if (/^(?:javascript|vbscript|data):/i.test(href)) {
+        el.removeAttribute('href');
+      }
+      if (el.getAttribute('target') === '_blank') {
+        el.setAttribute('rel', 'noopener noreferrer');
+      }
+    }
+  });
+
+  return template.innerHTML;
+}
+
+function prepareNoteHtml(html) {
+  return sanitizeNoteHtml(decodeLegacyEscapedMarkup(html));
+}
+
+function stripHtml(html) {
+  if (!html) return '';
+  try {
+    const doc = new DOMParser().parseFromString(prepareNoteHtml(html), 'text/html');
+    return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+  } catch (_) {
+    return String(html).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+}
+
+function getTitle(note) {
+  return note.title.trim() || 'Untitled';
+}
+
+function getSubtitle(note) {
+  const plain = stripHtml(note.body);
+  const first = plain.split('\n')[0];
+  return first.trim() || 'â€”';
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function currentNote() {
+  return notes.find(n => n.id === currentNoteId) || null;
+}
+
+/* ===== Rendering ===== */
+function renderList() {
+  if (notes.length === 0) {
+    const msgs = {
+      active: 'No notes yet.<br>Tap <strong>+</strong> to create one.',
+      archived: 'No archived notes.',
+      trashed: 'Trash is empty.',
+    };
+    const msg = searchQuery
+      ? 'No notes match your search.'
+      : (msgs[currentFilter] || msgs.active);
+    noteList.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">ğŸ“</div>
+        <p>${msg}</p>
+      </div>`;
+    return;
+  }
+  noteList.innerHTML = notes.map(n => {
+    const tagHtml = n.tags && n.tags.length
+      ? `<div class="note-item-tags">${n.tags.slice(0, 3).map(t =>
+          `<span class="note-tag-chip">${escapeHtml(t.name)}</span>`
+        ).join('')}${n.tags.length > 3 ? `<span class="note-tag-more">+${n.tags.length - 3}</span>` : ''}</div>`
+      : '';
+    const state = getSyncState(n.id);
+    const badgeHtml = (state !== 'synced')
+      ? `<span class="sync-badge" data-state="${state}" title="${
+          state === 'local' ? 'Saved locally \u2014 pending sync' :
+          state === 'saving' ? 'Syncing\u2026' : 'Sync failed'
+        }" aria-label="Sync status"></span>`
+      : '';
+    const isConflict = !!n.conflict_of;
+    const dateLabel = isConflict ? 'Conflict Copy' : `Edited ${formatDate(n.updated_at)}`;
+    return `
+    <div class="note-item ${n.id === currentNoteId ? 'active' : ''}${isConflict ? ' conflict-item' : ''}" data-id="${n.id}" role="listitem">
+      <div class="note-item-header">
+        <div class="note-item-title">${escapeHtml(getTitle(n))}</div>
+        ${n.is_pinned ? '<span class="note-pin-badge" aria-label="Pinned">ğŸ“Œ</span>' : ''}
+        ${badgeHtml}
+      </div>
+      <div class="note-item-subtitle">${escapeHtml(getSubtitle(n))}</div>
+      ${tagHtml}
+      <div class="note-item-date">${dateLabel}</div>
+    </div>`;
+  }).join('');
+
+  noteList.querySelectorAll('.note-item').forEach(el => {
+    el.addEventListener('click', () => openNote(parseInt(el.dataset.id)));
+  });
+}
+
+function renderFolderList() {
+  const allActive = currentFolderId === null;
+  let html = `<div class="folder-item ${allActive ? 'active' : ''}" data-folder-id="" role="listitem">
+    <span class="folder-icon">ğŸ“‚</span>
+    <span class="folder-name">All Notes</span>
+  </div>`;
+  html += folders.map(f => {
+    const isActive = currentFolderId === f.id;
+    return `<div class="folder-item ${isActive ? 'active' : ''}" data-folder-id="${f.id}" role="listitem">
+      <span class="folder-icon">ğŸ“</span>
+      <span class="folder-name">${escapeHtml(f.name)}</span>
+      <button class="btn-delete-folder" data-folder-id="${f.id}" title="Delete folder" aria-label="Delete folder ${escapeHtml(f.name)}">Ã—</button>
+    </div>`;
+  }).join('');
+  folderListEl.innerHTML = html;
+
+  folderListEl.querySelectorAll('.folder-item').forEach(el => {
+    el.addEventListener('click', e => {
+      if (e.target.classList.contains('btn-delete-folder')) return;
+      const raw = el.dataset.folderId;
+      setFolderFilter(raw ? parseInt(raw) : null);
+    });
+  });
+
+  folderListEl.querySelectorAll('.btn-delete-folder').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const fid = parseInt(btn.dataset.folderId);
+      deleteFolder(fid);
+    });
+  });
+}
+
+function renderTagChips(note) {
+  if (!note) { tagChipsEl.innerHTML = ''; return; }
+  const trashed = !!note.is_trashed;
+  tagChipsEl.innerHTML = (note.tags || []).map(t =>
+    `<span class="tag-chip">${escapeHtml(t.name)}${trashed ? '' :
+      `<button class="tag-chip-remove" data-tag-id="${t.id}" aria-label="Remove tag ${escapeHtml(t.name)}">Ã—</button>`
+    }</span>`
+  ).join('');
+
+  if (!trashed) {
+    tagChipsEl.querySelectorAll('.tag-chip-remove').forEach(btn => {
+      btn.addEventListener('click', () => removeTagFromNote(parseInt(btn.dataset.tagId)));
+    });
+  }
+}
+
+function updateTagDatalist() {
+  const note = currentNote();
+  const assignedIds = new Set((note && note.tags || []).map(t => t.id));
+  tagDatalist.innerHTML = tags
+    .filter(t => !assignedIds.has(t.id))
+    .map(t => `<option value="${escapeHtml(t.name)}">`)
+    .join('');
+}
+
+function populateFolderSelect() {
+  // Rebuild folder options in the note editor dropdown
+  let html = '<option value="">ğŸ“ No folder</option>';
+  html += folders.map(f =>
+    `<option value="${f.id}">${escapeHtml(f.name)}</option>`
+  ).join('');
+  noteFolderSelect.innerHTML = html;
+}
+
+function showEditor(show) {
+  if (show) {
+    editorContent.style.display = 'flex';
+    editorWelcome.style.display = 'none';
+  } else {
+    editorContent.style.display = 'none';
+    editorWelcome.style.display = '';
+    currentNoteId = null;
+    window.currentNoteId = null;
+    images = [];
+    if (imageBlocksEl) imageBlocksEl.innerHTML = '';
+    if (imageToolbar) imageToolbar.style.display = 'none';
+    if (fmtBar) fmtBar.style.display = 'none';
+    setImageStatus('');
+  }
+}
+
+function updateEditorToolbar(note) {
+  if (!note) return;
+  const trashed = !!note.is_trashed;
+  const isConflict = !!note.conflict_of;
+
+  btnPin.style.display = (trashed || isConflict) ? 'none' : '';
+  btnArchive.style.display = (trashed || isConflict) ? 'none' : '';
+  btnTrash.style.display = (trashed || isConflict) ? 'none' : '';
+  btnRestore.style.display = trashed ? '' : 'none';
+  btnDeletePermanent.style.display = trashed ? '' : 'none';
+  if (btnHistory) btnHistory.style.display = (trashed || isConflict) ? 'none' : '';
+  if (btnDeleteConflict) btnDeleteConflict.style.display = isConflict ? '' : 'none';
+
+  btnPin.classList.toggle('active', !!note.is_pinned);
+  btnPin.title = note.is_pinned ? 'Unpin note' : 'Pin note';
+
+  btnArchive.classList.toggle('active', !!note.is_archived);
+  btnArchive.title = note.is_archived ? 'Unarchive note' : 'Archive note';
+
+  noteTitle.contentEditable = (trashed || isConflict) ? 'false' : 'true';
+  noteBody.contentEditable = (trashed || isConflict) ? 'false' : 'true';
+  if (noteBodyAfter) noteBodyAfter.contentEditable = (trashed || isConflict) ? 'false' : 'true';
+
+  // Folder selector
+  noteFolderSelect.value = note.folder_id != null ? String(note.folder_id) : '';
+  noteFolderSelect.disabled = trashed || isConflict;
+
+  // Tag bar
+  tagInput.style.display = (trashed || isConflict) ? 'none' : '';
+  renderTagChips(note);
+  updateTagDatalist();
+
+  // Image toolbar
+  if (imageToolbar) imageToolbar.style.display = (trashed || isConflict) ? 'none' : '';
+  // Formatting toolbar
+  if (fmtBar) fmtBar.style.display = (trashed || isConflict) ? 'none' : '';
+}
+
+function openNote(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+
+  if (autosaveTimer && currentNoteId && currentNoteId !== id) {
+    clearTimeout(autosaveTimer);
+    autosaveTimer = null;
+    saveNote();
+  }
+
+  currentNoteId = id;
+  window.currentNoteId = id;
+  noteTitle.textContent = note.title;
+
+  const preparedBody = prepareNoteHtml(note.body);
+  const preparedBodyAfter = prepareNoteHtml(note.body_after || '');
+  const repairedMarkup = preparedBody !== note.body ||
+    preparedBodyAfter !== (note.body_after || '');
+  note.body = preparedBody;
+  note.body_after = preparedBodyAfter;
+  noteBody.innerHTML = preparedBody;
+  if (noteBodyAfter) noteBodyAfter.innerHTML = preparedBodyAfter;
+
+  showEditor(true);
+  updateEditorToolbar(note);
+  renderList();
+  images = [];
+  renderImageBlocks();
+  setImageStatus('');
+  loadImages(id);
+
+  mainLayout.classList.add('editor-open');
+
+  // Persist a one-time repair so PDF/export and other devices receive clean
+  // rich text instead of the legacy escaped markup.
+  if (repairedMarkup && !note.is_trashed && !note.conflict_of) {
+    scheduleAutosave();
+  }
+}
+
+function setAutosave(msg) {
+  if (autosaveEl) autosaveEl.textContent = msg;
+}
+
+/* ===== API ===== */
+async function apiRequest(method, path, body) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' }
+  };
+  if (body !== undefined) opts.body = JSON.stringify(body);
+  const res = await fetch(path, opts);
+  if (res.status === 204) return null;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function loadNotes() {
+  try {
+    const params = new URLSearchParams({ filter: currentFilter, sort: currentSort });
+    if (searchQuery) params.set('q', searchQuery);
+    if (currentFolderId !== null) params.set('folder_id', currentFolderId);
+    notes = await apiRequest('GET', `/api/notes?${params}`);
+    // Cache for offline use (only cache the default 'active' view with no filters)
+    if (currentFilter === 'active' && !searchQuery && currentFolderId === null) {
+      cacheNotes(notes);
+    }
+    renderList();
+  } catch (e) {
+    if (!navigator.onLine) {
+      // Serve from IndexedDB cache when offline
+      const cached = await getCachedNotes();
+      if (cached.length > 0) {
+        // Apply same filtering as the online view using cached data
+        notes = cached.filter(n => {
+          if (currentFilter === 'trashed') return !!n.is_trashed;
+          if (currentFilter === 'archived') return !!n.is_archived && !n.is_trashed;
+          return !n.is_archived && !n.is_trashed;
+        });
+        if (currentFolderId !== null) {
+          notes = notes.filter(n => n.folder_id === currentFolderId);
+        }
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          notes = notes.filter(n =>
+            n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q)
+          );
+        }
+        renderList();
+        console.log('[offline] serving', notes.length, 'note(s) from cache');
+        return;
+      }
+    }
+    console.error('Failed to load notes', e);
+  }
+}
+
+async function loadFolders() {
+  try {
+    folders = await apiRequest('GET', '/api/folders');
+    renderFolderList();
+    populateFolderSelect();
+  } catch (e) {
+    console.error('Failed to load folders', e);
+  }
+}
+
+async function loadTags() {
+  try {
+    tags = await apiRequest('GET', '/api/tags');
+    updateTagDatalist();
+  } catch (e) {
+    console.error('Failed to load tags', e);
+  }
+}
+
+async function createNote() {
+  if (!navigator.onLine) {
+    const localId = -Date.now();
+    const now = new Date().toISOString();
+    const note = {
+      id: localId, title: '', body: '', body_after: '', is_pinned: 0,
+      is_archived: 0, is_trashed: 0, folder_id: currentFolderId,
+      conflict_of: null, created_at: now, updated_at: null, tags: [], local_only: true,
+    };
+    notes.unshift(note);
+    await idbPut('cached_notes', { ...note, cached_at: Date.now() });
+    await queueOperation({ type: 'create_note', note_id: localId, payload: {
+      title: '', body: '', body_after: '', folder_id: currentFolderId,
+    }});
+    setSyncState(localId, 'local');
+    renderList();
+    openNote(localId);
+    noteTitle.focus();
+    return;
+  }
+  try {
+    const payload = { title: '', body: '' };
+    if (currentFolderId !== null) payload.folder_id = currentFolderId;
+    const note = await apiRequest('POST', '/api/notes', payload);
+    if (currentFilter !== 'active') {
+      setFilter('active');
+      return;
+    }
+    notes.unshift(note);
+    renderList();
+    openNote(note.id);
+    noteTitle.focus();
+  } catch (e) {
+    console.error('Failed to create note', e);
+  }
+}
+
+async function saveNote() {
+  if (!currentNoteId) return;
+  const note = currentNote();
+  if (!note || note.is_trashed || note.conflict_of) return;
+  isSaving = true;
+  const title = noteTitle.textContent.trim();
+  const body = noteBody.innerHTML;
+  const body_after = noteBodyAfter ? noteBodyAfter.innerHTML : '';
+  const is_pinned = note.is_pinned ? 1 : 0;
+  const folder_id = note.folder_id != null ? note.folder_id : null;
+
+  if (!navigator.onLine) {
+    // Save to IndexedDB queue; will sync on reconnect
+    await queueWrite(currentNoteId, title, body, body_after, is_pinned, folder_id);
+    // Update local notes array so UI stays current
+    const idx = notes.findIndex(n => n.id === currentNoteId);
+    if (idx !== -1) {
+      notes[idx] = { ...notes[idx], title, body, body_after, is_pinned, folder_id };
+      await idbPut('cached_notes', { ...notes[idx], cached_at: Date.now() });
+    }
+    setSyncState(currentNoteId, 'local');
+    renderList();
+    isSaving = false;
+    return;
+  }
+
+  setSyncState(currentNoteId, 'saving');
+  try {
+    const updated = await apiRequest('PUT', `/api/notes/${currentNoteId}`,
+      { title, body, body_after, is_pinned, folder_id, client_updated_at: note.updated_at });
+    const idx = notes.findIndex(n => n.id === currentNoteId);
+    if (idx !== -1) notes[idx] = updated;
+    // Remove from queue if it was previously queued
+    await dequeueWrite(currentNoteId);
+    await idbPut('cached_notes', { ...updated, cached_at: Date.now() });
+    setSyncState(currentNoteId, 'synced');
+    if (updated.conflict_note_id) showConflictBanner();
+    renderList();
+  } catch (e) {
+    // Queue for retry
+    await queueWrite(currentNoteId, title, body, body_after, is_pinned, folder_id);
+    setSyncState(currentNoteId, 'failed');
+    console.error('Save failed', e);
+  } finally {
+    isSaving = false;
+  }
+}
+
+async function togglePin() {
+  if (!currentNoteId) return;
+  const note = currentNote();
+  if (!note || note.is_trashed) return;
+  const newPinned = note.is_pinned ? 0 : 1;
+  clearTimeout(autosaveTimer);
+  autosaveTimer = null;
+  try {
+    const title = noteTitle.textContent.trim();
+    const body = noteBody.innerHTML;
+    const body_after = noteBodyAfter ? noteBodyAfter.innerHTML : '';
+    const folder_id = note.folder_id != null ? note.folder_id : null;
+    const updated = await apiRequest('PUT', `/api/notes/${currentNoteId}`,
+      { title, body, body_after, is_pinned: newPinned, folder_id });
+    const idx = notes.findIndex(n => n.id === currentNoteId);
+    if (idx !== -1) notes[idx] = updated;
+    updateEditorToolbar(updated);
+    renderList();
+    setAutosave(newPinned ? 'Pinned' : 'Unpinned');
+  } catch (e) {
+    console.error('Pin toggle failed', e);
+  }
+}
+
+async function toggleArchive() {
+  if (!currentNoteId) return;
+  const note = currentNote();
+  if (!note || note.is_trashed) return;
+  clearTimeout(autosaveTimer);
+  autosaveTimer = null;
+  try {
+    await apiRequest('POST', `/api/notes/${currentNoteId}/archive`);
+    notes = notes.filter(n => n.id !== currentNoteId);
+    showEditor(false);
+    mainLayout.classList.remove('editor-open');
+    renderList();
+    setAutosave('');
+  } catch (e) {
+    console.error('Archive toggle failed', e);
+  }
+}
+
+async function trashNote() {
+  if (!currentNoteId) return;
+  const id = currentNoteId;
+  clearTimeout(autosaveTimer);
+  autosaveTimer = null;
+  if (!navigator.onLine) {
+    const note = notes.find(n => n.id === id);
+    if (note && note.local_only) {
+      const ops = await getPendingOperations();
+      for (const op of ops.filter(item => item.note_id === id)) await idbDelete('pending_ops', op.op_id);
+    } else {
+      await queueOperation({ type: 'trash_note', note_id: id });
+    }
+    await dequeueWrite(id);
+    await idbDelete('cached_notes', id);
+    notes = notes.filter(n => n.id !== id);
+    showEditor(false);
+    mainLayout.classList.remove('editor-open');
+    renderList();
+    setAutosave('');
+    return;
+  }
+  try {
+    await apiRequest('DELETE', `/api/notes/${id}`);
+    notes = notes.filter(n => n.id !== id);
+    showEditor(false);
+    mainLayout.classList.remove('editor-open');
+    renderList();
+    setAutosave('');
+  } catch (e) {
+    console.error('Trash failed', e);
+  }
+}
+
+async function restoreNote() {
+  if (!currentNoteId) return;
+  const id = currentNoteId;
+  try {
+    await apiRequest('POST', `/api/notes/${id}/restore`);
+    notes = notes.filter(n => n.id !== id);
+    showEditor(false);
+    mainLayout.classList.remove('editor-open');
+    renderList();
+    setAutosave('');
+  } catch (e) {
+    console.error('Restore failed', e);
+  }
+}
+
+async function permanentDelete() {
+  if (!currentNoteId) return;
+  const id = currentNoteId;
+  try {
+    await apiRequest('DELETE', `/api/notes/${id}/permanent`);
+    notes = notes.filter(n => n.id !== id);
+    showEditor(false);
+    mainLayout.classList.remove('editor-open');
+    renderList();
+    setAutosave('');
+  } catch (e) {
+    console.error('Permanent delete failed', e);
+  }
+}
+
+async function changeNoteFolder(folderId) {
+  if (!currentNoteId) return;
+  const note = currentNote();
+  if (!note || note.is_trashed) return;
+  clearTimeout(autosaveTimer);
+  autosaveTimer = null;
+  try {
+    const title = noteTitle.textContent.trim();
+    const body = noteBody.innerHTML;
+    const is_pinned = note.is_pinned ? 1 : 0;
+    const updated = await apiRequest('PUT', `/api/notes/${currentNoteId}`,
+      { title, body, is_pinned, folder_id: folderId || null });
+    const idx = notes.findIndex(n => n.id === currentNoteId);
+    if (idx !== -1) notes[idx] = updated;
+    renderList();
+    setAutosave('Saved');
+  } catch (e) {
+    console.error('Folder change failed', e);
+  }
+}
+
+async function addTagToNote(name) {
+  if (!currentNoteId || !name.trim()) return;
+  const note = currentNote();
+  if (!note || note.is_trashed) return;
+  name = name.trim();
+
+  // Find or create the tag
+  let tag = tags.find(t => t.name.toLowerCase() === name.toLowerCase());
+  if (!tag) {
+    try {
+      tag = await apiRequest('POST', '/api/tags', { name });
+      tags.push(tag);
+      tags.sort((a, b) => a.name.localeCompare(b.name));
+    } catch (e) {
+      console.error('Failed to create tag', e);
+      return;
+    }
+  }
+
+  // Check if already assigned
+  if ((note.tags || []).some(t => t.id === tag.id)) return;
+
+  const newTagIds = [...(note.tags || []).map(t => t.id), tag.id];
+  try {
+    const updatedTags = await apiRequest('PUT', `/api/notes/${currentNoteId}/tags`,
+      { tag_ids: newTagIds });
+    const idx = notes.findIndex(n => n.id === currentNoteId);
+    if (idx !== -1) notes[idx] = { ...notes[idx], tags: updatedTags };
+    renderTagChips(notes[idx]);
+    updateTagDatalist();
+    renderList();
+  } catch (e) {
+    console.error('Failed to set tags', e);
+  }
+}
+
+async function removeTagFromNote(tagId) {
+  if (!currentNoteId) return;
+  const note = currentNote();
+  if (!note || note.is_trashed) return;
+  const newTagIds = (note.tags || []).filter(t => t.id !== tagId).map(t => t.id);
+  try {
+    const updatedTags = await apiRequest('PUT', `/api/notes/${currentNoteId}/tags`,
+      { tag_ids: newTagIds });
+    const idx = notes.findIndex(n => n.id === currentNoteId);
+    if (idx !== -1) notes[idx] = { ...notes[idx], tags: updatedTags };
+    renderTagChips(notes[idx]);
+    updateTagDatalist();
+    renderList();
+  } catch (e) {
+    console.error('Failed to remove tag', e);
+  }
+}
+
+/* ===== Image handling ===== */
+function setImageStatus(msg, isError) {
+  imageUploadStatus.textContent = msg;
+  imageUploadStatus.className = 'image-upload-status' + (isError ? ' error' : '');
+}
+
+function renderImageBlocks() {
+  if (!imageBlocksEl) return;
+  imageBlocksEl.innerHTML = '';
+  const note = currentNote();
+  const editable = note && !note.is_trashed;
+
+  images.forEach((img, idx) => {
+    const block = document.createElement('div');
+    block.className = 'image-block';
+    block.dataset.id = img.id;
+
+    if (img.annotation_data) {
+      // Show composite canvas preview when annotations exist
+      const canvas = document.createElement('canvas');
+      canvas.className = 'image-block-canvas';
+      canvas.setAttribute('aria-label', escapeHtml(img.original_filename || 'Annotated image'));
+      const srcImg = new Image();
+      srcImg.onload = () => {
+        if (typeof renderAnnotationPreview === 'function') {
+          renderAnnotationPreview(canvas, srcImg, img.annotation_data);
+        }
+      };
+      srcImg.src = img.url;
+      block.appendChild(canvas);
+    } else {
+      const imgEl = document.createElement('img');
+      imgEl.src = img.url;
+      imgEl.alt = escapeHtml(img.original_filename || 'Image');
+      imgEl.loading = 'lazy';
+      block.appendChild(imgEl);
+    }
+
+    const controls = document.createElement('div');
+    controls.className = 'image-block-controls';
+
+    const btnUp = document.createElement('button');
+    btnUp.className = 'btn-image-ctrl';
+    btnUp.title = 'Move up';
+    btnUp.setAttribute('aria-label', 'Move image up');
+    btnUp.textContent = 'â†‘';
+    btnUp.disabled = idx === 0;
+    btnUp.addEventListener('click', () => moveImage(img.id, -1));
+
+    const btnDown = document.createElement('button');
+    btnDown.className = 'btn-image-ctrl';
+    btnDown.title = 'Move down';
+    btnDown.setAttribute('aria-label', 'Move image down');
+    btnDown.textContent = 'â†“';
+    btnDown.disabled = idx === images.length - 1;
+    btnDown.addEventListener('click', () => moveImage(img.id, 1));
+
+    const btnDel = document.createElement('button');
+    btnDel.className = 'btn-image-ctrl btn-danger';
+    btnDel.title = 'Remove image';
+    btnDel.setAttribute('aria-label', 'Remove image');
+    btnDel.textContent = 'ğŸ—‘';
+    btnDel.addEventListener('click', () => removeImage(img.id));
+
+    const label = document.createElement('span');
+    label.style.cssText = 'flex:1;font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-left:4px;';
+    label.textContent = img.original_filename || '';
+
+    controls.appendChild(btnUp);
+    controls.appendChild(btnDown);
+    if (editable) {
+      const btnAnnotate = document.createElement('button');
+      btnAnnotate.className = 'btn-image-ctrl';
+      btnAnnotate.title = 'Annotate image';
+      btnAnnotate.setAttribute('aria-label', 'Annotate image');
+      btnAnnotate.textContent = 'âœï¸';
+      btnAnnotate.addEventListener('click', () => {
+        if (typeof openAnnotationEditor === 'function') {
+          openAnnotationEditor(currentNoteId, img.id, img.url, img.annotation_data);
+        }
+      });
+      controls.appendChild(btnAnnotate);
+    }
+    controls.appendChild(btnDel);
+    controls.appendChild(label);
+    block.appendChild(controls);
+
+    // Caption textarea (shown for all images; editable when note is not trashed)
+    const captionArea = document.createElement('textarea');
+    captionArea.className = 'image-caption';
+    captionArea.placeholder = 'Add a caption or textâ€¦';
+    captionArea.value = img.caption || '';
+    captionArea.setAttribute('aria-label', 'Image caption');
+    captionArea.readOnly = !editable;
+    captionArea.addEventListener('blur', async () => {
+      const newCaption = captionArea.value;
+      if (newCaption === (img.caption || '')) return;
+      try {
+        const updated = await apiRequest('PUT',
+          `/api/notes/${currentNoteId}/images/${img.id}`,
+          { caption: newCaption });
+        img.caption = updated.caption;
+      } catch (e) {
+        console.error('Failed to save image caption', e);
+      }
+    });
+    block.appendChild(captionArea);
+
+    // Section text: multi-line text area between this image and the next
+    const sectionTextArea = document.createElement('textarea');
+    sectionTextArea.className = 'image-section-text';
+    sectionTextArea.placeholder = 'Add text after this imageâ€¦';
+    sectionTextArea.value = img.section_text || '';
+    sectionTextArea.setAttribute('aria-label', 'Text after image');
+    sectionTextArea.readOnly = !editable;
+    sectionTextArea.addEventListener('blur', async () => {
+      const newText = sectionTextArea.value;
+      if (newText === (img.section_text || '')) return;
+      try {
+        const updated = await apiRequest('PUT',
+          `/api/notes/${currentNoteId}/images/${img.id}`,
+          { section_text: newText });
+        img.section_text = updated.section_text;
+      } catch (e) {
+        console.error('Failed to save image section text', e);
+      }
+    });
+    block.appendChild(sectionTextArea);
+
+    imageBlocksEl.appendChild(block);
+  });
+
+  // Bottom toolbar: duplicate Add image / Camera buttons so the user
+  // doesn't have to scroll back to the top after adding several images.
+  if (editable && images.length > 0) {
+    const bottomToolbar = document.createElement('div');
+    bottomToolbar.className = 'image-toolbar image-toolbar-bottom';
+
+    const btnAddBottom = document.createElement('button');
+    btnAddBottom.className = 'btn-image-add';
+    btnAddBottom.title = 'Upload image';
+    btnAddBottom.setAttribute('aria-label', 'Upload image');
+    btnAddBottom.textContent = 'ğŸ“ Add image';
+    btnAddBottom.addEventListener('click', () => inputUploadImage.click());
+
+    const btnCamBottom = document.createElement('button');
+    btnCamBottom.className = 'btn-image-add';
+    btnCamBottom.title = 'Capture from camera';
+    btnCamBottom.setAttribute('aria-label', 'Capture from camera');
+    btnCamBottom.textContent = 'ğŸ“· Camera';
+    btnCamBottom.addEventListener('click', () => inputCameraCapture.click());
+
+    bottomToolbar.appendChild(btnAddBottom);
+    bottomToolbar.appendChild(btnCamBottom);
+    imageBlocksEl.appendChild(bottomToolbar);
+  }
+}
+
+async function loadImages(noteId) {
+  try {
+    images = await apiRequest('GET', `/api/notes/${noteId}/images`);
+    await cacheImages(noteId, images);
+    renderImageBlocks();
+  } catch (e) {
+    const cached = await getCachedImages(noteId);
+    images = cached.map(image => image.file
+      ? { ...image, url: URL.createObjectURL(image.file) }
+      : image);
+    renderImageBlocks();
+    console.error('Failed to load images', e);
+  }
+}
+
+async function uploadImageFile(file) {
+  if (!currentNoteId || !file) return;
+  const note = currentNote();
+  if (!note || note.is_trashed) return;
+
+  if (!navigator.onLine) {
+    const localImageId = `local-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const localImage = {
+      id: localImageId, note_id: currentNoteId, file, filename: file.name,
+      mime_type: file.type, url: URL.createObjectURL(file), caption: '', section_text: '',
+      position: images.length, cache_key: `${currentNoteId}:${localImageId}`,
+    };
+    images.push(localImage);
+    await idbPut('cached_images', localImage);
+    await queueOperation({
+      type: 'upload_image', note_id: currentNoteId, local_image_id: localImageId,
+      file, file_name: file.name,
+    });
+    renderImageBlocks();
+    setImageStatus('Saved locally â€” image will upload when reconnected.');
+    inputUploadImage.value = '';
+    inputCameraCapture.value = '';
+    return;
+  }
+
+  setImageStatus('Uploadingâ€¦');
+  btnUploadImage.disabled = true;
+  btnCameraCapture.disabled = true;
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  // The editor and API are deliberately same-origin. Explicit credentials make
+  // the session-cookie requirement clear and avoids suggesting a CORS workaround.
+  const uploadUrl = new URL(
+    `/api/notes/${currentNoteId}/images`,
+    window.location.origin
+  );
+
+  try {
+    const res = await fetch(uploadUrl.toString(), {
+      method: 'POST',
+      body: formData,
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { 'Accept': 'application/json' },
+    });
+
+    const contentType = (res.headers.get('content-type') || '').toLowerCase();
+
+    // Flask's login_required decorator redirects expired API sessions to
+    // /login. fetch follows that redirect and receives HTML with HTTP 200;
+    // attempting res.json() then used to look like a network/CORS failure.
+    if (res.redirected && new URL(res.url).pathname === '/login') {
+      setImageStatus('Your session has expired. Reload the page and sign in again.', true);
+      return;
+    }
+    if (res.status === 401) {
+      setImageStatus('Your session has expired. Reload the page and sign in again.', true);
+      return;
+    }
+    if (res.status === 413) {
+      setImageStatus('Image too large (max 10 MB).', true);
+      return;
+    }
+    if (res.status === 400) {
+      setImageStatus('Unsupported or invalid image. Please use JPEG, PNG, GIF, or WebP.', true);
+      return;
+    }
+    if (res.status === 403) {
+      setImageStatus('Server blocked the upload (403). Check Plesk ModSecurity rules.', true);
+      return;
+    }
+    if (res.status === 404) {
+      setImageStatus('Upload endpoint not found (404). Deploy the latest app/media.py.', true);
+      return;
+    }
+    if (res.status >= 500) {
+      setImageStatus(
+        `Server could not save the image (${res.status}). Check Plesk logs and upload-folder permissions.`,
+        true
+      );
+      return;
+    }
+    if (!res.ok) {
+      setImageStatus(`Upload failed (${res.status}). Please try again.`, true);
+      return;
+    }
+    if (!contentType.includes('application/json')) {
+      setImageStatus(
+        'Upload endpoint returned HTML instead of JSON. Reload and sign in again, then retry.',
+        true
+      );
+      console.error('Image upload returned non-JSON response', {
+        status: res.status,
+        url: res.url,
+        contentType,
+      });
+      return;
+    }
+
+    const img = await res.json();
+    if (!img || !img.id || !img.url) {
+      setImageStatus('Upload returned an invalid response. Check the server log.', true);
+      console.error('Image upload response missing id/url', img);
+      return;
+    }
+
+    images.push(img);
+    renderImageBlocks();
+    setImageStatus('');
+  } catch (e) {
+    const detail = e && e.message ? ` (${e.message})` : '';
+    setImageStatus(`Could not reach the upload endpoint${detail}.`, true);
+    console.error('Image upload fetch failed', {
+      error: e,
+      url: uploadUrl.toString(),
+      noteId: currentNoteId,
+      fileType: file.type,
+      fileSize: file.size,
+    });
+  } finally {
+    btnUploadImage.disabled = false;
+    btnCameraCapture.disabled = false;
+    inputUploadImage.value = '';
+    inputCameraCapture.value = '';
+  }
+}
+
+async function removeImage(imageId) {
+  if (!currentNoteId) return;
+  if (!navigator.onLine) {
+    const image = images.find(item => item.id === imageId);
+    if (String(imageId).startsWith('local-')) {
+      const ops = await getPendingOperations();
+      for (const op of ops.filter(item => item.local_image_id === imageId)) await idbDelete('pending_ops', op.op_id);
+    } else {
+      await queueOperation({ type: 'delete_image', note_id: currentNoteId, image_id: imageId });
+    }
+    if (image) await idbDelete('cached_images', image.cache_key || `${currentNoteId}:${imageId}`);
+    images = images.filter(item => item.id !== imageId);
+    renderImageBlocks();
+    setImageStatus('Saved locally â€” deletion will sync when reconnected.');
+    return;
+  }
+  try {
+    await apiRequest('DELETE', `/api/notes/${currentNoteId}/images/${imageId}`);
+    images = images.filter(i => i.id !== imageId);
+    renderImageBlocks();
+    setImageStatus('');
+  } catch (e) {
+    setImageStatus('Could not remove image. Please try again.', true);
+    console.error('Image delete failed', e);
+  }
+}
+
+async function moveImage(imageId, delta) {
+  const idx = images.findIndex(i => i.id === imageId);
+  if (idx < 0) return;
+  const newIdx = idx + delta;
+  if (newIdx < 0 || newIdx >= images.length) return;
+
+  // Swap in local array
+  [images[idx], images[newIdx]] = [images[newIdx], images[idx]];
+  renderImageBlocks();
+
+  try {
+    await apiRequest('PUT', `/api/notes/${currentNoteId}/images/reorder`,
+      { image_ids: images.map(i => i.id) });
+  } catch (e) {
+    // Roll back on failure
+    [images[idx], images[newIdx]] = [images[newIdx], images[idx]];
+    renderImageBlocks();
+    setImageStatus('Could not reorder images. Please try again.', true);
+    console.error('Image reorder failed', e);
+  }
+}
+
+async function createFolder(name) {
+  name = name.trim();
+  if (!name) return;
+  try {
+    const folder = await apiRequest('POST', '/api/folders', { name });
+    folders.push(folder);
+    folders.sort((a, b) => a.name.localeCompare(b.name));
+    renderFolderList();
+    populateFolderSelect();
+  } catch (e) {
+    console.error('Failed to create folder', e);
+  }
+}
+
+async function deleteFolder(folderId) {
+  try {
+    await apiRequest('DELETE', `/api/folders/${folderId}`);
+    folders = folders.filter(f => f.id !== folderId);
+    // Unfile notes locally
+    notes.forEach(n => { if (n.folder_id === folderId) n.folder_id = null; });
+    if (currentFolderId === folderId) currentFolderId = null;
+    renderFolderList();
+    populateFolderSelect();
+    renderList();
+  } catch (e) {
+    console.error('Failed to delete folder', e);
+  }
+}
+
+/* ===== Version History ===== */
+async function openHistoryPanel(noteId) {
+  historyNoteId = noteId;
+  historyList.innerHTML = '<div class="history-loading">Loading\u2026</div>';
+  historyPanel.style.display = '';
+  try {
+    const versions = await apiRequest('GET', `/api/notes/${noteId}/versions`);
+    if (versions.length === 0) {
+      historyList.innerHTML = '<div class="history-empty">No versions saved yet.<br>Versions are created automatically when you update this note.</div>';
+      return;
+    }
+    historyList.innerHTML = versions.map(v => {
+      const d = new Date(v.saved_at.replace(' ', 'T') + 'Z');
+      const label = d.toLocaleString('en-GB', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+      return `<div class="history-item" data-version-id="${v.id}">
+        <div class="history-item-meta">
+          <span class="history-item-date">${label}</span>
+        </div>
+        <div class="history-item-title">${escapeHtml(v.title || 'Untitled')}</div>
+        <button class="btn-restore-version" data-version-id="${v.id}" aria-label="Restore version from ${label}">Restore</button>
+      </div>`;
+    }).join('');
+    historyList.querySelectorAll('.btn-restore-version').forEach(btn => {
+      btn.addEventListener('click', () => restoreVersion(noteId, parseInt(btn.dataset.versionId)));
+    });
+  } catch (e) {
+    historyList.innerHTML = '<div class="history-empty">Failed to load version history.</div>';
+    console.error('Failed to load history', e);
+  }
+}
+
+function closeHistoryPanel() {
+  historyPanel.style.display = 'none';
+  historyNoteId = null;
+}
+
+async function restoreVersion(noteId, versionId) {
+  if (!confirm('Restore this version? The current content will be saved as a new version first.')) return;
+  try {
+    const updated = await apiRequest('POST', `/api/notes/${noteId}/versions/${versionId}/restore`);
+    const idx = notes.findIndex(n => n.id === noteId);
+    if (idx !== -1) notes[idx] = updated;
+    if (currentNoteId === noteId) {
+      const preparedBody = prepareNoteHtml(updated.body);
+      const preparedBodyAfter = prepareNoteHtml(updated.body_after || '');
+      const repairedMarkup = preparedBody !== updated.body ||
+        preparedBodyAfter !== (updated.body_after || '');
+      updated.body = preparedBody;
+      updated.body_after = preparedBodyAfter;
+      noteTitle.textContent = updated.title;
+      noteBody.innerHTML = preparedBody;
+      if (noteBodyAfter) noteBodyAfter.innerHTML = preparedBodyAfter;
+      updateEditorToolbar(updated);
+      if (repairedMarkup) scheduleAutosave();
+    }
+    setAutosave('Restored \u2713');
+    renderList();
+    closeHistoryPanel();
+  } catch (e) {
+    console.error('Failed to restore version', e);
+    alert('Failed to restore version. Please try again.');
+  }
+}
+
+/* ===== Conflict Banner ===== */
+function showConflictBanner() {
+  if (conflictBanner) conflictBanner.style.display = '';
+}
+
+function hideConflictBanner() {
+  if (conflictBanner) conflictBanner.style.display = 'none';
+}
+
+async function deleteConflictCopy() {
+  if (!currentNoteId) return;
+  const note = currentNote();
+  if (!note || !note.conflict_of) return;
+  const id = currentNoteId;
+  try {
+    await apiRequest('DELETE', `/api/conflicts/${id}`);
+    notes = notes.filter(n => n.id !== id);
+    showEditor(false);
+    mainLayout.classList.remove('editor-open');
+    renderList();
+    setAutosave('');
+  } catch (e) {
+    console.error('Failed to delete conflict copy', e);
+  }
+}
+
+/* ===== Autosave ===== */
+function scheduleAutosave() {
+  setAutosave('');
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(saveNote, 1500);
+}
+
+/* ===== Filter / Sort / Search ===== */
+function setFilter(filter) {
+  currentFilter = filter;
+  // Hide folder section in Trash and Conflicts views
+  folderSection.style.display = (filter === 'trashed' || filter === 'conflicts') ? 'none' : '';
+  if (filter === 'trashed' || filter === 'conflicts') currentFolderId = null;
+
+  filterTabs.forEach(t => {
+    const isActive = t.dataset.filter === filter;
+    t.classList.toggle('active', isActive);
+    t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  });
+  if (autosaveTimer && currentNoteId) {
+    clearTimeout(autosaveTimer);
+    autosaveTimer = null;
+  }
+  showEditor(false);
+  mainLayout.classList.remove('editor-open');
+  renderFolderList();
+  loadNotes();
+}
+
+function setFolderFilter(folderId) {
+  currentFolderId = folderId;
+  renderFolderList();
+  loadNotes();
+}
+
+function scheduleSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    searchQuery = searchInput.value.trim();
+    loadNotes();
+  }, SEARCH_DEBOUNCE_MS);
+}
+
+/* ===== Events ===== */
+btnNew.addEventListener('click', createNote);
+
+btnBack.addEventListener('click', () => {
+  clearTimeout(autosaveTimer);
+  autosaveTimer = null;
+  const note = currentNote();
+  if (currentNoteId && note && !note.is_trashed) saveNote();
+  mainLayout.classList.remove('editor-open');
+});
+
+btnPin.addEventListener('click', togglePin);
+btnArchive.addEventListener('click', toggleArchive);
+btnTrash.addEventListener('click', trashNote);
+btnRestore.addEventListener('click', restoreNote);
+
+if (btnExportPdf) {
+  btnExportPdf.addEventListener('click', () => {
+    if (!currentNoteId) return;
+    window.open(`/api/notes/${currentNoteId}/export.pdf`, '_blank');
+  });
+}
+
+btnDeletePermanent.addEventListener('click', () => {
+  if (!currentNoteId) return;
+  dialogOverlay.classList.add('visible');
+});
+
+btnCancelDelete.addEventListener('click', () => {
+  dialogOverlay.classList.remove('visible');
+});
+
+btnConfirmDelete.addEventListener('click', async () => {
+  dialogOverlay.classList.remove('visible');
+  await permanentDelete();
+});
+
+dialogOverlay.addEventListener('click', e => {
+  if (e.target === dialogOverlay) dialogOverlay.classList.remove('visible');
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && dialogOverlay.classList.contains('visible')) {
+    dialogOverlay.classList.remove('visible');
+  }
+});
+
+noteTitle.addEventListener('input', scheduleAutosave);
+noteBody.addEventListener('input', scheduleAutosave);
+if (noteBodyAfter) noteBodyAfter.addEventListener('input', scheduleAutosave);
+
+noteTitle.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    noteBody.focus();
+  }
+});
+
+filterTabs.forEach(tab => {
+  tab.addEventListener('click', () => setFilter(tab.dataset.filter));
+});
+
+searchInput.addEventListener('input', scheduleSearch);
+
+// Clear search on Escape
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    searchInput.value = '';
+    searchQuery = '';
+    loadNotes();
+  }
+});
+
+sortSelect.addEventListener('change', () => {
+  currentSort = sortSelect.value;
+  loadNotes();
+});
+
+noteFolderSelect.addEventListener('change', () => {
+  const raw = noteFolderSelect.value;
+  changeNoteFolder(raw ? parseInt(raw) : null);
+});
+
+// New folder creation
+btnNewFolder.addEventListener('click', () => {
+  newFolderForm.style.display = newFolderForm.style.display === 'none' ? '' : 'none';
+  if (newFolderForm.style.display !== 'none') {
+    newFolderInput.value = '';
+    newFolderInput.focus();
+  }
+});
+
+newFolderInput.addEventListener('keydown', async e => {
+  if (e.key === 'Enter') {
+    const name = newFolderInput.value.trim();
+    if (name) await createFolder(name);
+    newFolderForm.style.display = 'none';
+    newFolderInput.value = '';
+  } else if (e.key === 'Escape') {
+    newFolderForm.style.display = 'none';
+    newFolderInput.value = '';
+  }
+});
+
+// Tag input â€” add tag on Enter or comma
+tagInput.addEventListener('keydown', async e => {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const name = tagInput.value.replace(',', '').trim();
+    if (name) await addTagToNote(name);
+    tagInput.value = '';
+  } else if (e.key === 'Escape') {
+    tagInput.value = '';
+  }
+});
+
+/* ===== Image upload events ===== */
+btnUploadImage.addEventListener('click', () => inputUploadImage.click());
+btnCameraCapture.addEventListener('click', () => inputCameraCapture.click());
+
+inputUploadImage.addEventListener('change', async () => {
+  const file = inputUploadImage.files[0];
+  if (file) await uploadImageFile(file);
+});
+
+inputCameraCapture.addEventListener('change', async () => {
+  const file = inputCameraCapture.files[0];
+  if (file) await uploadImageFile(file);
+});
+
+/* ===== Offline detection ===== */
+function updateOnlineStatus() {
+  offlineBanner.classList.toggle('visible', !navigator.onLine);
+  if (navigator.onLine) {
+    flushQueue().then(() => renderList());
+  } else {
+    updateGlobalSyncStatus();
+  }
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+/* ===== Service Worker ===== */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(console.error);
+  });
+}
+
+/* ===== Init ===== */
+showEditor(false);
+loadFolders();
+loadTags();
+loadNotes();
+if (typeof initAnnotationEditor === 'function') initAnnotationEditor();
+
+// Restore queue state on every startup. IndexedDB survives tab/app restarts.
+Promise.all([getPendingWrites(), getPendingOperations()]).then(([pending, operations]) => {
+  if (pending.length || operations.length) {
+    console.log('[sync] found', pending.length + operations.length, 'pending change(s) on startup');
+    pending.forEach(w => syncStates.set(w.note_id, 'local'));
+    updateGlobalSyncStatus(navigator.onLine ? 'syncing' : 'pending');
+    if (navigator.onLine) flushQueue().then(() => renderList());
+  } else {
+    updateGlobalSyncStatus('synced');
+  }
+}).catch(console.error);
+
+// Autosave indicator click â€” retry failed syncs
+if (autosaveEl) {
+  autosaveEl.addEventListener('click', () => {
+    if (autosaveEl.dataset.syncState === 'failed') {
+      flushRetryCount = 0;
+      flushInProgress = false;
+      flushQueue().then(() => renderList());
+    }
+  });
+}
+
+/* ===== History panel events ===== */
+if (btnHistory) {
+  btnHistory.addEventListener('click', () => {
+    if (currentNoteId) openHistoryPanel(currentNoteId);
+  });
+}
+
+if (btnCloseHistory) {
+  btnCloseHistory.addEventListener('click', closeHistoryPanel);
+}
+
+if (historyPanel) {
+  historyPanel.addEventListener('click', e => {
+    if (e.target === historyPanel) closeHistoryPanel();
+  });
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && historyPanel && historyPanel.style.display !== 'none') {
+    closeHistoryPanel();
+  }
+});
+
+/* ===== Conflict banner events ===== */
+if (btnViewConflicts) {
+  btnViewConflicts.addEventListener('click', () => {
+    hideConflictBanner();
+    setFilter('conflicts');
+  });
+}
+
+if (btnDismissConflictBanner) {
+  btnDismissConflictBanner.addEventListener('click', hideConflictBanner);
+}
+
+if (btnDeleteConflict) {
+  btnDeleteConflict.addEventListener('click', deleteConflictCopy);
+}
+
+/* ===== Formatting toolbar ===== */
+// Track which editable area is currently focused for formatting
+let _fmtTarget = null;
+[noteBody, noteBodyAfter].forEach(el => {
+  if (!el) return;
+  el.addEventListener('focus', () => { _fmtTarget = el; });
+  el.addEventListener('paste', event => {
+    const plainText = event.clipboardData
+      ? event.clipboardData.getData('text/plain')
+      : '';
+
+    // When HTML source is copied from a message/code block, browsers paste it
+    // as literal text. Treat recognisable note markup as rich text instead.
+    if (!NOTE_MARKUP_TAG_RE.test(plainText)) return;
+
+    event.preventDefault();
+    _fmtTarget = el;
+    el.focus();
+    document.execCommand('insertHTML', false, sanitizeNoteHtml(plainText));
+    scheduleAutosave();
+  });
+});
+
+function _applyFmt(cmd, value) {
+  // Restore focus to the note body before executing command
+  if (_fmtTarget) _fmtTarget.focus();
+  else noteBody.focus();
+  document.execCommand(cmd, false, value || null);
+  scheduleAutosave();
+  _updateFmtActiveState();
+}
+
+function _updateFmtActiveState() {
+  if (fmtBtnBold)   fmtBtnBold.classList.toggle('active', document.queryCommandState('bold'));
+  if (fmtBtnItalic) fmtBtnItalic.classList.toggle('active', document.queryCommandState('italic'));
+  if (fmtBtnUnder)  fmtBtnUnder.classList.toggle('active', document.queryCommandState('underline'));
+  if (fmtBtnStrike) fmtBtnStrike.classList.toggle('active', document.queryCommandState('strikeThrough'));
+  if (fmtBtnUl)     fmtBtnUl.classList.toggle('active', document.queryCommandState('insertUnorderedList'));
+  if (fmtBtnOl)     fmtBtnOl.classList.toggle('active', document.queryCommandState('insertOrderedList'));
+}
+
+document.addEventListener('selectionchange', _updateFmtActiveState);
+
+if (fmtBtnBold)   fmtBtnBold.addEventListener('mousedown',   e => { e.preventDefault(); _applyFmt('bold'); });
+if (fmtBtnItalic) fmtBtnItalic.addEventListener('mousedown', e => { e.preventDefault(); _applyFmt('italic'); });
+if (fmtBtnUnder)  fmtBtnUnder.addEventListener('mousedown',  e => { e.preventDefault(); _applyFmt('underline'); });
+if (fmtBtnStrike) fmtBtnStrike.addEventListener('mousedown', e => { e.preventDefault(); _applyFmt('strikeThrough'); });
+if (fmtBtnUl)     fmtBtnUl.addEventListener('mousedown',     e => { e.preventDefault(); _applyFmt('insertUnorderedList'); });
+if (fmtBtnOl)     fmtBtnOl.addEventListener('mousedown',     e => { e.preventDefault(); _applyFmt('insertOrderedList'); });
+if (fmtBtnClear)  fmtBtnClear.addEventListener('mousedown',  e => { e.preventDefault(); _applyFmt('removeFormat'); });
+
+if (fmtColor) {
+  fmtColor.addEventListener('input', () => _applyFmt('foreColor', fmtColor.value));
+}
+
+if (fmtHighlight) {
+  fmtHighlight.addEventListener('input', () => _applyFmt('backColor', fmtHighlight.value));
+}
+
+if (fmtSize) {
+  fmtSize.addEventListener('change', () => {
+    if (!fmtSize.value) return;
+    _applyFmt('fontSize', fmtSize.value);
+    fmtSize.value = '';
+  });
+}

@@ -679,7 +679,24 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: backgrou×^­¢G§²ÚîÆ­yÕx;
+  transition: background 0.12s, color 0.12s;
+  flex-shrink: 0;
+}
+.btn-delete:hover { background: #fdecea; color: var(--danger); }
+
+/* ===== Tag bar ===== */
+.tag-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 28px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  min-height: 40px;
+}
+.tag-chips {
+  display: flex;
   flex-wrap: wrap;
   gap: 5px;
   align-items: center;
