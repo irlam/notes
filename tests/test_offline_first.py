@@ -14,8 +14,15 @@ def test_indexeddb_persists_notes_images_and_operations():
 
 
 def test_offline_mutations_are_queued():
-    for operation in ('create_note', 'trash_note', 'upload_image', 'delete_image'):
+    for operation in ('create_note', 'trash_note', 'upload_image', 'delete_image', 'update_image'):
         assert f"type: '{operation}'" in APP_JS
+
+
+def test_failed_image_fetch_falls_back_to_local_queue():
+    assert APP_JS.count('await queueImageUploadLocally(file)') >= 2
+    annotation_js = (ROOT / 'app' / 'static' / 'js' / 'annotation.js').read_text(encoding='utf-8')
+    assert 'await saveImageUpdateLocally' in annotation_js
+    assert "annStatusEl.textContent = 'Saved locally'" in annotation_js
 
 
 def test_queued_edits_include_conflict_base_timestamp():
@@ -29,7 +36,7 @@ def test_reconnect_and_startup_flush_durable_queue():
 
 
 def test_service_worker_caches_full_install_shell():
-    assert "CACHE_NAME = 'notes-v5'" in SW_JS
+    assert "CACHE_NAME = 'notes-v6'" in SW_JS
     for asset in (
         '/dashboard', '/static/css/style.css', '/static/js/app.js',
         '/static/manifest.json', '/static/icons/favicon.ico',

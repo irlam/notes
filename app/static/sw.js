@@ -1,4 +1,4 @@
-const CACHE_NAME = 'notes-v5';
+const CACHE_NAME = 'notes-v6';
 const APP_SHELL = [
   '/',
   '/dashboard',

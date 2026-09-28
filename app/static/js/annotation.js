@@ -590,6 +590,16 @@ async function annSave() {
     annotation_data: JSON.stringify({ version: 1, strokes: annState.strokes }),
   };
 
+  if (!navigator.onLine || String(annState.imageId).startsWith('local-')) {
+    await saveImageUpdateLocally(annState.noteId, annState.imageId, payload);
+    annState.dirty = false;
+    if (annStatusEl) annStatusEl.textContent = 'Saved locally';
+    if (typeof renderImageBlocks === 'function') renderImageBlocks();
+    annState.saving = false;
+    annSaveBtn.disabled = false;
+    return;
+  }
+
   try {
     const res = await fetch(
       `/api/notes/${annState.noteId}/images/${annState.imageId}`,
@@ -617,7 +627,10 @@ async function annSave() {
     // Re-render image blocks to update preview
     if (typeof renderImageBlocks === 'function') renderImageBlocks();
   } catch (err) {
-    if (annStatusEl) annStatusEl.textContent = 'Save failed';
+    await saveImageUpdateLocally(annState.noteId, annState.imageId, payload);
+    annState.dirty = false;
+    if (annStatusEl) annStatusEl.textContent = 'Saved locally';
+    if (typeof renderImageBlocks === 'function') renderImageBlocks();
     console.error('Annotation save failed', err);
   } finally {
     annState.saving = false;

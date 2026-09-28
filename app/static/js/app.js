@@ -254,6 +254,20 @@ async function getCachedImages(noteId) {
   return all.filter(image => image.note_id === noteId && !image.locally_deleted);
 }
 
+async function saveImageUpdateLocally(noteId, imageId, changes) {
+  const image = images.find(item => item.id === imageId);
+  if (image) {
+    Object.assign(image, changes);
+    await idbPut('cached_images', {
+      ...image,
+      cache_key: image.cache_key || `${noteId}:${imageId}`,
+      note_id: noteId,
+      cached_at: Date.now(),
+    });
+  }
+  await queueOperation({ type: 'update_image', note_id: noteId, image_id: imageId, payload: changes });
+}
+
 async function replaceLocalNoteId(localId, serverNote) {
   await idbDelete('cached_notes', localId);
   await idbPut('cached_notes', { ...serverNote, cached_at: Date.now() });
@@ -278,6 +292,7 @@ async function replaceLocalNoteId(localId, serverNote) {
 async function flushOperations() {
   const pending = (await getPendingOperations()).sort((a, b) => a.queued_at - b.queued_at);
   const noteIds = new Map();
+  const imageIds = new Map();
   for (const op of pending) {
     const noteId = noteIds.get(op.note_id) || op.note_id;
     if (op.type === 'create_note') {
@@ -294,10 +309,19 @@ async function flushOperations() {
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const uploaded = await response.json();
+      imageIds.set(op.local_image_id, uploaded.id);
+      const remaining = await getPendingOperations();
+      for (const queued of remaining.filter(item => item.image_id === op.local_image_id)) {
+        await idbPut('pending_ops', { ...queued, note_id: noteId, image_id: uploaded.id });
+      }
       await idbDelete('cached_images', `${op.note_id}:${op.local_image_id}`);
       await idbPut('cached_images', { ...uploaded, cache_key: `${noteId}:${uploaded.id}`, note_id: noteId });
     } else if (op.type === 'delete_image') {
-      await apiRequest('DELETE', `/api/notes/${noteId}/images/${op.image_id}`);
+      const imageId = imageIds.get(op.image_id) || op.image_id;
+      await apiRequest('DELETE', `/api/notes/${noteId}/images/${imageId}`);
+    } else if (op.type === 'update_image') {
+      const imageId = imageIds.get(op.image_id) || op.image_id;
+      await apiRequest('PUT', `/api/notes/${noteId}/images/${imageId}`, op.payload);
     }
     await idbDelete('pending_ops', op.op_id);
   }
@@ -1227,12 +1251,21 @@ function renderImageBlocks() {
     captionArea.addEventListener('blur', async () => {
       const newCaption = captionArea.value;
       if (newCaption === (img.caption || '')) return;
+      if (!navigator.onLine || String(img.id).startsWith('local-')) {
+        await saveImageUpdateLocally(currentNoteId, img.id, { caption: newCaption });
+        img.caption = newCaption;
+        setImageStatus('Saved locally — text will sync when reconnected.');
+        return;
+      }
       try {
         const updated = await apiRequest('PUT',
           `/api/notes/${currentNoteId}/images/${img.id}`,
           { caption: newCaption });
         img.caption = updated.caption;
       } catch (e) {
+        await saveImageUpdateLocally(currentNoteId, img.id, { caption: newCaption });
+        img.caption = newCaption;
+        setImageStatus('Saved locally — text will sync when reconnected.');
         console.error('Failed to save image caption', e);
       }
     });
@@ -1248,12 +1281,21 @@ function renderImageBlocks() {
     sectionTextArea.addEventListener('blur', async () => {
       const newText = sectionTextArea.value;
       if (newText === (img.section_text || '')) return;
+      if (!navigator.onLine || String(img.id).startsWith('local-')) {
+        await saveImageUpdateLocally(currentNoteId, img.id, { section_text: newText });
+        img.section_text = newText;
+        setImageStatus('Saved locally — text will sync when reconnected.');
+        return;
+      }
       try {
         const updated = await apiRequest('PUT',
           `/api/notes/${currentNoteId}/images/${img.id}`,
           { section_text: newText });
         img.section_text = updated.section_text;
       } catch (e) {
+        await saveImageUpdateLocally(currentNoteId, img.id, { section_text: newText });
+        img.section_text = newText;
+        setImageStatus('Saved locally — text will sync when reconnected.');
         console.error('Failed to save image section text', e);
       }
     });
@@ -1303,26 +1345,31 @@ async function loadImages(noteId) {
   }
 }
 
+async function queueImageUploadLocally(file) {
+  const localImageId = `local-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const localImage = {
+    id: localImageId, note_id: currentNoteId, file, filename: file.name,
+    original_filename: file.name, mime_type: file.type, url: URL.createObjectURL(file),
+    caption: '', section_text: '', annotation_data: null,
+    position: images.length, cache_key: `${currentNoteId}:${localImageId}`,
+  };
+  images.push(localImage);
+  await idbPut('cached_images', localImage);
+  await queueOperation({
+    type: 'upload_image', note_id: currentNoteId, local_image_id: localImageId,
+    file, file_name: file.name || `photo-${Date.now()}.jpg`,
+  });
+  renderImageBlocks();
+  setImageStatus('Saved locally — image will upload when reconnected.');
+}
+
 async function uploadImageFile(file) {
   if (!currentNoteId || !file) return;
   const note = currentNote();
   if (!note || note.is_trashed) return;
 
   if (!navigator.onLine) {
-    const localImageId = `local-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    const localImage = {
-      id: localImageId, note_id: currentNoteId, file, filename: file.name,
-      mime_type: file.type, url: URL.createObjectURL(file), caption: '', section_text: '',
-      position: images.length, cache_key: `${currentNoteId}:${localImageId}`,
-    };
-    images.push(localImage);
-    await idbPut('cached_images', localImage);
-    await queueOperation({
-      type: 'upload_image', note_id: currentNoteId, local_image_id: localImageId,
-      file, file_name: file.name,
-    });
-    renderImageBlocks();
-    setImageStatus('Saved locally — image will upload when reconnected.');
+    await queueImageUploadLocally(file);
     inputUploadImage.value = '';
     inputCameraCapture.value = '';
     return;
@@ -1415,8 +1462,7 @@ async function uploadImageFile(file) {
     renderImageBlocks();
     setImageStatus('');
   } catch (e) {
-    const detail = e && e.message ? ` (${e.message})` : '';
-    setImageStatus(`Could not reach the upload endpoint${detail}.`, true);
+    await queueImageUploadLocally(file);
     console.error('Image upload fetch failed', {
       error: e,
       url: uploadUrl.toString(),
