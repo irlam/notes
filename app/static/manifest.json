@@ -2,8 +2,11 @@
   "name": "Notes",
   "short_name": "Notes",
   "description": "Personal notes app",
-  "start_url": "/",
+  "id": "/",
+  "start_url": "/dashboard",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#ffffff",
   "theme_color": "#f5a623",
   "icons": [

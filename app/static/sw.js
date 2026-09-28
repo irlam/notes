@@ -1,12 +1,21 @@
-const CACHE_NAME = 'notes-v3';
+const CACHE_NAME = 'notes-v4';
 const APP_SHELL = [
+  '/',
   '/dashboard',
   '/static/css/style.css',
   '/static/js/app.js',
   '/static/js/annotation.js',
   '/static/manifest.json',
+  '/static/icons/favicon.ico',
+  '/static/icons/favicon-16x16.png',
+  '/static/icons/favicon-32x32.png',
+  '/static/icons/apple-touch-icon.png',
   '/static/icons/icon-192x192.png',
-  '/static/icons/icon-512x512.png'
+  '/static/icons/icon-512x512.png',
+  '/static/icons/android-chrome-192x192.png',
+  '/static/icons/android-chrome-512x512.png',
+  '/static/icons/maskable-icon-192x192.png',
+  '/static/icons/maskable-icon-512x512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -64,9 +73,11 @@ self.addEventListener('fetch', event => {
       }
       return response;
     }).catch(() =>
-      caches.match(event.request).then(cached =>
-        cached || new Response('Offline', { status: 503 })
-      )
+      caches.match(event.request).then(cached => {
+        if (cached) return cached;
+        if (event.request.mode === 'navigate') return caches.match('/dashboard');
+        return new Response('Offline', { status: 503 });
+      })
     )
   );
 });
