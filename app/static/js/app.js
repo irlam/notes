@@ -382,6 +382,7 @@ const noteBody = document.getElementById('note-body');
 const noteBodyAfter = document.getElementById('note-body-after');
 const autosaveEl = document.getElementById('autosave-indicator');
 const offlineBanner = document.getElementById('offline-banner');
+const btnInstallApp = document.getElementById('btn-install-app');
 const btnNew = document.getElementById('btn-new');
 const btnBack = document.getElementById('btn-back');
 const btnPin = document.getElementById('btn-pin');
@@ -1787,6 +1788,38 @@ function updateOnlineStatus() {
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 updateOnlineStatus();
+
+/* ===== PWA installation ===== */
+let deferredInstallPrompt = null;
+const isInstalledPwa = window.matchMedia('(display-mode: standalone)').matches ||
+  window.navigator.standalone === true;
+if (btnInstallApp && isInstalledPwa) btnInstallApp.hidden = true;
+
+window.addEventListener('beforeinstallprompt', event => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  if (btnInstallApp) btnInstallApp.hidden = false;
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  if (btnInstallApp) btnInstallApp.hidden = true;
+});
+
+if (btnInstallApp) {
+  btnInstallApp.addEventListener('click', async () => {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      return;
+    }
+    const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    alert(isiOS
+      ? 'To install Notes: tap the Share button, then choose Add to Home Screen.'
+      : 'Open your browser menu and choose Install Notes or Add to home screen.');
+  });
+}
 
 /* ===== Service Worker ===== */
 if ('serviceWorker' in navigator) {

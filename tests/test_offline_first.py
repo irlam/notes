@@ -29,7 +29,7 @@ def test_reconnect_and_startup_flush_durable_queue():
 
 
 def test_service_worker_caches_full_install_shell():
-    assert "CACHE_NAME = 'notes-v4'" in SW_JS
+    assert "CACHE_NAME = 'notes-v5'" in SW_JS
     for asset in (
         '/dashboard', '/static/css/style.css', '/static/js/app.js',
         '/static/manifest.json', '/static/icons/favicon.ico',
